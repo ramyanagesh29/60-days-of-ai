@@ -1,0 +1,104 @@
+<svg viewBox="0 0 1200 1500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="genericCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="personalCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="1500" fill="url(#bg)"/>
+
+  <!-- Header -->
+  <text x="600" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="42" font-weight="bold" fill="#ffffff">Same Request. Different Prompt.</text>
+  <text x="600" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#94a3b8">Why context changes everything in AI-generated learning plans</text>
+
+  <!-- Divider -->
+  <line x1="600" y1="150" x2="600" y2="1240" stroke="#475569" stroke-width="2" stroke-dasharray="6,6"/>
+
+  <!-- Column headers -->
+  <rect x="60" y="170" width="500" height="60" rx="12" fill="#475569"/>
+  <text x="310" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#e2e8f0">🧩 Generic Prompt</text>
+
+  <rect x="640" y="170" width="500" height="60" rx="12" fill="url(#personalCard)"/>
+  <text x="890" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#ffffff">🎯 Context-Rich Prompt</text>
+
+  <!-- Prompt snippets -->
+  <rect x="60" y="250" width="500" height="90" rx="10" fill="#1e293b" stroke="#475569"/>
+  <text x="80" y="280" font-family="monospace" font-size="15" fill="#94a3b8">"Create a 30-day learning</text>
+  <text x="80" y="302" font-family="monospace" font-size="15" fill="#94a3b8">roadmap." + topic only</text>
+  <text x="80" y="324" font-family="monospace" font-size="15" fill="#64748b" font-style="italic">(no role, goal, or style given)</text>
+
+  <rect x="640" y="250" width="500" height="90" rx="10" fill="#7c2d12" stroke="#f97316"/>
+  <text x="660" y="280" font-family="monospace" font-size="15" fill="#fed7aa">Role: Student · Goal: Full Stack Dev</text>
+  <text x="660" y="302" font-family="monospace" font-size="15" fill="#fed7aa">Time: 1hr/day · Style: Mixed</text>
+  <text x="660" y="324" font-family="monospace" font-size="15" fill="#fdba74" font-style="italic">(full context supplied upfront)</text>
+
+  <!-- Comparison rows -->
+  <!-- Row: Structure -->
+  <text x="60" y="380" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#38bdf8">STRUCTURE</text>
+  <rect x="60" y="392" width="500" height="80" rx="10" fill="url(#genericCard)"/>
+  <text x="80" y="420" font-family="Arial, sans-serif" font-size="15" fill="#cbd5e1">4 weeks: Java basics → OOP →</text>
+  <text x="80" y="442" font-family="Arial, sans-serif" font-size="15" fill="#cbd5e1">Collections/Files → Testing/Capstone</text>
+  <text x="80" y="462" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Deep, single-track: Java only</text>
+
+  <rect x="640" y="392" width="500" height="80" rx="10" fill="#7c2d12" opacity="0.85"/>
+  <text x="660" y="420" font-family="Arial, sans-serif" font-size="15" fill="#fed7aa">4 weeks: Java core → Spring Boot API →</text>
+  <text x="660" y="442" font-family="Arial, sans-serif" font-size="15" fill="#fed7aa">Frontend + connect → Full-stack capstone</text>
+  <text x="660" y="462" font-family="Arial, sans-serif" font-size="14" fill="#fdba74">Broad, multi-layer: backend + frontend + DB</text>
+
+  <!-- Row: Resources -->
+  <text x="60" y="510" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#38bdf8">RESOURCES</text>
+  <rect x="60" y="522" width="500" height="70" rx="10" fill="url(#genericCard)"/>
+  <text x="80" y="550" font-family="Arial, sans-serif" font-size="15" fill="#cbd5e1">Mostly docs &amp; text tutorials</text>
+  <text x="80" y="572" font-family="Arial, sans-serif" font-size="14" fill="#64748b">One-size-fits-all reading list</text>
+
+  <rect x="640" y="522" width="500" height="70" rx="10" fill="#7c2d12" opacity="0.85"/>
+  <text x="660" y="550" font-family="Arial, sans-serif" font-size="15" fill="#fed7aa">Videos + docs + hands-on projects</text>
+  <text x="660" y="572" font-family="Arial, sans-serif" font-size="14" fill="#fdba74">Matched to stated learning style</text>
+
+  <!-- Row: Projects -->
+  <text x="60" y="622" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#38bdf8">PROJECTS</text>
+  <rect x="60" y="634" width="500" height="80" rx="10" fill="url(#genericCard)"/>
+  <text x="80" y="662" font-family="Arial, sans-serif" font-size="15" fill="#cbd5e1">Number Guesser → Library System →</text>
+  <text x="80" y="684" font-family="Arial, sans-serif" font-size="15" fill="#cbd5e1">Expense Tracker → Task Manager CLI</text>
+  <text x="80" y="704" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Console apps only</text>
+
+  <rect x="640" y="634" width="500" height="80" rx="10" fill="#7c2d12" opacity="0.85"/>
+  <text x="660" y="662" font-family="Arial, sans-serif" font-size="15" fill="#fed7aa">Grade Manager → Task API →</text>
+  <text x="660" y="684" font-family="Arial, sans-serif" font-size="15" fill="#fed7aa">Full-Stack Task App → Expense Tracker (capstone)</text>
+  <text x="660" y="704" font-family="Arial, sans-serif" font-size="14" fill="#fdba74">Real deployable, portfolio-ready apps</text>
+
+  <!-- Row: Outcome -->
+  <text x="60" y="752" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#38bdf8">FINAL OUTCOME</text>
+  <rect x="60" y="764" width="500" height="90" rx="10" fill="url(#genericCard)"/>
+  <text x="80" y="792" font-family="Arial, sans-serif" font-size="15" fill="#cbd5e1">Solid Java fundamentals,</text>
+  <text x="80" y="814" font-family="Arial, sans-serif" font-size="15" fill="#cbd5e1">one GitHub project</text>
+  <text x="80" y="836" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Good foundation, no career direction</text>
+
+  <rect x="640" y="764" width="500" height="90" rx="10" fill="#7c2d12" opacity="0.85"/>
+  <text x="660" y="792" font-family="Arial, sans-serif" font-size="15" fill="#fed7aa">Working full-stack app end-to-end,</text>
+  <text x="660" y="814" font-family="Arial, sans-serif" font-size="15" fill="#fed7aa">two GitHub projects, clear next steps</text>
+  <text x="660" y="836" font-family="Arial, sans-serif" font-size="14" fill="#fdba74">Aligned directly with career goal</text>
+
+  <!-- Bottom insight banner -->
+  <rect x="60" y="900" width="1080" height="270" rx="16" fill="#0c4a6e" stroke="#38bdf8" stroke-width="2"/>
+  <text x="600" y="945" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="bold" fill="#e0f2fe">💡 The Real Lesson: Context &gt; Prompt Length</text>
+
+  <text x="90" y="985" font-family="Arial, sans-serif" font-size="16" fill="#bae6fd">✓ Naming the ROLE (student) shaped realistic pacing</text>
+  <text x="90" y="1015" font-family="Arial, sans-serif" font-size="16" fill="#bae6fd">✓ Naming the GOAL (full stack, not just "Java") added an entire frontend layer</text>
+  <text x="90" y="1045" font-family="Arial, sans-serif" font-size="16" fill="#bae6fd">✓ Naming the LEARNING STYLE changed every resource recommendation</text>
+  <text x="90" y="1075" font-family="Arial, sans-serif" font-size="16" fill="#bae6fd">✓ Same time budget (1hr/day) forced an honest tradeoff: depth vs. breadth</text>
+  <text x="90" y="1115" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#f0f9ff">Takeaway: A generic prompt gets you A plan.</text>
+  <text x="90" y="1145" font-family="Arial, sans-serif" font-size="17" font-weight="bold" fill="#f0f9ff">A context-rich prompt gets you YOUR plan.</text>
+
+  <!-- Footer -->
+  <text x="600" y="1230" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Generated with Claude · #PromptEngineering #JavaDeveloper #LearningInPublic</text>
+</svg>
