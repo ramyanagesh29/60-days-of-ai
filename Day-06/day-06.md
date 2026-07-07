@@ -22,10 +22,10 @@ Claude analyzed my resume and suggested improvements for:
 ## ATS Score
 
 Previous Score:
-(Add Claude's score)
+52
 
 Optimized Score:
-(Add Claude's score)
+94
 
 ---
 
