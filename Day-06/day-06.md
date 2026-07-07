@@ -45,3 +45,9 @@ Optimized Score:
 A well-structured resume isn't just about good design—it should also be optimized for Applicant Tracking Systems (ATS) while clearly highlighting skills, experience, and projects.
 
 This exercise taught me how AI can help create a more effective and recruiter-friendly resume.
+
+## Infographic
+
+The following infographic summarizes the key concepts of AI Resume Optimization and highlights how AI improves ATS compatibility and recruiter readability.
+
+![AI Resume Optimizer](AI_Resume_Optimizer_Infographic.png)
