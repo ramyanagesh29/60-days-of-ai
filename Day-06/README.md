@@ -16,6 +16,7 @@ For Day 6 of the ABTalks 60-Day Claude Challenge, I used Claude to analyze and o
 
 - day6.md
 - Original_Resume.pdf
+- 🖼 AI Resume Optimizer Infographic
 - Optimized_Resume.pdf
 
 ---
