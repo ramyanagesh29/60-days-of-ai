@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Environmental Health Analyzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0A0D12;
+    --panel:#11151C;
+    --panel-2:#161B24;
+    --border:#222836;
+    --border-soft:#1A1F2B;
+    --text:#E7ECF2;
+    --text-dim:#8993A6;
+    --text-faint:#5B6478;
+    --teal:#2DD4BF;
+    --teal-dim:rgba(45,212,191,0.12);
+    --good:#4ADE80;
+    --moderate:#FBBF24;
+    --usg:#FB923C;
+    --unhealthy:#F87171;
+    --vunhealthy:#C084FC;
+    --hazardous:#FB7185;
+    --radius:14px;
+    --radius-sm:9px;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(45,212,191,0.07), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(192,132,252,0.05), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+  ::selection{background:var(--teal-dim); color:var(--teal);}
+  a,button,input,select{font-family:inherit;}
+  button{cursor:pointer;}
+  :focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+  /* ---------- GATE ---------- */
+  #gate{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:24px; position:relative; overflow:hidden;
+  }
+  .gate-card{
+    width:100%; max-width:520px; text-align:center; position:relative; z-index:2;
+    animation:riseIn 0.7s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes riseIn{from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);}}
+  .gate-eyebrow{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--teal); margin-bottom:18px; display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .gate-eyebrow::before, .gate-eyebrow::after{content:''; width:26px; height:1px; background:linear-gradient(90deg, transparent, var(--teal));}
+  .gate-eyebrow::after{background:linear-gradient(90deg, var(--teal), transparent);}
+  .gate-title{
+    font-family:var(--font-display); font-weight:600; font-size:clamp(28px,5vw,42px);
+    line-height:1.15; margin-bottom:14px; letter-spacing:-0.01em;
+  }
+  .gate-title span{color:var(--teal);}
+  .gate-sub{color:var(--text-dim); font-size:15px; line-height:1.6; margin-bottom:36px; max-width:440px; margin-inline:auto;}
+  .gate-form{display:flex; gap:10px; margin-bottom:18px;}
+  .gate-input{
+    flex:1; background:var(--panel); border:1px solid var(--border); color:var(--text);
+    padding:14px 16px; border-radius:var(--radius-sm); font-size:15px; font-family:var(--font-body);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .gate-input::placeholder{color:var(--text-faint);}
+  .gate-input:focus{border-color:var(--teal); box-shadow:0 0 0 3px var(--teal-dim);}
+  .gate-btn{
+    background:var(--teal); color:#04201C; border:none; padding:14px 22px; border-radius:var(--radius-sm);
+    font-weight:600; font-size:14px; white-space:nowrap; transition:transform .15s, box-shadow .15s;
+  }
+  .gate-btn:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(45,212,191,0.25);}
+  .gate-btn:active{transform:translateY(0);}
+  .gate-chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
+  .chip{
+    background:var(--panel); border:1px solid var(--border); color:var(--text-dim);
+    padding:7px 13px; border-radius:99px; font-size:12.5px; transition:all .15s;
+  }
+  .chip:hover{border-color:var(--teal); color:var(--teal);}
+  .gate-note{margin-top:28px; font-size:11.5px; color:var(--text-faint); font-family:var(--font-mono);}
+
+  /* ---------- DASHBOARD ---------- */
+  #dashboard{display:none; max-width:1320px; margin:0 auto; padding:22px 22px 60px;}
+  header.topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:14px 4px 22px; border-bottom:1px solid var(--border-soft); margin-bottom:22px; flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:11px;}
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px; background:linear-gradient(145deg, var(--teal), #0EA5A0);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .brand-mark svg{width:18px; height:18px;}
+  .brand-text .t1{font-family:var(--font-display); font-weight:600; font-size:15.5px; line-height:1.2;}
+  .brand-text .t2{font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); letter-spacing:.06em;}
+  .topbar-actions{display:flex; align-items:center; gap:10px;}
+  .city-pill{
+    display:flex; align-items:center; gap:8px; background:var(--panel); border:1px solid var(--border);
+    padding:8px 8px 8px 14px; border-radius:99px; font-size:13.5px;
+  }
+  .city-pill b{font-weight:600;}
+  .change-btn{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim);
+    padding:6px 12px; border-radius:99px; font-size:12px; transition:all .15s;
+  }
+  .change-btn:hover{color:var(--teal); border-color:var(--teal);}
+
+  /* Executive summary hero */
+  .exec-hero{
+    display:grid; grid-template-columns:auto 1fr; gap:32px; align-items:center;
+    background:linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
+    border:1px solid var(--border); border-radius:var(--radius); padding:28px 32px; margin-bottom:24px;
+    position:relative; overflow:hidden;
+  }
+  .exec-hero::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(circle at 85% 20%, rgba(45,212,191,0.06), transparent 60%);
+  }
+  .gauge-wrap{position:relative; z-index:1;}
+  #gaugeSvg{display:block; animation:breathe 4.5s ease-in-out infinite;}
+  @keyframes breathe{0%,100%{transform:scale(1);} 50%{transform:scale(1.035);}}
+  .gauge-center{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .gauge-num{font-family:var(--font-mono); font-weight:600; font-size:34px; line-height:1;}
+  .gauge-label{font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); margin-top:4px;}
+  .exec-body{position:relative; z-index:1; min-width:0;}
+  .exec-eyebrow{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--teal); margin-bottom:10px;
+  }
+  .exec-headline{font-family:var(--font-display); font-weight:600; font-size:22px; margin-bottom:10px; line-height:1.3;}
+  .exec-text{color:var(--text-dim); font-size:14px; line-height:1.65; max-width:640px;}
+  .exec-text b{color:var(--text); font-weight:600;}
+  .exec-tags{display:flex; gap:8px; margin-top:16px; flex-wrap:wrap;}
+  .tag{
+    font-family:var(--font-mono); font-size:11px; padding:5px 10px; border-radius:6px;
+    border:1px solid var(--border); color:var(--text-dim); background:var(--bg);
+  }
+
+  /* Metric cards */
+  .section-label{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--text-faint); margin:30px 0 14px; display:flex; align-items:center; gap:10px;
+  }
+  .section-label::after{content:''; flex:1; height:1px; background:var(--border-soft);}
+  .cards-grid{display:grid; grid-template-columns:repeat(6, 1fr); gap:12px;}
+  .metric-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:16px; transition:border-color .2s, transform .2s; cursor:default; position:relative; overflow:hidden;
+  }
+  .metric-card:hover{border-color:#2b3242; transform:translateY(-2px);}
+  .metric-card .bar{position:absolute; left:0; top:0; bottom:0; width:3px;}
+  .metric-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;}
+  .metric-icon{width:26px; height:26px; opacity:.85;}
+  .metric-delta{font-family:var(--font-mono); font-size:10.5px; padding:2px 6px; border-radius:5px;}
+  .metric-delta.up{color:var(--unhealthy); background:rgba(248,113,113,0.1);}
+  .metric-delta.down{color:var(--good); background:rgba(74,222,128,0.1);}
+  .metric-val{font-family:var(--font-mono); font-weight:600; font-size:24px; line-height:1;}
+  .metric-unit{font-size:11px; color:var(--text-faint); margin-left:3px;}
+  .metric-name{font-size:12px; color:var(--text-dim); margin-top:6px;}
+
+  /* Filters */
+  .filters-bar{
+    display:flex; align-items:flex-end; gap:22px; flex-wrap:wrap;
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:16px 20px; margin-top:14px;
+  }
+  .filter-group{display:flex; flex-direction:column; gap:7px;}
+  .filter-group label{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint);}
+  select.filter-input{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    padding:9px 12px; border-radius:8px; font-size:13px; min-width:170px;
+  }
+  .pollutant-toggle{display:flex; gap:6px;}
+  .ptbtn{
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text-dim);
+    padding:8px 13px; border-radius:8px; font-size:12.5px; font-family:var(--font-mono); transition:all .15s;
+  }
+  .ptbtn.active{background:var(--teal-dim); border-color:var(--teal); color:var(--teal);}
+  .ptbtn:hover:not(.active){border-color:#333c4d;}
+  .range-group{display:flex; align-items:center; gap:10px; min-width:220px;}
+  .range-group input[type=range]{flex:1; accent-color:var(--teal);}
+  .range-val{font-family:var(--font-mono); font-size:12.5px; color:var(--teal); min-width:32px; text-align:right;}
+  .filter-reset{
+    margin-left:auto; background:transparent; border:1px solid var(--border); color:var(--text-dim);
+    padding:9px 14px; border-radius:8px; font-size:12.5px; transition:all .15s;
+  }
+  .filter-reset:hover{color:var(--text); border-color:#333c4d;}
+
+  /* Charts */
+  /* Health & Risk Overview */
+  .health-grid{display:grid; grid-template-columns:1.3fr repeat(4, 1fr); gap:12px;}
+  .health-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:18px 16px; display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap:4px; transition:border-color .2s, transform .2s;
+  }
+  .health-card:hover{border-color:#2b3242; transform:translateY(-2px);}
+  .score-card{flex-direction:row; text-align:left; gap:16px; align-items:center; justify-content:flex-start;}
+  .ring-wrap svg{display:block;}
+  .health-card-body{display:flex; flex-direction:column; gap:4px; min-width:0;}
+  .health-card-label{font-size:12px; color:var(--text-dim); font-weight:500;}
+  .health-card-sub{font-size:11px; color:var(--text-faint); line-height:1.4;}
+  .grade-letter{font-family:var(--font-mono); font-weight:700; font-size:36px; line-height:1;}
+  .risk-badge{
+    font-family:var(--font-mono); font-weight:600; font-size:12.5px; padding:5px 12px;
+    border-radius:99px; border:1px solid; margin-bottom:2px;
+  }
+
+  /* Insights & Ranking */
+  .insights-grid{display:grid; grid-template-columns:1.5fr 1fr; gap:16px; margin-top:14px; align-items:start;}
+  .insights-panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:20px;
+  }
+  .insights-panel .chart-title{margin-bottom:14px;}
+  .insight-item{display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--border-soft); align-items:flex-start;}
+  .insight-item:last-child{border-bottom:none; padding-bottom:0;}
+  .insight-dot{width:8px; height:8px; border-radius:50%; margin-top:5px; flex-shrink:0;}
+  .insight-dot.good{background:var(--good);}
+  .insight-dot.warn{background:var(--unhealthy);}
+  .insight-dot.info{background:var(--teal);}
+  .insight-text{font-size:12.5px; color:var(--text-dim); line-height:1.55;}
+
+  /* Recommendations */
+  .reco-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:14px;}
+  .reco-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:16px; display:flex; gap:12px; align-items:flex-start; transition:border-color .2s, transform .2s;
+  }
+  .reco-card:hover{border-color:var(--teal); transform:translateY(-2px);}
+  .reco-icon{font-size:20px; line-height:1; flex-shrink:0;}
+  .reco-title{font-size:13px; font-weight:600; margin-bottom:4px;}
+  .reco-text{font-size:12px; color:var(--text-dim); line-height:1.55;}
+
+  .download-btn{
+    display:flex; align-items:center; gap:6px;
+    background:transparent; border:1px solid var(--teal); color:var(--teal);
+    padding:8px 14px; border-radius:99px; font-size:12.5px; font-weight:600; transition:all .15s;
+  }
+  .download-btn:hover{background:var(--teal-dim);}
+
+  .charts-grid{display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin-top:16px;}
+  .chart-panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:20px;
+  }
+  .chart-panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .chart-title{font-family:var(--font-display); font-size:14.5px; font-weight:600;}
+  .chart-sub{font-size:11px; color:var(--text-faint); font-family:var(--font-mono); margin-top:2px;}
+  .chart-canvas-wrap{height:230px; position:relative;}
+  .chart-canvas-wrap.small{height:200px;}
+
+  /* Ranking */
+  .ranking-panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-top:16px;
+  }
+  table.rank-table{width:100%; border-collapse:collapse; font-size:13px;}
+  .rank-table thead th{
+    text-align:left; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-faint); padding:0 12px 12px; border-bottom:1px solid var(--border-soft); font-weight:500;
+  }
+  .rank-table tbody td{padding:13px 12px; border-bottom:1px solid var(--border-soft);}
+  .rank-table tbody tr{transition:background .15s;}
+  .rank-table tbody tr:hover{background:var(--panel-2);}
+  .rank-table tbody tr.is-focus{background:var(--teal-dim);}
+  .rank-num{font-family:var(--font-mono); color:var(--text-faint); font-size:12px;}
+  .rank-city{font-weight:600;}
+  .rank-city .sub{font-weight:400; color:var(--text-faint); font-size:11px;}
+  .aqi-badge{
+    font-family:var(--font-mono); font-weight:600; font-size:12.5px; padding:4px 10px; border-radius:6px; display:inline-block;
+  }
+  .bar-track{width:100%; height:6px; background:var(--panel-2); border-radius:99px; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:99px;}
+  .empty-row td{text-align:center; color:var(--text-faint); padding:26px; font-family:var(--font-mono); font-size:12px;}
+
+  footer.foot{
+    margin-top:36px; padding-top:18px; border-top:1px solid var(--border-soft);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+    font-size:11px; color:var(--text-faint); font-family:var(--font-mono);
+  }
+
+  @media (max-width:980px){
+    .cards-grid{grid-template-columns:repeat(3,1fr);}
+    .charts-grid{grid-template-columns:1fr;}
+    .exec-hero{grid-template-columns:1fr; text-align:center;}
+    .exec-body{margin:0 auto;}
+    .gauge-wrap{margin:0 auto;}
+    .exec-tags{justify-content:center;}
+    .health-grid{grid-template-columns:repeat(3,1fr);}
+    .insights-grid{grid-template-columns:1fr;}
+    .reco-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media (max-width:640px){
+    .cards-grid{grid-template-columns:repeat(2,1fr);}
+    .gate-form{flex-direction:column;}
+    .filters-bar{flex-direction:column; align-items:stretch;}
+    .filter-reset{margin-left:0;}
+    .topbar-actions{width:100%; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+    .health-grid{grid-template-columns:repeat(2,1fr);}
+    .score-card{grid-column:1 / -1; flex-direction:row;}
+    .reco-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ GATE ============ -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-eyebrow">Environmental Health Analyzer</div>
+    <h1 class="gate-title">What's the air like<br>where <span>you</span> are?</h1>
+    <p class="gate-sub">Enter a city to generate a personal air quality dashboard — live-style AQI, pollutant breakdowns, trends, and a health-focused summary.</p>
+    <form class="gate-form" id="gateForm">
+      <input class="gate-input" id="cityInput" type="text" placeholder="e.g. Bengaluru, Delhi, London…" autocomplete="off" autofocus>
+      <button class="gate-btn" type="submit">Analyze air →</button>
+    </form>
+    <div class="gate-chips" id="gateChips"></div>
+    <p class="gate-note">MODELED ESTIMATES — FOR DEMONSTRATION, NOT LIVE SENSOR DATA</p>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="dashboard">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 12c3-4 6-4 9 0s6 4 9 0" stroke="#04201C" stroke-width="2" stroke-linecap="round"/>
+          <path d="M3 17c3-4 6-4 9 0s6 4 9 0" stroke="#04201C" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <div class="t1">Environmental Health Analyzer</div>
+        <div class="t2">PERSONAL AIR QUALITY DASHBOARD</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="city-pill">📍 <b id="pillCity">—</b></div>
+      <button class="download-btn" id="downloadBtn">⬇ Download report</button>
+      <button class="change-btn" id="changeCityBtn">Change city</button>
+    </div>
+  </header>
+
+  <!-- Executive Summary -->
+  <section class="exec-hero">
+    <div class="gauge-wrap">
+      <svg id="gaugeSvg" width="150" height="150" viewBox="0 0 150 150"></svg>
+      <div class="gauge-center">
+        <div class="gauge-num" id="gaugeNum">—</div>
+        <div class="gauge-label">AQI now</div>
+      </div>
+    </div>
+    <div class="exec-body">
+      <div class="exec-eyebrow">Executive Summary</div>
+      <h2 class="exec-headline" id="execHeadline">Analyzing…</h2>
+      <p class="exec-text" id="execText"></p>
+      <div class="exec-tags" id="execTags"></div>
+    </div>
+  </section>
+
+  <!-- Health & Risk Overview -->
+  <div class="section-label">Health &amp; Risk Overview</div>
+  <div class="health-grid" id="healthGrid"></div>
+
+  <!-- Metric Cards -->
+  <div class="section-label">Air Quality Metrics</div>
+  <div class="cards-grid" id="cardsGrid"></div>
+
+  <!-- Filters -->
+  <div class="section-label">Filters</div>
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Focus city</label>
+      <select class="filter-input" id="cityFilter"></select>
+    </div>
+    <div class="filter-group">
+      <label>Pollutant / metric</label>
+      <div class="pollutant-toggle" id="pollutantToggle"></div>
+    </div>
+    <div class="filter-group">
+      <label>Max AQI in ranking: <span class="range-val" id="aqiRangeVal">500</span></label>
+      <div class="range-group">
+        <input type="range" id="aqiRange" min="0" max="500" value="500">
+      </div>
+    </div>
+    <button class="filter-reset" id="resetFilters">Reset filters</button>
+  </div>
+
+  <!-- Charts -->
+  <div class="section-label">Trends</div>
+  <div class="charts-grid">
+    <div class="chart-panel">
+      <div class="chart-panel-head">
+        <div>
+          <div class="chart-title" id="trendTitle">AQI — 14 day trend</div>
+          <div class="chart-sub" id="trendSub">Daily modeled reading</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="chart-panel">
+      <div class="chart-panel-head">
+        <div>
+          <div class="chart-title">PM2.5 vs PM10</div>
+          <div class="chart-sub">µg/m³, last 7 days</div>
+        </div>
+      </div>
+      <div class="chart-canvas-wrap"><canvas id="pmChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Ranking & Insights -->
+  <div class="section-label">City Ranking &amp; Insights</div>
+  <div class="insights-grid">
+    <div class="ranking-panel">
+      <table class="rank-table">
+        <thead>
+          <tr><th>#</th><th>City</th><th>AQI</th><th>Category</th><th>PM2.5</th><th>Dominant pollutant</th></tr>
+        </thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+    </div>
+    <div class="insights-panel">
+      <div class="chart-title">Auto-generated insights</div>
+      <div id="insightsList"></div>
+    </div>
+  </div>
+
+  <!-- Recommendations -->
+  <div class="section-label">Personalized Recommendations</div>
+  <div class="reco-grid" id="recoGrid"></div>
+
+  <footer class="foot">
+    <span>Personal Environmental Health Analyzer · Data model v1</span>
+    <span id="footTimestamp"></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+
+// ---------------- Seeded RNG ----------------
+function hashStr(s){
+  let h = 2166136261;
+  for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h,16777619); }
+  return h >>> 0;
+}
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+
+// ---------------- AQI reference ----------------
+const AQI_LEVELS = [
+  {max:50,  name:'Good',                       color:'var(--good)',       hex:'#4ADE80'},
+  {max:100, name:'Moderate',                   color:'var(--moderate)',   hex:'#FBBF24'},
+  {max:150, name:'Unhealthy (Sensitive)',       color:'var(--usg)',        hex:'#FB923C'},
+  {max:200, name:'Unhealthy',                   color:'var(--unhealthy)',  hex:'#F87171'},
+  {max:300, name:'Very Unhealthy',              color:'var(--vunhealthy)', hex:'#C084FC'},
+  {max:500, name:'Hazardous',                   color:'var(--hazardous)',  hex:'#FB7185'}
+];
+function levelFor(aqi){ return AQI_LEVELS.find(l => aqi <= l.max) || AQI_LEVELS[AQI_LEVELS.length-1]; }
+
+// Baseline modeled AQI bias per well-known city (illustrative, not live)
+const CITY_BIAS = {
+  'delhi':175,'new delhi':175,'lahore':180,'dhaka':165,'beijing':135,'kolkata':150,
+  'mumbai':120,'bengaluru':95,'bangalore':95,'jakarta':130,'karachi':160,'cairo':140,
+  'ho chi minh city':110,'hanoi':145,'mexico city':100,'los angeles':80,'shanghai':105,
+  'kathmandu':155,'lima':95,'accra':110,'lagos':115,'riyadh':120,'baghdad':125,
+  'ulaanbaatar':170,'jerusalem':70,'new york':55,'london':48,'paris':52,'berlin':45,
+  'tokyo':50,'seoul':85,'singapore':60,'sydney':38,'toronto':42,'san francisco':48,
+  'chicago':58,'madrid':50,'rome':62,'amsterdam':44,'stockholm':30,'zurich':34,
+  'dubai':105,'moscow':65,'sao paulo':78,'bogota':82,'nairobi':88,'wellington':22,
+  'reykjavik':18,'oslo':28
+};
+const RANKING_POOL = ['Delhi','Lahore','Dhaka','Beijing','Kolkata','Mumbai','Bengaluru','Jakarta',
+  'Cairo','Mexico City','Los Angeles','Shanghai','Kathmandu','New York','London','Paris','Tokyo',
+  'Seoul','Singapore','Sydney','Toronto','Dubai','Moscow','Sao Paulo','Nairobi','Wellington','Reykjavik'];
+
+function baselineFor(cityKey, rand){
+  const known = CITY_BIAS[cityKey];
+  if(known !== undefined) return known;
+  return Math.round(35 + rand()*90); // unlisted cities: moderate-ish random baseline
+}
+
+const POLLUTANTS = [
+  {key:'aqi',  label:'AQI',   unit:'',      icon:'gauge'},
+  {key:'pm25', label:'PM2.5', unit:'µg/m³', icon:'dot'},
+  {key:'pm10', label:'PM10',  unit:'µg/m³', icon:'dot'},
+  {key:'no2',  label:'NO₂',   unit:'ppb',   icon:'dot'},
+  {key:'o3',   label:'O₃',    unit:'ppb',   icon:'dot'},
+];
+
+// ---------------- App State ----------------
+let state = {
+  focusCity: null,
+  cities: {},        // name -> {aqi, pm25, pm10, no2, o3, trend:{aqi:[],pm25:[],pm10:[]}, dominant}
+  activePollutant: 'aqi',
+  maxAqiFilter: 500,
+  charts: {trend:null, pm:null}
+};
+
+// ---------------- Health scoring helpers ----------------
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+function gradeFromScore(score){
+  if(score>=90) return {letter:'A', color:'#4ADE80'};
+  if(score>=80) return {letter:'B', color:'#86EFAC'};
+  if(score>=70) return {letter:'C', color:'#FBBF24'};
+  if(score>=60) return {letter:'D', color:'#FB923C'};
+  return {letter:'F', color:'#F87171'};
+}
+
+function airScoreFromAqi(aqi){
+  const pts = [[0,100],[50,90],[100,75],[150,60],[200,40],[300,20],[500,0]];
+  const a = clamp(aqi,0,500);
+  for(let i=0;i<pts.length-1;i++){
+    const [x0,y0]=pts[i], [x1,y1]=pts[i+1];
+    if(a>=x0 && a<=x1){
+      const t=(a-x0)/(x1-x0);
+      return Math.round(y0 + (y1-y0)*t);
+    }
+  }
+  return 0;
+}
+
+function riskFromScore(score){
+  if(score<30) return {level:'Low', color:'#4ADE80'};
+  if(score<55) return {level:'Moderate', color:'#FBBF24'};
+  if(score<75) return {level:'High', color:'#FB923C'};
+  return {level:'Very High', color:'#F87171'};
+}
+
+function scoreColor(score){ if(score>=80) return '#4ADE80'; if(score>=60) return '#FBBF24'; if(score>=40) return '#FB923C'; return '#F87171'; }
+function scoreVerdict(score){
+  if(score>=80) return 'Excellent overall conditions';
+  if(score>=60) return 'Fair — some caution advised';
+  if(score>=40) return 'Poor — take precautions';
+  return 'Very poor — high risk conditions';
+}
+
+function generateCityData(cityName){
+  const key = cityName.trim().toLowerCase();
+  const rand = mulberry32(hashStr(key + '::env-health'));
+  const base = baselineFor(key, rand);
+  const noise = () => (rand()-0.5) * 18;
+
+  const aqi = Math.max(4, Math.round(base + noise()));
+  const lvl = levelFor(aqi);
+  const pm25 = Math.max(1, Math.round(aqi * 0.45 + rand()*8));
+  const pm10 = Math.max(2, Math.round(pm25 * 1.6 + rand()*10));
+  const no2 = Math.max(1, Math.round(10 + rand()*40));
+  const o3 = Math.max(1, Math.round(15 + rand()*45));
+
+  const pollLevels = {pm25, pm10, no2, o3};
+  const dominant = Object.entries(pollLevels).sort((a,b)=>b[1]-a[1])[0][0];
+
+  // Derived environmental factors
+  const humidity = Math.round(30 + rand()*55); // 30-85%
+  const waterScore = clamp(Math.round(35 + rand()*60), 0, 100); // modeled WQI, 0-100 (higher = better)
+  const airScore = airScoreFromAqi(aqi);
+  const comfortScore = clamp(100 - Math.abs(humidity-45)*1.4, 0, 100);
+  const envHealthScore = clamp(Math.round(airScore*0.55 + waterScore*0.35 + comfortScore*0.10), 0, 100);
+
+  const airGrade = gradeFromScore(airScore);
+  const waterGrade = gradeFromScore(waterScore);
+
+  const hairRiskScore = clamp(aqi*0.22 + (100-waterScore)*0.35 + Math.abs(humidity-50)*0.5, 0, 100);
+  const skinRiskScore = clamp(aqi*0.35 + Math.abs(humidity-45)*0.6, 0, 100);
+  const hairRisk = riskFromScore(hairRiskScore);
+  const skinRisk = riskFromScore(skinRiskScore);
+
+  // 14 day trend, random-walk around base
+  const days = 14;
+  const trend = {aqi:[], pm25:[], pm10:[]};
+  let walkAqi = base;
+  for(let i=0;i<days;i++){
+    walkAqi = Math.max(5, walkAqi + (rand()-0.5)*14);
+    const dayAqi = Math.round(walkAqi);
+    trend.aqi.push(dayAqi);
+    trend.pm25.push(Math.max(1, Math.round(dayAqi*0.45 + (rand()-0.5)*6)));
+    trend.pm10.push(Math.max(2, Math.round(dayAqi*0.45*1.6 + (rand()-0.5)*8)));
+  }
+
+  return {
+    name: cityName.trim().replace(/\s+/g,' ').replace(/\b\w/g, c=>c.toUpperCase()),
+    aqi, level: lvl, pm25, pm10, no2, o3, dominant, trend,
+    humidity, waterScore, airScore, envHealthScore, airGrade, waterGrade, hairRisk, skinRisk
+  };
+}
+
+function ensureRankingPool(){
+  RANKING_POOL.forEach(c => {
+    if(!state.cities[c]) state.cities[c] = generateCityData(c);
+  });
+}
+
+// ---------------- Gate ----------------
+const QUICK_CITIES = ['Bengaluru','Delhi','London','New York','Tokyo','Beijing'];
+const chipsEl = document.getElementById('gateChips');
+QUICK_CITIES.forEach(c=>{
+  const b = document.createElement('button');
+  b.type='button'; b.className='chip'; b.textContent=c;
+  b.addEventListener('click', ()=> launchDashboard(c));
+  chipsEl.appendChild(b);
+});
+document.getElementById('gateForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const v = document.getElementById('cityInput').value.trim();
+  if(v) launchDashboard(v);
+});
+document.getElementById('changeCityBtn').addEventListener('click', function(){
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('cityInput').value = '';
+  document.getElementById('cityInput').focus();
+});
+
+function launchDashboard(cityName){
+  ensureRankingPool();
+  const data = generateCityData(cityName);
+  state.cities[data.name] = data;
+  state.focusCity = data.name;
+  state.activePollutant = 'aqi';
+  state.maxAqiFilter = 500;
+
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('pillCity').textContent = data.name;
+
+  buildCityFilter();
+  buildPollutantToggle();
+  document.getElementById('aqiRange').value = 500;
+  document.getElementById('aqiRangeVal').textContent = 500;
+  renderAll();
+}
+
+// ---------------- Filters UI ----------------
+function buildCityFilter(){
+  const sel = document.getElementById('cityFilter');
+  sel.innerHTML = '';
+  const names = Object.keys(state.cities).sort();
+  names.forEach(n=>{
+    const opt = document.createElement('option');
+    opt.value = n; opt.textContent = n;
+    if(n === state.focusCity) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', function(){
+    state.focusCity = this.value;
+    document.getElementById('pillCity').textContent = this.value;
+    renderAll();
+  });
+}
+function buildPollutantToggle(){
+  const wrap = document.getElementById('pollutantToggle');
+  wrap.innerHTML = '';
+  POLLUTANTS.forEach(p=>{
+    const b = document.createElement('button');
+    b.type='button'; b.className = 'ptbtn' + (p.key===state.activePollutant?' active':'');
+    b.textContent = p.label; b.dataset.key = p.key;
+    b.addEventListener('click', ()=>{
+      state.activePollutant = p.key;
+      [...wrap.children].forEach(c=>c.classList.toggle('active', c===b));
+      renderTrendChart();
+      highlightCard();
+    });
+    wrap.appendChild(b);
+  });
+}
+document.getElementById('aqiRange').addEventListener('input', function(){
+  state.maxAqiFilter = parseInt(this.value,10);
+  document.getElementById('aqiRangeVal').textContent = this.value;
+  renderRanking();
+});
+document.getElementById('resetFilters').addEventListener('click', function(){
+  state.maxAqiFilter = 500;
+  state.activePollutant = 'aqi';
+  document.getElementById('aqiRange').value = 500;
+  document.getElementById('aqiRangeVal').textContent = 500;
+  buildPollutantToggle();
+  renderAll();
+});
+
+// ---------------- Render ----------------
+function renderAll(){
+  renderExecSummary();
+  renderGauge();
+  renderHealthGrid();
+  renderCards();
+  renderTrendChart();
+  renderPmChart();
+  renderRanking();
+  renderInsights();
+  renderRecommendations();
+  document.getElementById('footTimestamp').textContent = 'Generated ' + new Date().toLocaleString();
+}
+
+function currentCity(){ return state.cities[state.focusCity]; }
+
+function renderExecSummary(){
+  const d = currentCity();
+  const lvl = d.level;
+  const trendArr = d.trend.aqi;
+  const first = trendArr[0], last = trendArr[trendArr.length-1];
+  const delta = last - first;
+  const direction = delta > 3 ? 'worsened' : delta < -3 ? 'improved' : 'stayed roughly stable';
+  const dominantLabel = {pm25:'PM2.5',pm10:'PM10',no2:'NO₂',o3:'O₃'}[d.dominant] || 'PM2.5';
+
+  document.getElementById('execHeadline').textContent =
+    `${d.name}'s air is currently ${lvl.name.toLowerCase()}.`;
+
+  let advice;
+  if(lvl.max<=50) advice = 'Air quality poses little or no risk — a good day for outdoor activity.';
+  else if(lvl.max<=100) advice = 'Acceptable for most people; unusually sensitive individuals should consider limiting prolonged outdoor exertion.';
+  else if(lvl.max<=150) advice = 'Sensitive groups (children, older adults, those with respiratory conditions) should reduce prolonged outdoor exertion.';
+  else if(lvl.max<=200) advice = 'Everyone may begin to experience effects; consider limiting extended outdoor exertion, especially near traffic.';
+  else if(lvl.max<=300) advice = 'Health alert: everyone may experience more serious effects — minimize outdoor activity where possible.';
+  else advice = 'Emergency conditions — avoid outdoor exertion and consider indoor air filtration.';
+
+  document.getElementById('execText').innerHTML =
+    `Over the past 14 days, modeled AQI has <b>${direction}</b> (from ${first} to ${last}). ` +
+    `<b>${dominantLabel}</b> is the dominant pollutant right now. ${advice}`;
+
+  const tagsEl = document.getElementById('execTags');
+  tagsEl.innerHTML = '';
+  [
+    `AQI ${d.aqi}`, lvl.name, `Dominant: ${dominantLabel}`,
+    `14d trend: ${delta>=0?'+':''}${delta}`
+  ].forEach(t=>{
+    const s = document.createElement('span'); s.className='tag'; s.textContent=t; tagsEl.appendChild(s);
+  });
+}
+
+function renderGauge(){
+  const d = currentCity();
+  const svg = document.getElementById('gaugeSvg');
+  const cx=75, cy=75, r=60, stroke=11;
+  const circumference = 2*Math.PI*r;
+  const pct = Math.min(d.aqi,500)/500;
+  const startAngle = -220, sweep = 260; // degrees, arc shape
+  const dashArr = circumference;
+  const dashOffsetTrack = 0;
+
+  function arcPath(cx,cy,r,startDeg,endDeg){
+    const s = polar(cx,cy,r,startDeg), e = polar(cx,cy,r,endDeg);
+    const large = (endDeg-startDeg) > 180 ? 1 : 0;
+    return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+  }
+  function polar(cx,cy,r,deg){
+    const rad = (deg-90) * Math.PI/180;
+    return {x: cx + r*Math.cos(rad), y: cy + r*Math.sin(rad)};
+  }
+
+  const segColors = ['#4ADE80','#FBBF24','#FB923C','#F87171','#C084FC','#FB7185'];
+  const segBounds = [0,50,100,150,200,300,500];
+  let segsSvg = '';
+  for(let i=0;i<6;i++){
+    const a0 = startAngle + (segBounds[i]/500)*sweep;
+    const a1 = startAngle + (segBounds[i+1]/500)*sweep;
+    segsSvg += `<path d="${arcPath(cx,cy,r,a0,a1)}" stroke="${segColors[i]}" stroke-width="${stroke}" fill="none" stroke-linecap="round" opacity="0.9"/>`;
+  }
+  const needleDeg = startAngle + pct*sweep;
+  const needleTip = polar(cx,cy,r-2, needleDeg);
+  const needleBase1 = polar(cx,cy,4, needleDeg+90);
+  const needleBase2 = polar(cx,cy,4, needleDeg-90);
+
+  svg.innerHTML = `
+    <path d="${arcPath(cx,cy,r,startAngle,startAngle+sweep)}" stroke="#1A1F2B" stroke-width="${stroke}" fill="none" stroke-linecap="round"/>
+    ${segsSvg}
+    <polygon points="${needleTip.x},${needleTip.y} ${needleBase1.x},${needleBase1.y} ${needleBase2.x},${needleBase2.y}" fill="#E7ECF2"/>
+    <circle cx="${cx}" cy="${cy}" r="5" fill="#E7ECF2"/>
+  `;
+  document.getElementById('gaugeNum').textContent = d.aqi;
+  document.getElementById('gaugeNum').style.color = d.level.hex;
+}
+
+function buildRing(score, color){
+  const r=38, c=2*Math.PI*r;
+  const offset = c*(1-clamp(score,0,100)/100);
+  return `<svg width="92" height="92" viewBox="0 0 92 92">
+    <circle cx="46" cy="46" r="${r}" stroke="#1A1F2B" stroke-width="8" fill="none"/>
+    <circle cx="46" cy="46" r="${r}" stroke="${color}" stroke-width="8" fill="none" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}" transform="rotate(-90 46 46)"/>
+    <text x="46" y="52" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="20" font-weight="600" fill="${color}">${Math.round(score)}</text>
+  </svg>`;
+}
+
+function hairNote(d){ return `${d.dominant.toUpperCase()} exposure · ${d.humidity}% humidity`; }
+function skinNote(d){ return `AQI ${d.aqi} · ${Math.abs(d.humidity-45)<=10 ? 'balanced' : (d.humidity<45?'dry air':'humid air')}`; }
+
+function renderHealthGrid(){
+  const d = currentCity();
+  const grid = document.getElementById('healthGrid');
+  grid.innerHTML = '';
+
+  const scoreCard = document.createElement('div');
+  scoreCard.className = 'health-card score-card';
+  scoreCard.innerHTML = `
+    <div class="ring-wrap">${buildRing(d.envHealthScore, scoreColor(d.envHealthScore))}</div>
+    <div class="health-card-body">
+      <div class="health-card-label">Environmental Health Score</div>
+      <div class="health-card-sub">${scoreVerdict(d.envHealthScore)}</div>
+    </div>`;
+  grid.appendChild(scoreCard);
+
+  const gradeItems = [
+    {label:'Air Quality Grade', grade:d.airGrade, sub:d.level.name},
+    {label:'Water Quality Grade', grade:d.waterGrade, sub:`WQI ${d.waterScore}/100`}
+  ];
+  gradeItems.forEach(it=>{
+    const c = document.createElement('div');
+    c.className = 'health-card grade-card';
+    c.innerHTML = `
+      <div class="grade-letter" style="color:${it.grade.color}">${it.grade.letter}</div>
+      <div class="health-card-label">${it.label}</div>
+      <div class="health-card-sub">${it.sub}</div>`;
+    grid.appendChild(c);
+  });
+
+  const riskItems = [
+    {label:'Hair Risk', risk:d.hairRisk, note:hairNote(d)},
+    {label:'Skin Risk', risk:d.skinRisk, note:skinNote(d)}
+  ];
+  riskItems.forEach(it=>{
+    const c = document.createElement('div');
+    c.className = 'health-card risk-card';
+    c.innerHTML = `
+      <div class="risk-badge" style="color:${it.risk.color}; border-color:${it.risk.color}66; background:${it.risk.color}1a;">${it.risk.level}</div>
+      <div class="health-card-label">${it.label}</div>
+      <div class="health-card-sub">${it.note}</div>`;
+    grid.appendChild(c);
+  });
+}
+
+function buildRecommendations(d){
+  const recs = [];
+  if(d.airGrade.letter==='A' || d.airGrade.letter==='B'){
+    recs.push({icon:'🌤️', title:'Good day to be outside', text:'Air quality supports normal outdoor activity and exercise.'});
+  } else if(d.airGrade.letter==='C'){
+    recs.push({icon:'😷', title:'Sensitive groups: mask up', text:'Consider a mask during extended outdoor exertion if you have respiratory sensitivity.'});
+  } else {
+    recs.push({icon:'😷', title:'Wear a mask outdoors', text:'An N95/KN95 mask meaningfully reduces particulate exposure on days like this.'});
+    recs.push({icon:'🌬️', title:'Run an air purifier indoors', text:'A HEPA purifier can noticeably reduce indoor PM2.5 during high-AQI periods.'});
+  }
+  if(d.waterGrade.letter==='D' || d.waterGrade.letter==='F'){
+    recs.push({icon:'🚰', title:'Filter your drinking water', text:'A certified carbon or reverse-osmosis filter is recommended given local water quality signals.'});
+  } else {
+    recs.push({icon:'💧', title:'Water quality looks solid', text:'Standard filtration is likely sufficient for drinking water here.'});
+  }
+  if(d.hairRisk.level==='High' || d.hairRisk.level==='Very High'){
+    recs.push({icon:'💇', title:'Protect your hair', text:'Rinse hair after outdoor exposure and use a weekly clarifying shampoo to clear particulate buildup.'});
+  } else {
+    recs.push({icon:'💇', title:'Light hair care routine', text:'Current conditions are low-risk — your normal wash routine is fine.'});
+  }
+  if(d.skinRisk.level==='High' || d.skinRisk.level==='Very High'){
+    recs.push({icon:'🧴', title:'Shield your skin', text:'Use an antioxidant-rich moisturizer and double-cleanse in the evening to remove pollutant buildup.'});
+  } else {
+    recs.push({icon:'🧴', title:'Standard skincare is fine', text:'Low irritation risk today — your usual routine should be enough.'});
+  }
+  recs.push({icon:'⏰', title:'Best time outdoors', text: d.aqi>100 ? 'Early morning tends to have the lowest pollutant concentration — plan outdoor activity accordingly.' : 'Air quality is steady enough today that timing matters less.'});
+  return recs;
+}
+
+function renderRecommendations(){
+  const d = currentCity();
+  const grid = document.getElementById('recoGrid');
+  grid.innerHTML = '';
+  buildRecommendations(d).forEach(r=>{
+    const c = document.createElement('div');
+    c.className = 'reco-card';
+    c.innerHTML = `
+      <div class="reco-icon">${r.icon}</div>
+      <div>
+        <div class="reco-title">${r.title}</div>
+        <div class="reco-text">${r.text}</div>
+      </div>`;
+    grid.appendChild(c);
+  });
+}
+
+function buildInsights(d){
+  const pool = Object.values(state.cities);
+  const avgAqi = Math.round(pool.reduce((s,c)=>s+c.aqi,0)/pool.length);
+  const diffPct = avgAqi ? Math.round(((d.aqi-avgAqi)/avgAqi)*100) : 0;
+  const sortedByAqi = pool.slice().sort((a,b)=>b.aqi-a.aqi);
+  const rank = sortedByAqi.findIndex(c=>c.name===d.name)+1;
+  const best = Math.min(...d.trend.aqi);
+  const bestIdx = d.trend.aqi.indexOf(best);
+  const worst = Math.max(...d.trend.aqi);
+  const pmShare = clamp(Math.round((d.pm25*2.2/d.aqi)*100), 5, 95);
+
+  return [
+    {type: diffPct>0?'warn':'good', text:`${d.name} is ${Math.abs(diffPct)}% ${diffPct>=0?'worse':'better'} than the ${pool.length}-city tracked average AQI (${avgAqi}).`},
+    {type:'info', text:`Ranked #${rank} of ${pool.length} tracked cities by current AQI.`},
+    {type:'good', text:`Best 14-day reading was AQI ${best} (Day D-${13-bestIdx}); worst was AQI ${worst}.`},
+    {type: pmShare>50?'warn':'info', text:`Fine particulates (PM2.5) account for an estimated ${pmShare}% of current AQI severity.`},
+    {type: d.envHealthScore<50?'warn':'good', text:`Composite Environmental Health Score is ${d.envHealthScore}/100 — ${scoreVerdict(d.envHealthScore).toLowerCase()}.`}
+  ];
+}
+
+function renderInsights(){
+  const d = currentCity();
+  const list = document.getElementById('insightsList');
+  list.innerHTML = '';
+  buildInsights(d).forEach(item=>{
+    const row = document.createElement('div');
+    row.className = 'insight-item';
+    row.innerHTML = `<span class="insight-dot ${item.type}"></span><span class="insight-text">${item.text}</span>`;
+    list.appendChild(row);
+  });
+}
+
+function iconSvg(kind, color){
+  if(kind==='gauge'){
+    return `<svg class="metric-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 9 9" stroke="${color}" stroke-width="1.8" stroke-linecap="round"/><path d="M12 12l5-5" stroke="${color}" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+  }
+  return `<svg class="metric-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="6" stroke="${color}" stroke-width="1.8"/><circle cx="12" cy="12" r="2" fill="${color}"/></svg>`;
+}
+
+function renderCards(){
+  const d = currentCity();
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+  const values = {
+    aqi: {val:d.aqi, unit:'', level: d.level},
+    pm25:{val:d.pm25, unit:'µg/m³'},
+    pm10:{val:d.pm10, unit:'µg/m³'},
+    no2: {val:d.no2, unit:'ppb'},
+    o3:  {val:d.o3, unit:'ppb'},
+  };
+  const extra = {key:'humidity', label:'Humidity', unit:'%', val: d.humidity};
+
+  const cardsDef = [
+    {key:'aqi', label:'AQI (US)', color:d.level.hex, delta: d.trend.aqi[13]-d.trend.aqi[0]},
+    {key:'pm25', label:'PM2.5', color:'#2DD4BF', delta: null},
+    {key:'pm10', label:'PM10', color:'#2DD4BF', delta: null},
+    {key:'no2', label:'Nitrogen Dioxide', color:'#93C5FD', delta:null},
+    {key:'o3', label:'Ozone', color:'#FBBF24', delta:null},
+    {key:'humidity', label:'Humidity', color:'#7DD3FC', delta:null},
+  ];
+
+  cardsDef.forEach(c=>{
+    const isMain = c.key==='aqi';
+    const v = c.key==='humidity' ? extra : values[c.key];
+    const card = document.createElement('div');
+    card.className = 'metric-card';
+    card.dataset.key = c.key;
+    const deltaHtml = (c.delta!==null && c.delta!==undefined)
+      ? `<span class="metric-delta ${c.delta>=0?'up':'down'}">${c.delta>=0?'▲':'▼'} ${Math.abs(c.delta)}</span>`
+      : '';
+    card.innerHTML = `
+      <div class="bar" style="background:${c.color}"></div>
+      <div class="metric-top">
+        ${iconSvg(isMain?'gauge':'dot', c.color)}
+        ${deltaHtml}
+      </div>
+      <div class="metric-val" style="color:${isMain? c.color : 'var(--text)'}">${c.key==='humidity'?extra.val:v.val}<span class="metric-unit">${c.key==='humidity'?extra.unit:(v.unit||'')}</span></div>
+      <div class="metric-name">${c.label}${isMain?' · '+d.level.name:''}</div>
+    `;
+    grid.appendChild(card);
+  });
+  highlightCard();
+}
+function highlightCard(){
+  document.querySelectorAll('.metric-card').forEach(c=>{
+    c.style.boxShadow = c.dataset.key === state.activePollutant ? '0 0 0 1px var(--teal)' : 'none';
+  });
+}
+
+let trendChartInst = null, pmChartInst = null;
+function baseChartOptions(extra){
+  return Object.assign({
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{labels:{color:'#8993A6', font:{family:'IBM Plex Mono', size:11}}} },
+    scales:{
+      x:{ ticks:{color:'#5B6478', font:{size:10}}, grid:{color:'#1A1F2B'} },
+      y:{ ticks:{color:'#5B6478', font:{size:10}}, grid:{color:'#1A1F2B'} }
+    }
+  }, extra||{});
+}
+
+function renderTrendChart(){
+  const d = currentCity();
+  const key = state.activePollutant === 'aqi' ? 'aqi' : (state.activePollutant==='pm25'?'pm25':state.activePollutant==='pm10'?'pm10':null);
+  const labels = Array.from({length:14}, (_,i)=> `D-${13-i}`);
+  let dataArr, label, color;
+  if(key){
+    dataArr = d.trend[key];
+    label = POLLUTANTS.find(p=>p.key===state.activePollutant).label;
+    color = key==='aqi' ? d.level.hex : '#2DD4BF';
+  } else {
+    // synth a light trend for no2/o3 from aqi trend proportionally
+    const factor = state.activePollutant==='no2' ? (d.no2/d.aqi) : (d.o3/d.aqi);
+    dataArr = d.trend.aqi.map(v => Math.max(1, Math.round(v*factor)));
+    label = POLLUTANTS.find(p=>p.key===state.activePollutant).label;
+    color = state.activePollutant==='no2' ? '#93C5FD' : '#FBBF24';
+  }
+  document.getElementById('trendTitle').textContent = `${label} — 14 day trend`;
+  document.getElementById('trendSub').textContent = `Focus city: ${d.name}`;
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if(trendChartInst) trendChartInst.destroy();
+  const grad = ctx.createLinearGradient(0,0,0,220);
+  grad.addColorStop(0, color + '55');
+  grad.addColorStop(1, color + '00');
+  trendChartInst = new Chart(ctx, {
+    type:'line',
+    data:{ labels, datasets:[{
+      label, data:dataArr, borderColor:color, backgroundColor:grad,
+      fill:true, tension:.35, pointRadius:2, pointBackgroundColor:color, borderWidth:2.4
+    }]},
+    options: baseChartOptions({plugins:{legend:{display:false}}})
+  });
+}
+
+function renderPmChart(){
+  const d = currentCity();
+  const labels = Array.from({length:7}, (_,i)=> `D-${6-i}`);
+  const pm25 = d.trend.pm25.slice(-7);
+  const pm10 = d.trend.pm10.slice(-7);
+  const ctx = document.getElementById('pmChart').getContext('2d');
+  if(pmChartInst) pmChartInst.destroy();
+  pmChartInst = new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[
+      {label:'PM2.5', data:pm25, backgroundColor:'#2DD4BF', borderRadius:4, maxBarThickness:16},
+      {label:'PM10', data:pm10, backgroundColor:'#C084FC', borderRadius:4, maxBarThickness:16}
+    ]},
+    options: baseChartOptions({plugins:{legend:{labels:{color:'#8993A6', font:{family:'IBM Plex Mono', size:10.5}}}}})
+  });
+}
+
+function renderRanking(){
+  ensureRankingPool();
+  const tbody = document.getElementById('rankBody');
+  tbody.innerHTML = '';
+  const rows = Object.values(state.cities)
+    .filter(d => d.aqi <= state.maxAqiFilter)
+    .sort((a,b)=> b.aqi - a.aqi);
+
+  if(rows.length===0){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No cities match the current AQI filter.</td></tr>`;
+    return;
+  }
+
+  rows.forEach((d, i)=>{
+    const dominantLabel = {pm25:'PM2.5', pm10:'PM10', no2:'NO₂', o3:'O₃'}[d.dominant] || 'PM2.5';
+    const pct = Math.min(100, Math.round((d.aqi/500)*100));
+    const tr = document.createElement('tr');
+    if(d.name === state.focusCity) tr.classList.add('is-focus');
+    tr.innerHTML = `
+      <td class="rank-num">${i+1}</td>
+      <td class="rank-city">${d.name}${d.name===state.focusCity?' <span class="sub">(focus)</span>':''}</td>
+      <td>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-family:var(--font-mono); font-weight:600;">${d.aqi}</span>
+          <div class="bar-track" style="max-width:70px;"><div class="bar-fill" style="width:${pct}%; background:${d.level.hex}"></div></div>
+        </div>
+      </td>
+      <td><span class="aqi-badge" style="color:${d.level.hex}; background:${d.level.hex}1a;">${d.level.name}</span></td>
+      <td style="font-family:var(--font-mono);">${d.pm25} µg/m³</td>
+      <td>${dominantLabel}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// ---------------- Downloadable static report (index.html) ----------------
+function sparklineSvg(vals, color, w, h){
+  const pad = 8;
+  const max = Math.max(...vals), min = Math.min(...vals);
+  const pts = vals.map((v,i)=>{
+    const x = pad + i*((w-2*pad)/(vals.length-1));
+    const y = h-pad - ((v-min)/((max-min)||1))*(h-2*pad);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function buildStaticReportHtml(d){
+  const pool = Object.values(state.cities).sort((a,b)=>b.aqi-a.aqi).slice(0,10);
+  const recos = buildRecommendations(d);
+  const insights = buildInsights(d);
+  const generatedAt = new Date().toLocaleString();
+
+  const rankRows = pool.map((c,i)=>`
+    <tr${c.name===d.name?' style="background:#132420;"':''}>
+      <td>${i+1}</td><td>${c.name}</td>
+      <td style="color:${c.level.hex}; font-weight:600;">${c.aqi}</td>
+      <td>${c.level.name}</td>
+      <td>${c.pm25} µg/m³</td>
+    </tr>`).join('');
+
+  const recoItems = recos.map(r=>`
+    <div class="rc"><div class="rc-i">${r.icon}</div><div><div class="rc-t">${r.title}</div><div class="rc-x">${r.text}</div></div></div>`).join('');
+
+  const insightItems = insights.map(i=>`
+    <div class="ins"><span class="dot ${i.type}"></span><span>${i.text}</span></div>`).join('');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${d.name} — Environmental Health Report</title>
+<style>
+  :root{
+    --bg:#0A0D12; --panel:#11151C; --panel-2:#161B24; --border:#222836; --border-soft:#1A1F2B;
+    --text:#E7ECF2; --text-dim:#8993A6; --text-faint:#5B6478; --teal:#2DD4BF;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:'Segoe UI', Inter, Arial, sans-serif; padding:32px 20px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  h1{font-size:24px; margin-bottom:4px;}
+  .meta{color:var(--text-faint); font-size:12px; font-family:'Consolas','IBM Plex Mono',monospace; margin-bottom:28px;}
+  .grid{display:grid; grid-template-columns:1.2fr repeat(4,1fr); gap:10px; margin-bottom:28px;}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center;}
+  .card.score{display:flex; align-items:center; gap:14px; text-align:left;}
+  .grade{font-family:'Consolas','IBM Plex Mono',monospace; font-weight:700; font-size:32px;}
+  .badge{display:inline-block; font-family:'Consolas','IBM Plex Mono',monospace; font-weight:600; font-size:12px; padding:4px 10px; border-radius:99px; border:1px solid; margin-bottom:4px;}
+  .lbl{font-size:11.5px; color:var(--text-dim);}
+  .sub{font-size:10.5px; color:var(--text-faint); margin-top:2px;}
+  h2{font-size:14px; margin:26px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-weight:600;}
+  .exec{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:18px; font-size:13.5px; line-height:1.7; color:var(--text-dim);}
+  .exec b{color:var(--text);}
+  .metrics{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .metrics .m{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center;}
+  .metrics .m .v{font-family:'Consolas','IBM Plex Mono',monospace; font-size:19px; font-weight:600;}
+  .metrics .m .l{font-size:10.5px; color:var(--text-faint); margin-top:4px;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px; background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+  th{text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); padding:10px 12px; border-bottom:1px solid var(--border-soft);}
+  td{padding:10px 12px; border-bottom:1px solid var(--border-soft);}
+  .rc-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .rc{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:13px; display:flex; gap:10px;}
+  .rc-i{font-size:18px;}
+  .rc-t{font-size:12.5px; font-weight:600; margin-bottom:3px;}
+  .rc-x{font-size:11.5px; color:var(--text-dim); line-height:1.5;}
+  .ins{display:flex; gap:9px; padding:9px 0; border-bottom:1px solid var(--border-soft); font-size:12.5px; color:var(--text-dim); align-items:flex-start;}
+  .ins:last-child{border-bottom:none;}
+  .dot{width:7px; height:7px; border-radius:50%; margin-top:4px; flex-shrink:0;}
+  .dot.good{background:#4ADE80;} .dot.warn{background:#F87171;} .dot.info{background:#2DD4BF;}
+  .sparkbox{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; display:flex; align-items:center; justify-content:center;}
+  footer{margin-top:30px; padding-top:14px; border-top:1px solid var(--border-soft); font-size:10.5px; color:var(--text-faint); font-family:'Consolas','IBM Plex Mono',monospace; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;}
+  @media (max-width:700px){ .grid{grid-template-columns:repeat(2,1fr);} .card.score{grid-column:1/-1;} .metrics{grid-template-columns:repeat(2,1fr);} .rc-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>${d.name} — Environmental Health Report</h1>
+  <div class="meta">Generated ${generatedAt} · Modeled estimates, not live sensor data</div>
+
+  <div class="grid">
+    <div class="card score">
+      ${buildRing(d.envHealthScore, scoreColor(d.envHealthScore))}
+      <div>
+        <div class="lbl">Environmental Health Score</div>
+        <div class="sub">${scoreVerdict(d.envHealthScore)}</div>
+      </div>
+    </div>
+    <div class="card"><div class="grade" style="color:${d.airGrade.color}">${d.airGrade.letter}</div><div class="lbl">Air Quality Grade</div><div class="sub">${d.level.name}</div></div>
+    <div class="card"><div class="grade" style="color:${d.waterGrade.color}">${d.waterGrade.letter}</div><div class="lbl">Water Quality Grade</div><div class="sub">WQI ${d.waterScore}/100</div></div>
+    <div class="card"><div class="badge" style="color:${d.hairRisk.color}; border-color:${d.hairRisk.color}66; background:${d.hairRisk.color}1a;">${d.hairRisk.level}</div><div class="lbl">Hair Risk</div><div class="sub">${hairNote(d)}</div></div>
+    <div class="card"><div class="badge" style="color:${d.skinRisk.color}; border-color:${d.skinRisk.color}66; background:${d.skinRisk.color}1a;">${d.skinRisk.level}</div><div class="lbl">Skin Risk</div><div class="sub">${skinNote(d)}</div></div>
+  </div>
+
+  <h2>Executive Summary</h2>
+  <div class="exec">${document.getElementById('execText').innerHTML}</div>
+
+  <h2>Air Quality Metrics</h2>
+  <div class="metrics">
+    <div class="m"><div class="v" style="color:${d.level.hex}">${d.aqi}</div><div class="l">AQI (US)</div></div>
+    <div class="m"><div class="v">${d.pm25}</div><div class="l">PM2.5 µg/m³</div></div>
+    <div class="m"><div class="v">${d.pm10}</div><div class="l">PM10 µg/m³</div></div>
+    <div class="m"><div class="v">${d.no2}</div><div class="l">NO₂ ppb</div></div>
+    <div class="m"><div class="v">${d.o3}</div><div class="l">O₃ ppb</div></div>
+  </div>
+
+  <h2>14-Day AQI Trend</h2>
+  <div class="sparkbox">${sparklineSvg(d.trend.aqi, d.level.hex, 760, 120)}</div>
+
+  <h2>Personalized Recommendations</h2>
+  <div class="rc-grid">${recoItems}</div>
+
+  <h2>Insights</h2>
+  <div>${insightItems}</div>
+
+  <h2>City Ranking (Top 10 Tracked)</h2>
+  <table>
+    <thead><tr><th>#</th><th>City</th><th>AQI</th><th>Category</th><th>PM2.5</th></tr></thead>
+    <tbody>${rankRows}</tbody>
+  </table>
+
+  <footer>
+    <span>Personal Environmental Health Analyzer · Data model v1</span>
+    <span>Standalone report snapshot</span>
+  </footer>
+</div>
+</body>
+</html>`;
+}
+
+document.getElementById('downloadBtn').addEventListener('click', function(){
+  const d = currentCity();
+  if(!d) return;
+  const html = buildStaticReportHtml(d);
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'index.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+})();
+</script>
+</body>
+</html>

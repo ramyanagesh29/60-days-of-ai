@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bengaluru — Environmental Health Report</title>
+<style>
+  :root{
+    --bg:#0A0D12; --panel:#11151C; --panel-2:#161B24; --border:#222836; --border-soft:#1A1F2B;
+    --text:#E7ECF2; --text-dim:#8993A6; --text-faint:#5B6478; --teal:#2DD4BF;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:'Segoe UI', Inter, Arial, sans-serif; padding:32px 20px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  h1{font-size:24px; margin-bottom:4px;}
+  .meta{color:var(--text-faint); font-size:12px; font-family:'Consolas','IBM Plex Mono',monospace; margin-bottom:28px;}
+  .grid{display:grid; grid-template-columns:1.2fr repeat(4,1fr); gap:10px; margin-bottom:28px;}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; text-align:center;}
+  .card.score{display:flex; align-items:center; gap:14px; text-align:left;}
+  .grade{font-family:'Consolas','IBM Plex Mono',monospace; font-weight:700; font-size:32px;}
+  .badge{display:inline-block; font-family:'Consolas','IBM Plex Mono',monospace; font-weight:600; font-size:12px; padding:4px 10px; border-radius:99px; border:1px solid; margin-bottom:4px;}
+  .lbl{font-size:11.5px; color:var(--text-dim);}
+  .sub{font-size:10.5px; color:var(--text-faint); margin-top:2px;}
+  h2{font-size:14px; margin:26px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-weight:600;}
+  .exec{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:18px; font-size:13.5px; line-height:1.7; color:var(--text-dim);}
+  .exec b{color:var(--text);}
+  .metrics{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .metrics .m{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center;}
+  .metrics .m .v{font-family:'Consolas','IBM Plex Mono',monospace; font-size:19px; font-weight:600;}
+  .metrics .m .l{font-size:10.5px; color:var(--text-faint); margin-top:4px;}
+  table{width:100%; border-collapse:collapse; font-size:12.5px; background:var(--panel); border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+  th{text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); padding:10px 12px; border-bottom:1px solid var(--border-soft);}
+  td{padding:10px 12px; border-bottom:1px solid var(--border-soft);}
+  .rc-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .rc{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:13px; display:flex; gap:10px;}
+  .rc-i{font-size:18px;}
+  .rc-t{font-size:12.5px; font-weight:600; margin-bottom:3px;}
+  .rc-x{font-size:11.5px; color:var(--text-dim); line-height:1.5;}
+  .ins{display:flex; gap:9px; padding:9px 0; border-bottom:1px solid var(--border-soft); font-size:12.5px; color:var(--text-dim); align-items:flex-start;}
+  .ins:last-child{border-bottom:none;}
+  .dot{width:7px; height:7px; border-radius:50%; margin-top:4px; flex-shrink:0;}
+  .dot.good{background:#4ADE80;} .dot.warn{background:#F87171;} .dot.info{background:#2DD4BF;}
+  .sparkbox{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; display:flex; align-items:center; justify-content:center;}
+  footer{margin-top:30px; padding-top:14px; border-top:1px solid var(--border-soft); font-size:10.5px; color:var(--text-faint); font-family:'Consolas','IBM Plex Mono',monospace; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;}
+  @media (max-width:700px){ .grid{grid-template-columns:repeat(2,1fr);} .card.score{grid-column:1/-1;} .metrics{grid-template-columns:repeat(2,1fr);} .rc-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Bengaluru — Environmental Health Report</h1>
+  <div class="meta">Generated 10/07/2026, 12:20:35 · Modeled estimates, not live sensor data</div>
+
+  <div class="grid">
+    <div class="card score">
+      <svg width="92" height="92" viewBox="0 0 92 92">
+    <circle cx="46" cy="46" r="38" stroke="#1A1F2B" stroke-width="8" fill="none"/>
+    <circle cx="46" cy="46" r="38" stroke="#FBBF24" stroke-width="8" fill="none" stroke-linecap="round"
+      stroke-dasharray="238.8" stroke-dashoffset="83.6" transform="rotate(-90 46 46)"/>
+    <text x="46" y="52" text-anchor="middle" font-family="'IBM Plex Mono', monospace" font-size="20" font-weight="600" fill="#FBBF24">65</text>
+  </svg>
+      <div>
+        <div class="lbl">Environmental Health Score</div>
+        <div class="sub">Fair — some caution advised</div>
+      </div>
+    </div>
+    <div class="card"><div class="grade" style="color:#FBBF24">C</div><div class="lbl">Air Quality Grade</div><div class="sub">Moderate</div></div>
+    <div class="card"><div class="grade" style="color:#F87171">F</div><div class="lbl">Water Quality Grade</div><div class="sub">WQI 39/100</div></div>
+    <div class="card"><div class="badge" style="color:#FBBF24; border-color:#FBBF2466; background:#FBBF241a;">Moderate</div><div class="lbl">Hair Risk</div><div class="sub">PM10 exposure · 57% humidity</div></div>
+    <div class="card"><div class="badge" style="color:#FBBF24; border-color:#FBBF2466; background:#FBBF241a;">Moderate</div><div class="lbl">Skin Risk</div><div class="sub">AQI 88 · humid air</div></div>
+  </div>
+
+  <h2>Executive Summary</h2>
+  <div class="exec">Over the past 14 days, modeled AQI has <b>stayed roughly stable</b> (from 95 to 92). <b>PM10</b> is the dominant pollutant right now. Acceptable for most people; unusually sensitive individuals should consider limiting prolonged outdoor exertion.</div>
+
+  <h2>Air Quality Metrics</h2>
+  <div class="metrics">
+    <div class="m"><div class="v" style="color:#FBBF24">88</div><div class="l">AQI (US)</div></div>
+    <div class="m"><div class="v">42</div><div class="l">PM2.5 µg/m³</div></div>
+    <div class="m"><div class="v">68</div><div class="l">PM10 µg/m³</div></div>
+    <div class="m"><div class="v">39</div><div class="l">NO₂ ppb</div></div>
+    <div class="m"><div class="v">42</div><div class="l">O₃ ppb</div></div>
+  </div>
+
+  <h2>14-Day AQI Trend</h2>
+  <div class="sparkbox"><svg width="760" height="120" viewBox="0 0 760 120" xmlns="http://www.w3.org/2000/svg">
+    <polyline points="8.0,86.0 65.2,42.7 122.5,68.7 179.7,34.0 236.9,8.0 294.2,16.7 351.4,77.3 408.6,94.7 465.8,68.7 523.1,77.3 580.3,77.3 637.5,86.0 694.8,60.0 752.0,112.0" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg></div>
+
+  <h2>Personalized Recommendations</h2>
+  <div class="rc-grid">
+    <div class="rc"><div class="rc-i">😷</div><div><div class="rc-t">Sensitive groups: mask up</div><div class="rc-x">Consider a mask during extended outdoor exertion if you have respiratory sensitivity.</div></div></div>
+    <div class="rc"><div class="rc-i">🚰</div><div><div class="rc-t">Filter your drinking water</div><div class="rc-x">A certified carbon or reverse-osmosis filter is recommended given local water quality signals.</div></div></div>
+    <div class="rc"><div class="rc-i">💇</div><div><div class="rc-t">Light hair care routine</div><div class="rc-x">Current conditions are low-risk — your normal wash routine is fine.</div></div></div>
+    <div class="rc"><div class="rc-i">🧴</div><div><div class="rc-t">Standard skincare is fine</div><div class="rc-x">Low irritation risk today — your usual routine should be enough.</div></div></div>
+    <div class="rc"><div class="rc-i">⏰</div><div><div class="rc-t">Best time outdoors</div><div class="rc-x">Air quality is steady enough today that timing matters less.</div></div></div></div>
+
+  <h2>Insights</h2>
+  <div>
+    <div class="ins"><span class="dot good"></span><span>Bengaluru is 6% better than the 27-city tracked average AQI (94).</span></div>
+    <div class="ins"><span class="dot info"></span><span>Ranked #14 of 27 tracked cities by current AQI.</span></div>
+    <div class="ins"><span class="dot good"></span><span>Best 14-day reading was AQI 92 (Day D-0); worst was AQI 104.</span></div>
+    <div class="ins"><span class="dot warn"></span><span>Fine particulates (PM2.5) account for an estimated 95% of current AQI severity.</span></div>
+    <div class="ins"><span class="dot good"></span><span>Composite Environmental Health Score is 65/100 — fair — some caution advised.</span></div></div>
+
+  <h2>City Ranking (Top 10 Tracked)</h2>
+  <table>
+    <thead><tr><th>#</th><th>City</th><th>AQI</th><th>Category</th><th>PM2.5</th></tr></thead>
+    <tbody>
+    <tr>
+      <td>1</td><td>Lahore</td>
+      <td style="color:#F87171; font-weight:600;">185</td>
+      <td>Unhealthy</td>
+      <td>85 µg/m³</td>
+    </tr>
+    <tr>
+      <td>2</td><td>Delhi</td>
+      <td style="color:#F87171; font-weight:600;">176</td>
+      <td>Unhealthy</td>
+      <td>86 µg/m³</td>
+    </tr>
+    <tr>
+      <td>3</td><td>Dhaka</td>
+      <td style="color:#F87171; font-weight:600;">167</td>
+      <td>Unhealthy</td>
+      <td>81 µg/m³</td>
+    </tr>
+    <tr>
+      <td>4</td><td>Kolkata</td>
+      <td style="color:#FB923C; font-weight:600;">150</td>
+      <td>Unhealthy (Sensitive)</td>
+      <td>73 µg/m³</td>
+    </tr>
+    <tr>
+      <td>5</td><td>Kathmandu</td>
+      <td style="color:#FB923C; font-weight:600;">149</td>
+      <td>Unhealthy (Sensitive)</td>
+      <td>72 µg/m³</td>
+    </tr>
+    <tr>
+      <td>6</td><td>Cairo</td>
+      <td style="color:#FB923C; font-weight:600;">146</td>
+      <td>Unhealthy (Sensitive)</td>
+      <td>74 µg/m³</td>
+    </tr>
+    <tr>
+      <td>7</td><td>Beijing</td>
+      <td style="color:#FB923C; font-weight:600;">127</td>
+      <td>Unhealthy (Sensitive)</td>
+      <td>60 µg/m³</td>
+    </tr>
+    <tr>
+      <td>8</td><td>Jakarta</td>
+      <td style="color:#FB923C; font-weight:600;">125</td>
+      <td>Unhealthy (Sensitive)</td>
+      <td>58 µg/m³</td>
+    </tr>
+    <tr>
+      <td>9</td><td>Mumbai</td>
+      <td style="color:#FB923C; font-weight:600;">116</td>
+      <td>Unhealthy (Sensitive)</td>
+      <td>56 µg/m³</td>
+    </tr>
+    <tr>
+      <td>10</td><td>Dubai</td>
+      <td style="color:#FB923C; font-weight:600;">106</td>
+      <td>Unhealthy (Sensitive)</td>
+      <td>52 µg/m³</td>
+    </tr></tbody>
+  </table>
+
+  <footer>
+    <span>Personal Environmental Health Analyzer · Data model v1</span>
+    <span>Standalone report snapshot</span>
+  </footer>
+</div>
+</body>
+</html>
