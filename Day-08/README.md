@@ -1,25 +1,28 @@
-# 🚀 Day 8 – AI-Powered Dashboard using Claude Artifacts
+# 🚀 Day 8 – Claude Artifacts: AI-Powered Dashboard
 
-## Overview
+## Topic
+Claude Artifacts – Build Your First AI-Powered Dashboard
 
-For Day 8 of the ABTalks 60-Day Claude Challenge, I explored **Claude Artifacts** by building an interactive Environmental Health Analyzer dashboard.
+## Project
+Personal Environmental Health Analyzer
+
+## Files
+- index.html
+- env_health_analyzer.html
+
+## Features
+- Interactive Environmental Health Dashboard
+- AQI Analysis
+- PM2.5 & PM10 Visualization
+- Health Risk Assessment
+- Personalized Recommendations
+- Responsive HTML Application
 
 ## What I Learned
+- Claude can generate complete HTML applications.
+- AI can create interactive dashboards from prompts.
+- Claude Artifacts help transform prompts into real products.
+- Prompt engineering improves application quality.
 
-- How Claude can generate complete HTML applications
-- Creating interactive dashboards using AI
-- Building visual interfaces with charts and filters
-- Exporting and running HTML applications locally
-- Transforming prompts into usable applications
-
-## Files Included
-
-- day8.md
-- Environmental_Health_Analyzer.html
-- Dashboard screenshots
-
----
-
-Challenge: ABTalks 60-Day Claude Challenge
-
-Day: 8 – Claude Artifacts
+## Screenshots
+(Add your dashboard screenshots here.)
