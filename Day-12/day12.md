@@ -1,30 +1,42 @@
-# Day 12 – Job Search & Personal Branding Toolkit
+# Day 12 – Career Applications with Claude
 
-## Objective
+## Topic
+Build Your Complete Job Search & Personal Branding Toolkit
 
-Built a complete AI-powered job search toolkit using Claude AI.
+## What I Learned
 
-## What I Generated
+Today I used Claude AI to create a complete job search toolkit tailored to my profile.
+
+The toolkit included:
 
 - ATS-Friendly Cover Letter
 - Recruiter Outreach Email
 - Hiring Manager Email
 - LinkedIn Connection Request
 - Referral Request
-- Follow-up Email
-- 30-second Professional Introduction
-- Top 10 Job Titles
-- Recruiter Strengths
+- Follow-Up Email
+- 30-Second Professional Introduction
+- Top 10 Suitable Job Roles
+- Recruiter Strength Analysis
 - Skill Gap Analysis
 - Personal Brand Summary
 - Interview Talking Points
+- Learning Roadmap
 
-## Key Learnings
+## Key Takeaways
 
-- Personal branding is essential for job searching.
-- Recruiters value communication as much as technical skills.
-- AI can generate professional career documents quickly.
-- Skill gap analysis helps create a focused learning roadmap.
-- A complete job search toolkit improves networking and interview readiness.
+- Learned how recruiters evaluate resumes beyond ATS.
+- Understood the importance of personal branding.
+- Created professional outreach templates for networking.
+- Identified my current strengths and technical skill gaps.
+- Built reusable career documents for future job applications.
 
-#60DayClaudeChallenge
+## Tools Used
+
+- Claude AI
+- GitHub
+- Markdown
+
+## Screenshots
+
+(Add all screenshots here)
