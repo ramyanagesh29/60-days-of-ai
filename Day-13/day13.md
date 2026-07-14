@@ -31,6 +31,5 @@ Use Claude Connectors with Indeed to discover personalized job opportunities bas
 - Indeed
 - GitHub
 
-## Screenshots
 
-(Add your screenshots here)
+
