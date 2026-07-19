@@ -1,0 +1,269 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+    background: #f4f5f7;
+    color: #1f2430;
+    padding: 24px;
+    line-height: 1.5;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 24px; margin-bottom: 4px; }
+  .subtitle { color: #6b7280; margin-bottom: 24px; font-size: 14px; }
+  .section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .section-header {
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fafbfc;
+  }
+  .section-header:hover { background: #f0f2f5; }
+  .section-body { padding: 20px; }
+  .toggle-icon { transition: transform 0.2s; font-size: 12px; color: #888; }
+  .collapsed .toggle-icon { transform: rotate(-90deg); }
+  .collapsed .section-body { display: none; }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: #f8f9fb;
+    border: 1px solid #eceef1;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eee; }
+  th { background: #fafbfc; color: #6b7280; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  tr:hover { background: #fafbfc; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-high { background: #fde2e1; color: #b3261e; }
+  .badge-medium { background: #fef0da; color: #925c00; }
+  .badge-low { background: #e2f6e6; color: #1e7a34; }
+  .badge-conflict { background: #fff0d9; color: #a15c00; }
+  .badge-question { background: #e6ecff; color: #2a4bd7; }
+  .badge-pending { background: #eceff3; color: #4b5563; }
+  .badge-completed { background: #dcf6e3; color: #1c7a37; }
+
+  .item-block {
+    border-left: 3px solid #d0d5dd;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    background: #f8f9fb;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  .item-block.high { border-left-color: #b3261e; }
+  .item-block.conflict { border-left-color: #a15c00; }
+  .item-block.question { border-left-color: #2a4bd7; }
+
+  .speaker-name { font-weight: 700; color: #1f2430; }
+
+  @media (max-width: 600px) {
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tr { margin-bottom: 12px; border: 1px solid #eee; border-radius: 8px; padding: 8px; }
+    td { border: none; padding: 6px 8px; }
+    td::before { content: attr(data-label); font-weight: 600; color: #6b7280; display: block; font-size: 11px; text-transform: uppercase; }
+  }
+</style>
+
+<div class="container">
+  <h1>Quarterly Growth Strategy Meeting</h1>
+  <div class="subtitle">Transcript Breakdown &middot; Generated Summary</div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Summary <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <p>The leadership team reviewed Q2 performance: revenue grew 12%, below the 18% annual target, mainly due to enterprise deals slipping (9 of 14 expected large contracts closed) from procurement delays and added client security reviews. Website traffic rose 34% but conversion remains low, prompting a planned redesign — constrained by engineering capacity already committed to the August analytics dashboard. Customer retention is strong at 94%, but support tickets have risen due to reporting performance and dashboard loading times, which the CEO flagged as a priority. Hiring decisions and the annual customer conference budget were both postponed pending further inputs (Q3 forecasts and vendor proposals, respectively). The team agreed not to make public commitments about the August dashboard release until engineering completes its milestone review.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Key Takeaways <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="cards-grid">
+        <div class="card"><strong>Revenue Gap</strong><br>Q2 revenue grew 12% vs. 18% target.</div>
+        <div class="card"><strong>Deals Slipped</strong><br>9 of 14 expected enterprise contracts closed; remainder slipped due to procurement delays and security reviews.</div>
+        <div class="card"><strong>Marketing Traffic Up</strong><br>Website traffic increased 34% quarter-over-quarter; conversion rates still lower than expected.</div>
+        <div class="card"><strong>Engineering Capacity</strong><br>Engineering is near capacity with the August analytics dashboard; website redesign may need contractors.</div>
+        <div class="card"><strong>Retention Strong</strong><br>Customer retention at 94%, but support ticket volume has increased significantly.</div>
+        <div class="card"><strong>Reporting Performance Issue</strong><br>Flagged as a priority — affecting both support tickets and sales prospects.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Action Items <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr><th>Task</th><th>Owner</th><th>Deadline</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Task">Provide cost estimate for website redesign / additional contractor needs (pending architecture review)</td>
+            <td data-label="Owner">CTO</td>
+            <td data-label="Deadline">Not specified</td>
+            <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Investigate reporting performance and dashboard loading time issues</td>
+            <td data-label="Owner">Engineering team (CTO)</td>
+            <td data-label="Deadline">Not specified</td>
+            <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span> <span class="badge badge-high">🔴 High Priority</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Finalize Q3 forecasts before hiring decisions</td>
+            <td data-label="Owner">CFO</td>
+            <td data-label="Deadline">Not specified</td>
+            <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Submit final vendor proposals for annual conference budget</td>
+            <td data-label="Owner">Not specified</td>
+            <td data-label="Deadline">Not specified</td>
+            <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Revisit and approve conference budget</td>
+            <td data-label="Owner">CFO</td>
+            <td data-label="Deadline">Next month</td>
+            <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Complete engineering milestone review before making public commitments on August dashboard release</td>
+            <td data-label="Owner">Engineering / CTO</td>
+            <td data-label="Deadline">Not specified</td>
+            <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+          <tr>
+            <td data-label="Task">Follow up on open items</td>
+            <td data-label="Owner">Leadership team</td>
+            <td data-label="Deadline">Next week's leadership meeting</td>
+            <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Open Questions <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="item-block question"><span class="badge badge-question">❓ Open Question</span><br>Why did the remaining enterprise deals slip? (Partially answered: procurement delays, additional security reviews — but full resolution/status not specified)</div>
+      <div class="item-block question"><span class="badge badge-question">❓ Open Question</span><br>What is the cost estimate for the website redesign / additional contractor work? (Architecture review not yet completed)</div>
+      <div class="item-block question"><span class="badge badge-question">❓ Open Question</span><br>Should the new analytics dashboard be announced at the customer conference? (Contingent on confirming the August release date, which CTO could not guarantee)</div>
+      <div class="item-block question"><span class="badge badge-question">❓ Open Question</span><br>Next year's hiring plan / headcount — department heads submitted differing requests, not yet reconciled</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Risks / Blockers <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="item-block high"><span class="badge badge-high">🔴 High Priority</span><br>Enterprise deal slippage risks missing the annual revenue target if deals move again (raised by CFO).</div>
+      <div class="item-block high"><span class="badge badge-high">🔴 High Priority</span><br>Engineering is operating close to capacity; taking on website redesign work may require additional contractors.</div>
+      <div class="item-block"><span class="badge badge-medium">🟠 Medium Priority</span><br>Architecture review for website redesign not yet completed, blocking cost estimate and spending approval.</div>
+      <div class="item-block high"><span class="badge badge-high">🔴 High Priority</span><br>Rising support ticket volume tied to reporting performance and dashboard loading times, also mentioned by prospects during sales calls.</div>
+      <div class="item-block"><span class="badge badge-medium">🟠 Medium Priority</span><br>August analytics dashboard release date cannot currently be guaranteed by CTO.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Conflicts <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="item-block conflict"><span class="badge badge-conflict">⚠️ Conflict</span><br>Department heads submitted different headcount requests for next year's hiring plan — not yet reconciled; hiring decisions postponed until Q3 forecasts are finalized.</div>
+      <div class="item-block conflict"><span class="badge badge-conflict">⚠️ Conflict</span><br>Desire to announce the new analytics dashboard at the customer conference conflicts with CTO's inability to guarantee the August release date; CEO decided against public commitments until the milestone review is complete.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Additional Notes <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <p>Product Director noted that improving reporting performance may have a larger business impact than some planned feature releases. CEO emphasized getting a cost estimate before approving additional spending on the website redesign.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Speaker Summary <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="cards-grid">
+        <div class="card"><span class="speaker-name">CEO</span><br>Led the meeting; flagged revenue gap; asked for clarity on deal slippage; directed prioritization of reporting performance issue; postponed hiring and conference budget decisions; blocked public commitments on dashboard release.</div>
+        <div class="card"><span class="speaker-name">Head of Sales</span><br>Reported 9 of 14 expected enterprise deals closed; cited procurement delays and security reviews; noted prospects also mention reporting performance; asked about announcing the dashboard at the conference.</div>
+        <div class="card"><span class="speaker-name">CFO</span><br>Raised revenue forecast risk from slipped deals; asked for cost estimate on redesign; raised hiring plan clarity needs; required vendor proposals before approving conference budget.</div>
+        <div class="card"><span class="speaker-name">VP Marketing</span><br>Reported 34% traffic increase, low conversion; proposed website redesign and simplified demo-request process; raised conference budget approval request.</div>
+        <div class="card"><span class="speaker-name">Product Director</span><br>Raised timeline concerns given engineering's dashboard focus; suggested reporting performance may outweigh some feature releases; tied conference announcement to confidence in August date.</div>
+        <div class="card"><span class="speaker-name">CTO</span><br>Confirmed engineering near capacity; said cost estimate not ready, architecture review incomplete; confirmed reporting performance issue is known and under investigation; could not guarantee August release date.</div>
+        <div class="card"><span class="speaker-name">Customer Success Lead</span><br>Reported 94% retention and rising support ticket volume; identified reporting performance and dashboard loading times as main complaint drivers.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Decisions by Speaker <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="item-block"><span class="speaker-name">CEO:</span> Decided to require a cost estimate before approving additional redesign spending; decided reporting performance is a priority issue; decided to postpone hiring decisions until Q3 forecasts are finalized; decided to revisit conference budget next month; decided to avoid public commitments on the dashboard release until milestone review is complete.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Action Items by Speaker <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="item-block"><span class="speaker-name">CTO:</span> Provide cost estimate once architecture review is complete; continue investigating reporting performance/dashboard loading issue.</div>
+      <div class="item-block"><span class="speaker-name">CFO:</span> Finalize Q3 forecasts; collect vendor proposals for conference budget.</div>
+      <div class="item-block"><span class="speaker-name">All / Leadership team:</span> Follow up on open items at next week's leadership meeting.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+      Attribution Notes <span class="toggle-icon">▼</span>
+    </div>
+    <div class="section-body">
+      <p>Owner for "submit final vendor proposals" is not specified — CFO stated proposals are needed but no owner was named for submitting them. Deadlines for most action items are Not specified in the transcript.</p>
+    </div>
+  </div>
+</div>
