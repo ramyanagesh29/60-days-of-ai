@@ -38,20 +38,6 @@ The startup is evaluated on:
 - Execution
 - Investment Worthiness
 
-## Screenshots
-
-### Startup Pitch
-![Startup Input](screenshots/01-startup-input.png)
-
-### AI Investor Q&A
-![AI Judges](screenshots/02-ai-judges.png)
-
-### Startup Scorecard
-![Scorecard](screenshots/03-scorecard.png)
-
-### Investment Decision
-![Investment Decision](screenshots/04-investment-decision.png)
-
 ## Key Learnings
 
 - Learned how investors evaluate startups from different perspectives.
