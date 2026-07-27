@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prior Authorization Workflow Simulator</title>
+<style>
+  /* ============================================================
+     DESIGN TOKENS — shades of blue, black text, per requirements
+     ============================================================ */
+  :root{
+    --navy:#0b1f4d;
+    --deep-blue:#12356e;
+    --blue:#1d5bbf;
+    --mid-blue:#3b82f6;
+    --sky:#8fc0ff;
+    --pale:#dfeeff;
+    --paler:#f2f8ff;
+    --white:#ffffff;
+    --ink:#0a0a0a;           /* required black text */
+    --ok:#1d7a46;
+    --warn:#a9720a;
+    --bad:#a01d2c;
+    --card-shadow: 0 6px 18px rgba(11,31,77,0.18);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg,var(--pale) 0%, var(--paler) 40%, #eaf3ff 100%);
+    color: var(--ink);
+    min-height:100vh;
+  }
+  h1,h2,h3,h4{ color:var(--navy); margin:0 0 6px 0; }
+  p{ margin:0 0 8px 0; }
+  button{
+    font-family:inherit;
+    cursor:pointer;
+    border:none;
+    border-radius:10px;
+    padding:10px 16px;
+    font-weight:600;
+    font-size:14px;
+    background:var(--blue);
+    color:#fff;
+    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+    box-shadow:0 3px 8px rgba(29,91,191,0.35);
+  }
+  button:hover{ background:var(--deep-blue); transform:translateY(-1px); }
+  button:active{ transform:translateY(0px); }
+  button.secondary{ background:var(--sky); color:var(--ink); box-shadow:none; }
+  button.secondary:hover{ background:var(--mid-blue); color:#fff; }
+  button:disabled{ background:#b9c9de; color:#5a6b82; cursor:not-allowed; box-shadow:none; transform:none; }
+
+  /* ---------- App chrome ---------- */
+  header.app-header{
+    background: linear-gradient(120deg,var(--navy),var(--deep-blue));
+    color:#fff;
+    padding:14px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.25);
+    position:sticky; top:0; z-index:50;
+  }
+  header.app-header h1{ color:#fff; font-size:19px; }
+  header.app-header .stats{
+    display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+  }
+  .stat-pill{
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.3);
+    border-radius:999px;
+    padding:6px 14px;
+    font-size:13px;
+    color:#fff;
+    display:flex; gap:6px; align-items:center;
+  }
+  .stat-pill b{ font-size:14px; }
+
+  main{ max-width:1200px; margin:0 auto; padding:18px 16px 60px; }
+
+  /* ---------- Progress tracker ---------- */
+  .tracker{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:4px;
+    margin:6px 0 26px;
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:16px 10px;
+    box-shadow:var(--card-shadow);
+    overflow-x:auto;
+  }
+  .tracker-step{
+    flex:1;
+    min-width:88px;
+    text-align:center;
+    position:relative;
+    font-size:12px;
+    color:#5a6b82;
+  }
+  .tracker-step .dot{
+    width:26px;height:26px;border-radius:50%;
+    background:#d7e6fb;
+    color:var(--navy);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 6px;
+    font-weight:700;
+    font-size:12px;
+    border:2px solid #b9d3f7;
+  }
+  .tracker-step::before{
+    content:"";
+    position:absolute;
+    top:13px; left:-50%;
+    width:100%; height:2px;
+    background:#c7dcf6;
+    z-index:0;
+  }
+  .tracker-step:first-child::before{ display:none; }
+  .tracker-step.done .dot{ background:var(--ok); color:#fff; border-color:var(--ok); }
+  .tracker-step.done::before{ background:var(--ok); }
+  .tracker-step.active .dot{ background:var(--mid-blue); color:#fff; border-color:var(--mid-blue); box-shadow:0 0 0 4px rgba(59,130,246,0.25); }
+  .tracker-step.active{ color:var(--navy); font-weight:700; }
+
+  /* ---------- Scenario select screen ---------- */
+  #screen-select .intro{
+    background:var(--white);
+    border-radius:var(--radius);
+    padding:22px;
+    box-shadow:var(--card-shadow);
+    margin-bottom:20px;
+  }
+  .scenario-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+  }
+  .scenario-card{
+    background:var(--white);
+    border:2px solid var(--pale);
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:var(--card-shadow);
+    cursor:pointer;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .scenario-card:hover{ border-color:var(--mid-blue); transform:translateY(-3px); }
+  .scenario-card .icon{ font-size:34px; }
+  .scenario-card h3{ margin-top:8px; }
+  .scenario-card p{ font-size:13px; color:#33415c; }
+  .scenario-card .tag{
+    display:inline-block; margin-top:8px;
+    background:var(--pale); color:var(--navy);
+    border-radius:999px; padding:3px 10px; font-size:11px; font-weight:700;
+  }
+
+  /* ---------- Board (3 lanes) ---------- */
+  .hidden{ display:none !important; }
+  .board{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+    align-items:start;
+  }
+  @media (max-width: 880px){
+    .board{ grid-template-columns:1fr; }
+  }
+  .lane{
+    background:var(--white);
+    border-radius:var(--radius);
+    box-shadow:var(--card-shadow);
+    min-height:420px;
+    display:flex;
+    flex-direction:column;
+    border:3px dashed transparent;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .lane.drag-over{ border-color:var(--mid-blue); background:var(--pale); }
+  .lane.locked-target{ }
+  .lane-head{
+    padding:14px 16px;
+    border-radius:var(--radius) var(--radius) 0 0;
+    color:#fff;
+    font-weight:800;
+    letter-spacing:.3px;
+    font-size:15px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .lane-head.patient{ background:linear-gradient(120deg,#1d5bbf,#3b82f6); }
+  .lane-head.provider{ background:linear-gradient(120deg,#12356e,#1d5bbf); }
+  .lane-head.payer{ background:linear-gradient(120deg,#0b1f4d,#12356e); }
+  .lane-body{
+    padding:14px;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .lane-hint{
+    font-size:12.5px;
+    color:#5a6b82;
+    background:var(--paler);
+    border:1px dashed #c7dcf6;
+    border-radius:10px;
+    padding:10px;
+  }
+
+  /* ---------- Case card (draggable) ---------- */
+  .case-card{
+    background:linear-gradient(160deg,#fff,#eaf3ff);
+    border:2px solid var(--mid-blue);
+    border-radius:12px;
+    padding:12px;
+    box-shadow:0 4px 10px rgba(29,91,191,0.25);
+    user-select:none;
+  }
+  .case-card.draggable{
+    cursor:grab;
+    animation: pulse 1.6s infinite;
+  }
+  .case-card.draggable:active{ cursor:grabbing; }
+  @keyframes pulse{
+    0%,100%{ box-shadow:0 4px 10px rgba(29,91,191,0.25); }
+    50%{ box-shadow:0 4px 18px rgba(29,91,191,0.55); }
+  }
+  .case-card h4{ font-size:14px; margin-bottom:2px; }
+  .case-card .meta{ font-size:11.5px; color:#33415c; }
+  .case-card .drag-label{
+    margin-top:8px; font-size:11px; font-weight:700; color:var(--blue);
+  }
+
+  /* ---------- Step panels ---------- */
+  .panel{
+    background:var(--paler);
+    border:1px solid #d7e6fb;
+    border-radius:12px;
+    padding:12px;
+  }
+  .panel h4{ font-size:14px; }
+  .checklist{ list-style:none; margin:8px 0; padding:0; }
+  .checklist li{
+    display:flex; align-items:flex-start; gap:8px;
+    font-size:13px; padding:6px 4px; border-radius:8px;
+  }
+  .checklist li:hover{ background:#e4f0ff; }
+  .checklist input{ margin-top:3px; }
+  .panel .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+
+  .edu-box{
+    border-left:4px solid var(--mid-blue);
+    background:#eef6ff;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:13px;
+    color:#173a66;
+  }
+  .edu-box b{ color:var(--navy); }
+
+  .outcome-badge{
+    display:inline-block;
+    font-weight:800;
+    font-size:13px;
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:6px;
+  }
+  .outcome-approval{ background:#d5f2df; color:var(--ok); }
+  .outcome-pend{ background:#fdedcf; color:var(--warn); }
+  .outcome-denial{ background:#fbdadd; color:var(--bad); }
+
+  /* ---------- Activity log ---------- */
+  .log-wrap{
+    margin-top:20px;
+    background:var(--white);
+    border-radius:var(--radius);
+    box-shadow:var(--card-shadow);
+    padding:16px;
+  }
+  .log-wrap h3{ font-size:15px; }
+  #activity-log{
+    list-style:none; margin:8px 0 0; padding:0;
+    max-height:220px; overflow-y:auto;
+  }
+  #activity-log li{
+    font-size:13px;
+    padding:8px 10px;
+    border-bottom:1px solid #eef3fa;
+    display:flex; gap:8px;
+  }
+  #activity-log li .lane-flag{
+    font-size:10.5px; font-weight:800; border-radius:6px;
+    padding:1px 6px; color:#fff; white-space:nowrap; height:18px;
+  }
+  .flag-patient{ background:var(--mid-blue); }
+  .flag-provider{ background:var(--deep-blue); }
+  .flag-payer{ background:var(--navy); }
+
+  /* ---------- Toast ---------- */
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+    background:var(--navy); color:#fff; padding:12px 20px; border-radius:10px;
+    font-size:13.5px; box-shadow:0 8px 24px rgba(0,0,0,0.35);
+    z-index:200; opacity:0; pointer-events:none; transition:opacity .25s ease, bottom .25s ease;
+  }
+  #toast.show{ opacity:1; bottom:34px; }
+  #toast.error{ background:var(--bad); }
+  #toast.good{ background:var(--ok); }
+
+  /* ---------- Celebration ---------- */
+  #celebration{
+    position:fixed; inset:0; pointer-events:none; z-index:300; overflow:hidden;
+  }
+  .confetti{
+    position:absolute; top:-20px;
+    width:10px; height:16px;
+    border-radius:2px;
+    animation: fall linear forwards;
+  }
+  @keyframes fall{
+    to{ transform:translateY(110vh) rotate(540deg); opacity:0.9; }
+  }
+  #celebration-banner{
+    position:fixed; top:18%; left:50%; transform:translate(-50%,-50%) scale(0.8);
+    background:linear-gradient(120deg,var(--navy),var(--blue));
+    color:#fff; padding:22px 34px; border-radius:16px;
+    font-size:26px; font-weight:900; text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.35);
+    z-index:310;
+    opacity:0;
+    animation: pop .6s ease forwards;
+  }
+  @keyframes pop{
+    0%{ opacity:0; transform:translate(-50%,-50%) scale(0.6); }
+    60%{ opacity:1; transform:translate(-50%,-50%) scale(1.08); }
+    100%{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  }
+  #celebration-banner span{ display:block; font-size:14px; font-weight:500; margin-top:6px; }
+
+  /* ---------- Summary modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(11,31,77,0.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index:400; padding:16px;
+  }
+  .modal{
+    background:#fff; border-radius:18px; max-width:560px; width:100%;
+    padding:26px; box-shadow:0 30px 70px rgba(0,0,0,0.4);
+    max-height:88vh; overflow-y:auto;
+  }
+  .modal h2{ margin-bottom:12px; }
+  .summary-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    margin:14px 0;
+  }
+  .summary-item{
+    background:var(--paler); border-radius:10px; padding:10px 12px;
+  }
+  .summary-item .label{ font-size:11px; color:#5a6b82; font-weight:700; text-transform:uppercase; }
+  .summary-item .value{ font-size:18px; font-weight:800; color:var(--navy); }
+  .modal ol{ padding-left:18px; font-size:13px; }
+  .modal ol li{ margin-bottom:4px; }
+
+  footer.credit{
+    text-align:center; font-size:11.5px; color:#7185a1; padding:20px 0 6px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER — always visible: title, days, efficiency, restart
+     ============================================================ -->
+<header class="app-header">
+  <h1>🩺 Prior Authorization Workflow Simulator</h1>
+  <div class="stats">
+    <div class="stat-pill">📅 Days Elapsed: <b id="stat-days">0</b></div>
+    <div class="stat-pill">⚡ Efficiency: <b id="stat-eff">100</b>%</div>
+    <button id="btn-restart" class="secondary" onclick="restartGame()">🔄 Restart / New Patient</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============================================================
+       SCREEN 1 — Scenario selection
+       ============================================================ -->
+  <section id="screen-select">
+    <div class="intro">
+      <h2>Choose a Patient Scenario</h2>
+      <p>You'll guide a case through the real-world Prior Authorization (PA) journey across three lanes —
+      <b>Patient</b>, <b>Provider</b>, and <b>Payer</b>. Drag the case card between lanes when it's ready to move,
+      complete each step's mini-task, and see how your decisions affect the days elapsed, efficiency score,
+      and final outcome (Approval, Pend, Denial, Appeal, or Peer-to-Peer Review).</p>
+    </div>
+    <div class="scenario-grid" id="scenario-grid"><!-- filled by JS --></div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN 2 — Main game board
+       ============================================================ -->
+  <section id="screen-game" class="hidden">
+
+    <!-- Progress tracker -->
+    <div class="tracker" id="tracker"><!-- filled by JS --></div>
+
+    <!-- Three lanes -->
+    <div class="board">
+      <div class="lane" id="lane-patient" data-lane="patient">
+        <div class="lane-head patient">🧑‍⚕️ Patient</div>
+        <div class="lane-body" id="lane-patient-body"></div>
+      </div>
+      <div class="lane" id="lane-provider" data-lane="provider">
+        <div class="lane-head provider">🏥 Provider</div>
+        <div class="lane-body" id="lane-provider-body"></div>
+      </div>
+      <div class="lane" id="lane-payer" data-lane="payer">
+        <div class="lane-head payer">🏢 Payer</div>
+        <div class="lane-body" id="lane-payer-body"></div>
+      </div>
+    </div>
+
+    <!-- Activity / education log -->
+    <div class="log-wrap">
+      <h3>📜 Activity &amp; Education Log</h3>
+      <ul id="activity-log"></ul>
+    </div>
+  </section>
+
+</main>
+
+<footer class="credit">Prior Authorization Workflow Simulator — an educational, fictional simulation. Not medical or coverage advice.</footer>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Celebration overlay -->
+<div id="celebration"></div>
+
+<script>
+/* ================================================================
+   PRIOR AUTHORIZATION WORKFLOW SIMULATOR
+   Single-file HTML/CSS/vanilla JS. No frameworks, no CDNs, no
+   localStorage. All state lives in the `state` object below.
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   1) SCENARIO DATA — easy to edit / extend.
+   Each scenario has:
+     - necessity criteria checklist (needed:true = clinically required)
+     - required documentation checklist (needed:true = actually required)
+   ---------------------------------------------------------------- */
+const SCENARIOS = [
+  {
+    id: "surgery",
+    icon: "🦴",
+    name: "Elective Surgery",
+    subtitle: "Total Knee Replacement",
+    description: "A 62-year-old patient with worsening osteoarthritis is being scheduled for an elective total knee replacement.",
+    necessity: [
+      { text: "Failed 6+ weeks of conservative treatment (PT, medications)", needed: true },
+      { text: "Imaging confirms significant joint degeneration", needed: true },
+      { text: "Pain documented to significantly limit daily activities", needed: true },
+      { text: "Patient requested surgery for cosmetic reasons", needed: false },
+      { text: "Surgeon prefers a specific hospital's OR schedule", needed: false }
+    ],
+    docs: [
+      { text: "Imaging reports (X-ray / MRI)", needed: true },
+      { text: "Conservative treatment history notes", needed: true },
+      { text: "Surgeon's clinical justification letter", needed: true },
+      { text: "Patient's employment records", needed: false },
+      { text: "Insurance card copy only", needed: false }
+    ]
+  },
+  {
+    id: "mri",
+    icon: "🧲",
+    name: "Advanced Imaging",
+    subtitle: "Lumbar Spine MRI",
+    description: "A 45-year-old patient with persistent low back pain and radiating leg symptoms needs an MRI of the lumbar spine.",
+    necessity: [
+      { text: "Persistent radicular pain 6+ weeks despite therapy", needed: true },
+      { text: "Neurological deficit found on physical exam", needed: true },
+      { text: "Presence of red-flag symptoms (e.g., bladder/bowel changes)", needed: true },
+      { text: "Patient is anxious about the pain", needed: false },
+      { text: "Physician wants a baseline scan for the chart", needed: false }
+    ],
+    docs: [
+      { text: "Physical exam findings", needed: true },
+      { text: "Conservative therapy documentation", needed: true },
+      { text: "Symptom timeline / progression notes", needed: true },
+      { text: "Family history questionnaire", needed: false },
+      { text: "General wellness intake form", needed: false }
+    ]
+  },
+  {
+    id: "biologic",
+    icon: "💊",
+    name: "Specialty Medication",
+    subtitle: "Biologic for Rheumatoid Arthritis",
+    description: "A 38-year-old patient with rheumatoid arthritis needs approval for a biologic infusion therapy.",
+    necessity: [
+      { text: "Failed 2+ conventional DMARDs", needed: true },
+      { text: "Active disease confirmed by labs/exam (elevated CRP/ESR)", needed: true },
+      { text: "Diagnosis confirmed by a rheumatologist", needed: true },
+      { text: "Patient prefers the brand-name over generic", needed: false },
+      { text: "A pharmaceutical rep recommended this therapy", needed: false }
+    ],
+    docs: [
+      { text: "Lab results (CRP/ESR, RF/anti-CCP)", needed: true },
+      { text: "Prior DMARD trial history & outcomes", needed: true },
+      { text: "Rheumatologist's treatment plan", needed: true },
+      { text: "Pharmacy loyalty card", needed: false },
+      { text: "Unrelated dermatology note", needed: false }
+    ]
+  },
+  {
+    id: "inpatient",
+    icon: "🏨",
+    name: "Inpatient Admission",
+    subtitle: "Behavioral Health Crisis Stabilization",
+    description: "A patient in acute psychiatric crisis is being evaluated for inpatient behavioral health admission.",
+    necessity: [
+      { text: "Imminent risk of harm to self or others", needed: true },
+      { text: "Outpatient / crisis stabilization attempts have failed", needed: true },
+      { text: "Psychiatric evaluation supports inpatient level of care", needed: true },
+      { text: "Family requests admission mainly for convenience", needed: false },
+      { text: "Patient wants a private room", needed: false }
+    ],
+    docs: [
+      { text: "Psychiatric evaluation notes", needed: true },
+      { text: "Risk assessment documentation", needed: true },
+      { text: "Treatment plan & level-of-care justification", needed: true },
+      { text: "Unrelated primary care note", needed: false },
+      { text: "Transportation request form", needed: false }
+    ]
+  }
+];
+
+/* ----------------------------------------------------------------
+   2) TRACKER STEP DEFINITIONS (for the top progress bar)
+   ---------------------------------------------------------------- */
+const TRACKER_STEPS = [
+  "Request Care", "Necessity Review", "Documentation",
+  "Submission", "Payer Review", "Outcome", "Complete"
+];
+
+/* ----------------------------------------------------------------
+   3) GLOBAL STATE — everything lives here, in memory only.
+   ---------------------------------------------------------------- */
+let state = null;
+
+function freshState(scenario){
+  return {
+    scenario: scenario,
+    phase: "intake",          // current workflow phase id
+    trackerIndex: 0,
+    daysElapsed: 0,
+    penalty: 0,               // accumulates efficiency deductions
+    necessityScore: 0,
+    docsScore: 0,
+    pendUsed: false,
+    deniedOnce: false,
+    log: []                   // { text, lane } activity/education entries
+  };
+}
+
+/* ----------------------------------------------------------------
+   4) UTILITIES
+   ---------------------------------------------------------------- */
+function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+
+function efficiency(){
+  return clamp(Math.round(100 - state.penalty - Math.floor(state.daysElapsed/3)), 0, 100);
+}
+
+function addDays(n){ state.daysElapsed += n; refreshStats(); }
+function addPenalty(n){ state.penalty += n; refreshStats(); }
+
+function refreshStats(){
+  document.getElementById("stat-days").textContent = state.daysElapsed;
+  document.getElementById("stat-eff").textContent = efficiency();
+}
+
+function logEntry(lane, text){
+  state.log.push({ lane, text });
+  const ul = document.getElementById("activity-log");
+  const li = document.createElement("li");
+  const flagClass = lane === "patient" ? "flag-patient" : lane === "provider" ? "flag-provider" : "flag-payer";
+  li.innerHTML = '<span class="lane-flag ' + flagClass + '">' + lane.toUpperCase() + '</span><span>' + text + '</span>';
+  ul.appendChild(li);
+  ul.scrollTop = ul.scrollHeight;
+}
+
+function showToast(msg, kind){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "show" + (kind ? " " + kind : "");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(()=>{ t.className = ""; }, 2600);
+}
+
+/* ----------------------------------------------------------------
+   5) SCREEN NAVIGATION
+   ---------------------------------------------------------------- */
+function showScreen(name){
+  document.getElementById("screen-select").classList.toggle("hidden", name !== "select");
+  document.getElementById("screen-game").classList.toggle("hidden", name !== "game");
+}
+
+function restartGame(){
+  state = null;
+  document.getElementById("activity-log").innerHTML = "";
+  document.getElementById("stat-days").textContent = "0";
+  document.getElementById("stat-eff").textContent = "100";
+  showScreen("select");
+}
+
+/* ----------------------------------------------------------------
+   6) BUILD SCENARIO SELECTION CARDS
+   ---------------------------------------------------------------- */
+function buildScenarioCards(){
+  const grid = document.getElementById("scenario-grid");
+  grid.innerHTML = "";
+  SCENARIOS.forEach(sc => {
+    const card = document.createElement("div");
+    card.className = "scenario-card";
+    card.onclick = () => selectScenario(sc.id);
+    card.innerHTML =
+      '<div class="icon">' + sc.icon + '</div>' +
+      '<h3>' + sc.name + '</h3>' +
+      '<p><b>' + sc.subtitle + '</b><br>' + sc.description + '</p>' +
+      '<span class="tag">Start Case ▶</span>';
+    grid.appendChild(card);
+  });
+}
+
+function selectScenario(id){
+  const scenario = SCENARIOS.find(s => s.id === id);
+  state = freshState(scenario);
+  showScreen("game");
+  buildTracker();
+  resetLanes();
+  refreshStats();
+  enterIntake();
+}
+
+/* ----------------------------------------------------------------
+   7) PROGRESS TRACKER RENDERING
+   ---------------------------------------------------------------- */
+function buildTracker(){
+  const el = document.getElementById("tracker");
+  el.innerHTML = "";
+  TRACKER_STEPS.forEach((label, i) => {
+    const div = document.createElement("div");
+    div.className = "tracker-step";
+    div.id = "tracker-step-" + i;
+    div.innerHTML = '<div class="dot">' + (i+1) + '</div><div>' + label + '</div>';
+    el.appendChild(div);
+  });
+  updateTracker();
+}
+
+function updateTracker(){
+  TRACKER_STEPS.forEach((_, i) => {
+    const el = document.getElementById("tracker-step-" + i);
+    el.classList.toggle("done", i < state.trackerIndex);
+    el.classList.toggle("active", i === state.trackerIndex);
+  });
+}
+
+function setTrackerIndex(i){
+  state.trackerIndex = i;
+  updateTracker();
+}
+
+/* ----------------------------------------------------------------
+   8) LANE RESET / HELPERS
+   ---------------------------------------------------------------- */
+function resetLanes(){
+  document.getElementById("lane-patient-body").innerHTML = "";
+  document.getElementById("lane-provider-body").innerHTML = "";
+  document.getElementById("lane-payer-body").innerHTML =
+    '<div class="lane-hint">The case will appear here once submitted by the Provider.</div>';
+  document.getElementById("lane-provider-body").innerHTML =
+    '<div class="lane-hint">The case will appear here once sent by the Patient.</div>';
+}
+
+function laneBody(lane){ return document.getElementById("lane-" + lane + "-body"); }
+
+/* Builds the draggable case card HTML for a given lane + drag target */
+function caseCardHTML(dragLabel){
+  const sc = state.scenario;
+  return (
+    '<div class="case-card draggable" id="case-card" draggable="true">' +
+      '<h4>' + sc.icon + ' Case #PA-' + (1000 + Math.floor(Math.random()*900)) + '</h4>' +
+      '<div class="meta">' + sc.name + ' — ' + sc.subtitle + '</div>' +
+      (dragLabel ? '<div class="drag-label">👉 ' + dragLabel + '</div>' : '') +
+    '</div>'
+  );
+}
+
+function attachDragHandlers(){
+  const card = document.getElementById("case-card");
+  if(!card) return;
+  card.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("text/plain", "case");
+    e.dataTransfer.effectAllowed = "move";
+  });
+}
+
+/* Lane drop-zone wiring (called once at load) */
+["patient","provider","payer"].forEach(laneName => {
+  const laneEl = document.getElementById("lane-" + laneName);
+  laneEl.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    laneEl.classList.add("drag-over");
+  });
+  laneEl.addEventListener("dragleave", () => {
+    laneEl.classList.remove("drag-over");
+  });
+  laneEl.addEventListener("drop", (e) => {
+    e.preventDefault();
+    laneEl.classList.remove("drag-over");
+    handleDrop(laneName);
+  });
+});
+
+function handleDrop(targetLane){
+  if(!state || !state.expectedLane){
+    return; // nothing to drop right now
+  }
+  if(targetLane !== state.expectedLane){
+    showToast("⛔ Not ready yet — this case can't move there at this step.", "error");
+    return;
+  }
+  // Valid drop — run the transition function that was queued.
+  const fn = state.onValidDrop;
+  state.expectedLane = null;
+  state.onValidDrop = null;
+  if(fn) fn();
+}
+
+/* ================================================================
+   9) WORKFLOW PHASES
+   ================================================================ */
+
+/* ---- PHASE: intake (Patient lane) ---- */
+function enterIntake(){
+  state.phase = "intake";
+  setTrackerIndex(0);
+  const sc = state.scenario;
+  laneBody("patient").innerHTML =
+    '<div class="panel">' +
+      '<h4>🧑‍⚕️ Patient Requests Care</h4>' +
+      '<p style="font-size:13px;">' + sc.description + '</p>' +
+      '<div class="edu-box"><b>Why this matters:</b> The PA process begins when a patient\'s clinical need ' +
+      'is identified and their provider decides that a service, procedure, or medication requires payer authorization ' +
+      'before it can proceed.</div>' +
+    '</div>' +
+    caseCardHTML("Drag the case to the Provider lane to begin");
+  attachDragHandlers();
+  state.expectedLane = "provider";
+  state.onValidDrop = () => {
+    addDays(1);
+    logEntry("patient", "Patient case sent to the Provider for clinical review.");
+    enterProviderNecessity();
+  };
+}
+
+/* ---- PHASE: providerNecessity (Provider lane) ---- */
+function enterProviderNecessity(){
+  state.phase = "providerNecessity";
+  setTrackerIndex(1);
+  const sc = state.scenario;
+  const body = laneBody("provider");
+  body.innerHTML =
+    '<div class="panel">' +
+      '<h4>🩺 Step 1: Medical Necessity Evaluation</h4>' +
+      '<p style="font-size:13px;">Review the clinical picture and check every finding that supports ' +
+      'medical necessity for this case. Unchecking irrelevant items keeps the record accurate.</p>' +
+      '<ul class="checklist" id="necessity-list">' +
+        sc.necessity.map((item, i) =>
+          '<li><input type="checkbox" id="nec-' + i + '"><label for="nec-' + i + '">' + item.text + '</label></li>'
+        ).join("") +
+      '</ul>' +
+      '<div class="actions"><button onclick="evaluateNecessity()">✅ Evaluate Medical Necessity</button></div>' +
+    '</div>';
+}
+
+function evaluateNecessity(){
+  const sc = state.scenario;
+  let score = 0, wrong = 0, missed = 0;
+  const neededCount = sc.necessity.filter(c => c.needed).length;
+  sc.necessity.forEach((item, i) => {
+    const checked = document.getElementById("nec-" + i).checked;
+    if(item.needed && checked) score += 100 / neededCount;
+    if(item.needed && !checked) missed++;
+    if(!item.needed && checked) wrong++;
+  });
+  score = clamp(Math.round(score - wrong*15), 0, 100);
+  state.necessityScore = score;
+  addPenalty(wrong*3 + missed*5);
+  addDays(1);
+
+  let feedback = "Medical necessity documented (score: " + score + "/100).";
+  if(wrong>0) feedback += " " + wrong + " irrelevant finding(s) were included.";
+  if(missed>0) feedback += " " + missed + " key supporting finding(s) were missed.";
+  logEntry("provider", feedback);
+
+  laneBody("provider").insertAdjacentHTML("beforeend",
+    '<div class="edu-box"><b>Education:</b> Medical necessity review confirms that the requested service ' +
+    'aligns with clinical guidelines and the patient\'s documented condition — this is the foundation payers ' +
+    'use to judge every PA request.</div>');
+
+  setTimeout(enterProviderDocs, 500);
+}
+
+/* ---- PHASE: providerDocs (Provider lane) ---- */
+function enterProviderDocs(){
+  state.phase = "providerDocs";
+  const sc = state.scenario;
+  const body = laneBody("provider");
+  body.innerHTML =
+    '<div class="panel">' +
+      '<h4>📁 Step 2: Collect PA Documentation</h4>' +
+      '<p style="font-size:13px;">Select every document that should accompany this request. Irrelevant paperwork ' +
+      'can slow the payer\'s review, while missing items risk a Pend.</p>' +
+      '<ul class="checklist" id="docs-list">' +
+        sc.docs.map((item, i) =>
+          '<li><input type="checkbox" id="doc-' + i + '"><label for="doc-' + i + '">' + item.text + '</label></li>'
+        ).join("") +
+      '</ul>' +
+      '<div class="actions"><button onclick="evaluateDocs()">✅ Compile Documentation</button></div>' +
+    '</div>';
+}
+
+function evaluateDocs(){
+  const sc = state.scenario;
+  let score = 0, wrong = 0, missed = 0;
+  const neededCount = sc.docs.filter(c => c.needed).length;
+  sc.docs.forEach((item, i) => {
+    const checked = document.getElementById("doc-" + i).checked;
+    if(item.needed && checked) score += 100 / neededCount;
+    if(item.needed && !checked) missed++;
+    if(!item.needed && checked) wrong++;
+  });
+  score = clamp(Math.round(score - wrong*15), 0, 100);
+  state.docsScore = score;
+  addPenalty(wrong*3 + missed*5);
+  addDays(2);
+
+  let feedback = "Documentation packet compiled (score: " + score + "/100).";
+  if(wrong>0) feedback += " " + wrong + " unnecessary document(s) were attached.";
+  if(missed>0) feedback += " " + missed + " required document(s) are missing.";
+  logEntry("provider", feedback);
+
+  laneBody("provider").insertAdjacentHTML("beforeend",
+    '<div class="edu-box"><b>Education:</b> Payers require specific supporting documentation — clinical notes, ' +
+    'test results, and treatment history — to verify that the necessity criteria are actually met.</div>');
+
+  setTimeout(enterReadyToSubmit, 500);
+}
+
+/* ---- PHASE: readyToSubmit (Provider lane, card becomes draggable to Payer) ---- */
+function enterReadyToSubmit(){
+  state.phase = "readyToSubmit";
+  setTrackerIndex(3);
+  laneBody("provider").insertAdjacentHTML("beforeend", caseCardHTML("Drag the case to the Payer lane to submit"));
+  attachDragHandlers();
+  state.expectedLane = "payer";
+  state.onValidDrop = () => {
+    addDays(1);
+    logEntry("provider", "Prior authorization request submitted to the Payer.");
+    enterPayerReview(false);
+  };
+}
+
+/* ---- PHASE: payerReview (Payer lane) ---- */
+function enterPayerReview(isSecondReview){
+  state.phase = isSecondReview ? "payerReviewSecond" : "payerReview";
+  setTrackerIndex(4);
+  const body = laneBody("payer");
+  body.innerHTML =
+    '<div class="panel">' +
+      '<h4>🏢 ' + (isSecondReview ? "Payer Re-Review" : "Payer Review") + '</h4>' +
+      '<p style="font-size:13px;">The payer\'s clinical review team will compare the submitted necessity evidence ' +
+      'and documentation against coverage policy.</p>' +
+      '<div class="actions"><button onclick="runPayerReview(' + (isSecondReview ? "true" : "false") + ')">🔍 Run Payer Review</button></div>' +
+    '</div>';
+}
+
+function runPayerReview(isSecondReview){
+  const combined = (state.necessityScore + state.docsScore) / 2;
+  const rand = (Math.random() * 20) - 10;
+  let outcome;
+
+  if(!isSecondReview){
+    const adjusted = combined + rand;
+    if(adjusted >= 75) outcome = "approval";
+    else if(adjusted >= 45) outcome = "pend";
+    else outcome = "denial";
+  } else {
+    // Second review after fixing pend info — no more pends, force resolution
+    const adjusted = combined + rand;
+    outcome = (adjusted >= 55) ? "approval" : "denial";
+  }
+
+  addDays(7);
+  renderOutcome(outcome, isSecondReview ? "second" : "first");
+}
+
+/* ---- OUTCOME ROUTING ---- */
+function renderOutcome(outcome, pass){
+  setTrackerIndex(5);
+  const body = laneBody("payer");
+
+  if(outcome === "approval"){
+    body.insertAdjacentHTML("beforeend",
+      '<div class="panel"><span class="outcome-badge outcome-approval">✅ APPROVED</span>' +
+      '<div class="edu-box"><b>Education:</b> When necessity and documentation clearly meet coverage policy, ' +
+      'the payer can approve the request without further delay — this is the fastest, most efficient path through PA.</div></div>');
+    logEntry("payer", "Prior authorization APPROVED.");
+    enterCompletion("approval");
+    return;
+  }
+
+  if(outcome === "pend" && !state.pendUsed){
+    state.pendUsed = true;
+    addPenalty(15);
+    body.insertAdjacentHTML("beforeend",
+      '<div class="panel"><span class="outcome-badge outcome-pend">⏳ PENDED — Additional Info Needed</span>' +
+      '<div class="edu-box"><b>Education:</b> A "Pend" means the payer needs more information before deciding. ' +
+      'This is common and usually resolvable — but it adds days to the process.</div></div>');
+    logEntry("payer", "Request PENDED — payer requests additional clinical information.");
+    setTimeout(() => enterPendInfo(), 500);
+    return;
+  }
+
+  // Denial path (also used if a pend happens twice, force as denial)
+  state.deniedOnce = true;
+  addPenalty(25);
+  body.insertAdjacentHTML("beforeend",
+    '<div class="panel"><span class="outcome-badge outcome-denial">❌ DENIED</span>' +
+    '<div class="edu-box"><b>Education:</b> A denial means the payer determined coverage criteria were not met ' +
+    'based on the evidence submitted. Providers have the right to appeal and request a Peer-to-Peer review.</div></div>');
+  logEntry("payer", "Request DENIED by the payer.");
+
+  if(pass === "second-final" || state.appealUsed){
+    // final denial after appeal / peer-to-peer already happened
+    enterCompletion("denial");
+  } else {
+    setTimeout(() => enterDenialAppeal(), 500);
+  }
+}
+
+/* ---- PHASE: pendInfo (Provider lane) ---- */
+function enterPendInfo(){
+  state.phase = "pendInfo";
+  const sc = state.scenario;
+  const body = laneBody("provider");
+  body.innerHTML =
+    '<div class="panel">' +
+      '<h4>📎 Respond to Additional Information Request</h4>' +
+      '<p style="font-size:13px;">Gather the missing documentation the payer flagged. Check the items you now have ready.</p>' +
+      '<ul class="checklist" id="pend-list">' +
+        sc.docs.filter(d => d.needed).map((item, i) =>
+          '<li><input type="checkbox" id="pend-' + i + '"><label for="pend-' + i + '">' + item.text + '</label></li>'
+        ).join("") +
+      '</ul>' +
+      '<div class="actions"><button onclick="resolvePendInfo()">📤 Prepare Resubmission</button></div>' +
+    '</div>';
+}
+
+function resolvePendInfo(){
+  const items = document.querySelectorAll('#pend-list input[type="checkbox"]');
+  let checkedCount = 0;
+  items.forEach(cb => { if(cb.checked) checkedCount++; });
+  const boost = Math.round((checkedCount / items.length) * 30);
+  state.docsScore = clamp(state.docsScore + boost, 0, 100);
+  addDays(3);
+  logEntry("provider", "Additional documentation gathered and prepared for resubmission (docs score now " + state.docsScore + "/100).");
+
+  laneBody("provider").insertAdjacentHTML("beforeend", caseCardHTML("Drag the case back to the Payer lane to resubmit"));
+  attachDragHandlers();
+  state.expectedLane = "payer";
+  state.onValidDrop = () => {
+    addDays(1);
+    logEntry("provider", "Case resubmitted to the Payer with additional information.");
+    enterPayerReview(true);
+  };
+}
+
+/* ---- PHASE: denialAppeal (Provider lane) ---- */
+function enterDenialAppeal(){
+  state.phase = "denialAppeal";
+  const body = laneBody("provider");
+  body.innerHTML =
+    '<div class="panel">' +
+      '<h4>⚖️ File an Appeal</h4>' +
+      '<p style="font-size:13px;">Strengthen the case with new clinical evidence or rationale before requesting ' +
+      'a Peer-to-Peer review with the payer\'s medical director.</p>' +
+      '<label style="font-size:13px; font-weight:600;">Strength of new supporting evidence:</label>' +
+      '<select id="appeal-strength" style="width:100%; padding:8px; margin-top:6px; border-radius:8px; border:1px solid #c7dcf6;">' +
+        '<option value="10">Minor clarification of existing notes</option>' +
+        '<option value="20" selected>Additional clinical detail from the provider</option>' +
+        '<option value="30">New test results / specialist consultation</option>' +
+      '</select>' +
+      '<div class="actions"><button onclick="submitAppeal()">📝 Submit Appeal</button></div>' +
+    '</div>';
+}
+
+function submitAppeal(){
+  state.appealBonus = parseInt(document.getElementById("appeal-strength").value, 10);
+  state.appealUsed = true;
+  addPenalty(10);
+  addDays(5);
+  logEntry("provider", "Formal appeal filed with supporting rationale; requesting Peer-to-Peer review.");
+
+  laneBody("provider").insertAdjacentHTML("beforeend", caseCardHTML("Drag the case to the Payer lane for Peer-to-Peer Review"));
+  attachDragHandlers();
+  state.expectedLane = "payer";
+  state.onValidDrop = () => {
+    addDays(1);
+    logEntry("provider", "Case sent to the Payer for Peer-to-Peer review.");
+    enterPeerToPeer();
+  };
+}
+
+/* ---- PHASE: peerToPeer (Payer lane) — final resolution ---- */
+function enterPeerToPeer(){
+  state.phase = "peerToPeer";
+  const body = laneBody("payer");
+  body.innerHTML =
+    '<div class="panel">' +
+      '<h4>☎️ Peer-to-Peer Review</h4>' +
+      '<p style="font-size:13px;">The treating provider discusses the case directly with the payer\'s medical director ' +
+      'to clarify medical necessity and address the reasons for denial.</p>' +
+      '<div class="actions"><button onclick="runPeerToPeer()">📞 Conduct Peer-to-Peer Review</button></div>' +
+    '</div>';
+}
+
+function runPeerToPeer(){
+  const combined = (state.necessityScore + state.docsScore) / 2;
+  const rand = (Math.random() * 16) - 8;
+  const adjusted = combined + (state.appealBonus || 0) + rand;
+  addDays(7);
+
+  const body = laneBody("payer");
+  if(adjusted >= 65){
+    body.insertAdjacentHTML("beforeend",
+      '<div class="panel"><span class="outcome-badge outcome-approval">✅ APPROVED on Appeal</span>' +
+      '<div class="edu-box"><b>Education:</b> Peer-to-Peer reviews let a treating provider speak directly with the payer\'s ' +
+      'medical director — often the deciding factor when new clinical context changes the outcome.</div></div>');
+    logEntry("payer", "Peer-to-Peer review successful — request APPROVED on appeal.");
+    enterCompletion("approval-on-appeal");
+  } else {
+    addPenalty(15);
+    body.insertAdjacentHTML("beforeend",
+      '<div class="panel"><span class="outcome-badge outcome-denial">❌ Denial Upheld</span>' +
+      '<div class="edu-box"><b>Education:</b> If the Peer-to-Peer review does not resolve the payer\'s concerns, ' +
+      'the denial is upheld. Further options may include external review or exploring alternative treatments.</div></div>');
+    logEntry("payer", "Peer-to-Peer review complete — denial UPHELD.");
+    enterCompletion("final-denial");
+  }
+}
+
+/* ---- PHASE: completion ---- */
+function enterCompletion(result){
+  state.phase = "complete";
+  setTrackerIndex(6);
+
+  const isApproved = (result === "approval" || result === "approval-on-appeal");
+  if(isApproved){
+    celebrate();
+  }
+  setTimeout(() => showSummary(result), isApproved ? 1600 : 400);
+}
+
+/* ----------------------------------------------------------------
+   10) CELEBRATION ANIMATION
+   ---------------------------------------------------------------- */
+function celebrate(){
+  const container = document.getElementById("celebration");
+  container.innerHTML = "";
+  const colors = ["#1d5bbf","#3b82f6","#8fc0ff","#0b1f4d","#12356e","#ffffff"];
+  for(let i=0;i<70;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = (Math.random()*100) + "vw";
+    c.style.background = colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration = (2 + Math.random()*2) + "s";
+    c.style.animationDelay = (Math.random()*0.6) + "s";
+    container.appendChild(c);
+  }
+  const banner = document.createElement("div");
+  banner.id = "celebration-banner";
+  banner.innerHTML = "🎉 Prior Authorization Approved! 🎉<span>Great work navigating the workflow.</span>";
+  container.appendChild(banner);
+
+  setTimeout(() => { container.innerHTML = ""; }, 3600);
+}
+
+/* ----------------------------------------------------------------
+   11) SUMMARY MODAL
+   ---------------------------------------------------------------- */
+const OUTCOME_LABELS = {
+  "approval": "Approved (First Review)",
+  "approval-on-appeal": "Approved on Appeal (Peer-to-Peer)",
+  "final-denial": "Denied (Upheld after Appeal)",
+  "denial": "Denied"
+};
+
+function showSummary(result){
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.id = "summary-overlay";
+
+  const stepsHTML = state.log.map(l => "<li><b>[" + l.lane.toUpperCase() + "]</b> " + l.text + "</li>").join("");
+
+  overlay.innerHTML =
+    '<div class="modal">' +
+      '<h2>📋 Workflow Summary</h2>' +
+      '<p>Case: <b>' + state.scenario.name + ' — ' + state.scenario.subtitle + '</b></p>' +
+      '<div class="summary-grid">' +
+        '<div class="summary-item"><div class="label">Final Outcome</div><div class="value">' + (OUTCOME_LABELS[result] || result) + '</div></div>' +
+        '<div class="summary-item"><div class="label">Days Elapsed</div><div class="value">' + state.daysElapsed + '</div></div>' +
+        '<div class="summary-item"><div class="label">Efficiency Score</div><div class="value">' + efficiency() + '%</div></div>' +
+        '<div class="summary-item"><div class="label">Necessity Score</div><div class="value">' + state.necessityScore + '/100</div></div>' +
+      '</div>' +
+      '<h3>Path Taken</h3>' +
+      '<ol>' + stepsHTML + '</ol>' +
+      '<div class="actions" style="margin-top:16px;"><button onclick="closeSummaryAndRestart()">🔄 Start a New Patient</button> ' +
+      '<button class="secondary" onclick="closeSummary()">Close</button></div>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+}
+
+function closeSummary(){
+  const overlay = document.getElementById("summary-overlay");
+  if(overlay) overlay.remove();
+}
+
+function closeSummaryAndRestart(){
+  closeSummary();
+  restartGame();
+}
+
+/* ----------------------------------------------------------------
+   12) INIT
+   ---------------------------------------------------------------- */
+buildScenarioCards();
+showScreen("select");
+</script>
+</body>
+</html>
