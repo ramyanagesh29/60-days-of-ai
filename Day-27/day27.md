@@ -38,31 +38,26 @@ The story contains 8 scenes:
 - Restart option to explore different dialogue paths
 - Responsive web interface
 
-## Screenshots
 
-### 1. Story Beginning
+## 📸 Screenshots
 
-Rahul begins his healthcare journey after visiting City Medical Center and receiving a diagnosis and treatment recommendation.
+### 1. Doctor Visit
+![Doctor Visit](screenshots/stimulator.png)
 
-![Story Start](screenshots/story-start.png)
+### 2. Insurance Review
+![Insurance Review](screenshots/insurance.png)
 
-### 2. Understanding Prior Authorization
+### 3. PA Denial
+![PA Denial](screenshots/denial.png)
 
-Priya explains Prior Authorization and why insurance review can affect access to treatment.
+### 4. Appeal Process
+![Appeal Process](screenshots/appeal.png)
 
-![PA Explanation](screenshots/pa-explanation.png)
+### 5. PA Approval
+![PA Approval](screenshots/approval.png)
 
-### 3. Denial and Appeal Journey
-
-The request is denied because step therapy documentation is missing. The story demonstrates that a denial is not necessarily the end of the process and shows how an appeal can be prepared.
-
-![Denial and Appeal](screenshots/denial-appeal.png)
-
-### 4. Approval and Final Takeaways
-
-The story progresses through approval and concludes with lessons from both the patient and healthcare-system perspectives.
-
-![Approval and Takeaways](screenshots/approval-takeaways.png)
+### 6. Final Takeaways
+![Final Takeaways](screenshots/takeaways.png)
 
 ## Key Takeaways
 
