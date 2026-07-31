@@ -1,67 +1,106 @@
-# Day 29 – Operation Lifeline: Supply Chain Crisis Lab 🚨
+# Day 29 – Operation Lifeline: Supply Chain Crisis Lab
 
-## ABTalks 60-Day Claude Challenge
+## 60 Days of Claude Challenge
 
-For Day 29, I built and explored **Operation Lifeline: Supply Chain Crisis Lab**, an interactive enterprise business simulation created with Claude.
+### Project Overview
 
-The challenge focuses on making strategic decisions during a supply-chain crisis and observing how those decisions affect business outcomes.
+For Day 29, I built **Operation Lifeline: Supply Chain Crisis Lab**, an interactive browser-based simulation where the user takes control of a global company during a supply chain crisis.
 
-## 🎯 Objective
+The simulation challenges the user to make decisions across crisis response, supplier negotiation, leadership, risk management, and AI investment.
 
-The goal was to experience enterprise crisis management through an interactive simulation and understand how leaders must balance competing priorities when supply-chain disruptions occur.
+The application was built as a single HTML file using HTML, CSS, and Vanilla JavaScript.
 
-## 🚨 Crisis Scenario
+---
 
-**Biggest Crisis:** [Add your actual crisis]
+## Features
 
-**Strategy Chosen:** [Add the strategy you selected]
+- Randomized company and crisis scenarios
+- Live operational metrics
+- Company and crisis briefing
+- War Room crisis-response decisions
+- Supplier negotiation
+- Boardroom leadership decisions
+- AI strategy investments
+- Final Crisis Score
+- Leadership, negotiation, resilience, cost control, risk management, and customer satisfaction scores
+- Best decision and biggest mistake analysis
+- Expert recommendation
+- Lessons learned
+- New simulation/replay functionality
 
-**Final Crisis Score:** [Add your actual score]
+---
 
-## 🧠 Decisions & Strategy
+## Simulation Screenshots
 
-During the simulation, I had to evaluate the crisis, review available information, choose a response strategy, and observe the impact of those decisions.
+### 1. Operation Lifeline – Start Screen
 
-The experience demonstrated how business decisions during a crisis can involve trade-offs rather than having one perfect solution.
+![Start Screen](screenshots/crisis-start.png)
 
-## 📊 Executive Dashboard
+The simulation begins by introducing the supply chain crisis environment and the decisions the player will face.
 
-The executive dashboard helped visualize the status and impact of the crisis throughout the simulation.
+### 2. Company Profile
 
-![Executive Dashboard](screenshots/executive-dashboard.png)
+![Company Profile](screenshots/crisis-event.png)
 
-## 📸 Simulation Screenshots
+In this simulation, I managed **Meridian Collective**, an automotive parts company. The company profile provides operational information such as revenue, factories, warehouses, suppliers, inventory, lead time, and countries of operation.
 
-### Crisis Beginning
-![Crisis Start](screenshots/crisis-start.png)
+### 3. AI Strategy
 
-### Major Crisis
-![Crisis Event](screenshots/crisis-event.png)
+![AI Strategy](screenshots/strategy-decision.png)
 
-### Strategic Decision
-![Strategy Decision](screenshots/strategy-decision.png)
+One of the final challenges was deciding which AI technologies should be funded to improve future supply chain resilience.
 
-### Final Result
+The available options included Demand Forecasting AI, Inventory Optimization AI, Supplier Risk Monitoring, Warehouse Vision, and Procurement Copilot.
+
+### 4. Final Crisis Score
+
 ![Final Result](screenshots/final-result.png)
 
-## 💡 Key Learnings
+My final **Overall Crisis Score was 79/100 – Solid**.
 
-- Learned how interactive simulations can represent enterprise crisis situations.
-- Understood the importance of evaluating risks before making strategic decisions.
-- Learned that crisis management involves balancing multiple business priorities.
-- Explored how an executive dashboard can support decision-making.
-- Learned how Claude can be used to build interactive enterprise simulations.
+Key results:
 
-## 🛠️ Tools Used
+- Leadership: 68/100
+- Negotiation: 52/100
+- Resilience: 95/100
+- Cost Control: 79/100
+- Risk Management: 100/100
+- Customer Satisfaction: 79/100
 
-- Claude AI
+### 5. Lessons Learned & Run Summary
+
+![Final Report](screenshots/final-result-2.png)
+
+The simulator identified supplier negotiation as my biggest weakness while highlighting supplier diversification and monitoring investments as a strong decision.
+
+---
+
+## Key Learnings
+
+This simulation helped me understand that supply chain crisis management is not only about reducing immediate costs.
+
+I learned that:
+
+- Supplier diversification can significantly improve resilience.
+- Strong supplier relationships and trust matter during negotiations.
+- Crisis response requires balancing cost, inventory, delivery, profit, and customer satisfaction.
+- Geopolitical risks should be considered when designing supply networks.
+- AI-based forecasting, inventory optimization, and supplier monitoring can improve long-term resilience.
+- Good crisis management requires a portfolio of coordinated decisions rather than one isolated action.
+
+---
+
+## Tech Stack
+
 - HTML
 - CSS
-- JavaScript
-- GitHub
+- Vanilla JavaScript
+- Claude
 
-## 🚀 Challenge
+---
 
-**Day 29 – Operation Lifeline: Supply Chain Crisis Lab**
+## Challenge
 
-#60DayClaudeChallenge
+Day 29 of the **#60DayClaudeChallenge**
+
+Built as part of the ABTalks 60-Day Claude Challenge.
