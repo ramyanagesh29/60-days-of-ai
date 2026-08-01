@@ -28,7 +28,7 @@ The simulator places the user in the role of Head of Operations responsible for 
 ![Live Dashboard](screenshots/start-stimulation.png)
 
 ### Running Simulation
-![Simulation](screenshots/live score.png)
+![Simulation](screenshots/live-score.png)
 
 ### Final Report
 ![Final Report](screenshots/final.png)
