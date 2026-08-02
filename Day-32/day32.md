@@ -38,7 +38,7 @@ The simulator explains every decision with simple reasoning and also teaches reu
 
 ### Welcome Screen
 
-![Welcome](screenshots/welcome.png)
+![Welcome](screenshots/01-dashboard.png)
 
 ### Brand Selection
 
