@@ -1,26 +1,27 @@
 # Day 34 – Marketing Detective
 
 ## Challenge
+
 Built an interactive **Marketing Detective** application using Claude AI.
 
-The application teaches marketing analytics through a detective-style investigation where users analyze campaign evidence, identify marketing mistakes, and learn how data-driven decisions improve business outcomes.
+The application teaches marketing analytics through detective-style investigations where users analyze campaign evidence, identify marketing mistakes, and learn data-driven decision making.
 
 ---
 
 ## Features
 
-- Theme selection (including Claude Orange)
-- Detective-style dark UI
-- Randomized marketing investigation cases
-- Interactive investigation board
-- Draggable evidence cards
-- Campaign metrics analysis
-- Customer feedback analysis
-- Marketing mistake identification
-- Expert explanation and verdict
-- Learning report with recommendations
-- Replay with new marketing cases
-- Responsive single-file HTML application
+- Dark Detective UI
+- Theme Selection
+- Random Marketing Cases
+- Interactive Investigation Board
+- Draggable Evidence Cards
+- Campaign Metrics Analysis
+- Customer Comments Analysis
+- Marketing Mistake Detection
+- Expert Verdict
+- Learning Report
+- Replay with New Cases
+- Responsive Single HTML Application
 
 ---
 
@@ -29,36 +30,60 @@ The application teaches marketing analytics through a detective-style investigat
 - HTML5
 - CSS3
 - JavaScript
-- React (CDN) / Vanilla JavaScript (offline compatible)
 - Claude AI
 
 ---
 
 ## Screenshots
 
-- Home Screen
-- Theme Selection
-- Investigation Board
-- Evidence Analysis
-- Solved Marketing Case
-- Learning Report
+### Welcome Screen
+![Welcome](screenshots/welcome.png)
+
+### Investigation Board
+![Investigation](screenshots/investigation-board.png)
+
+### Evidence Analysis
+![Evidence](screenshots/evidence-analysis.png)
+
+### Solved Marketing Case
+![Solved Case](screenshots/solved-case.png)
+
+### Learning Report
+![Learning Report](screenshots/learning-report.png)
+
+---
+
+## Generated HTML File
+
+- marketing-detective.html
+
+---
+
+## Marketing Learning Report
+
+### Investigation Summary
+
+- Campaign performance analyzed
+- Marketing evidence reviewed
+- Primary marketing mistake identified
+- Expert recommendations generated
 
 ---
 
 ## Key Learnings
 
-- Marketing decisions should always be supported by data rather than assumptions.
-- Campaign metrics such as CTR, engagement, conversions, and customer feedback reveal valuable business insights.
-- Investigating customer behavior helps identify the root cause of poor campaign performance.
-- Organizing evidence before making conclusions improves analytical thinking.
-- Claude can generate engaging educational applications that make learning marketing interactive and practical.
+- Marketing decisions should be based on evidence rather than assumptions.
+- Customer behavior provides valuable campaign insights.
+- Marketing metrics help identify weak campaign areas.
+- Data-driven improvements increase campaign effectiveness.
+- Claude AI can generate interactive educational applications with real-world business scenarios.
 
 ---
 
 ## Project Outcome
 
-Successfully developed a standalone interactive Marketing Detective application that simulates real-world marketing investigations and strengthens analytical decision-making skills.
+Successfully created an interactive Marketing Detective simulator that improves analytical thinking and marketing decision-making through hands-on investigation.
 
 ---
 
-#60DaysClaudeChallenge
+#60DayClaudeChallenge
