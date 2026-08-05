@@ -1,28 +1,26 @@
 # Day 35 – Interactive Prompt Engineering
 
-## 🧩 Prompt Puzzle — Master AI Prompting Through Play
+# 🧩 Prompt Puzzle — Master AI Prompting Through Play
 
-Today I built an interactive educational web application called **Prompt Puzzle** using Claude AI.
+## Challenge
 
-The application teaches prompt engineering through a fun puzzle-based learning experience where users build, clean, and optimize prompts for different AI scenarios.
+Built an interactive Prompt Puzzle application using Claude AI to practice Prompt Engineering through engaging puzzle-based activities.
 
 ---
 
 ## Features
 
-- Interactive Prompt Puzzle game
-- Offline single-file HTML application
-- Premium modern dark UI
-- Drag-and-drop prompt building
-- Prompt cleaning challenges
-- Best prompt selection challenges
-- Live scoring system
-- Accuracy and time tracking
+- Offline Single HTML Application
+- Modern Dark UI
+- Interactive Prompt Challenges
+- Build the Prompt
+- Clean the Prompt
+- Choose the Best Prompt
+- Live Score Tracking
 - Prompt Performance Report
-- Prompt DNA visualization
-- Personalized feedback
-- Replay with randomized scenarios
-- Responsive design
+- Prompt DNA Visualization
+- Personalized Feedback
+- Replay with Randomized Scenarios
 
 ---
 
@@ -35,35 +33,84 @@ The application teaches prompt engineering through a fun puzzle-based learning e
 
 ---
 
-## Challenge Types
+# Screenshots
 
-### 🧱 Build the Prompt
-Arrange prompt blocks in the correct order to create an effective AI prompt.
+## Welcome Screen
 
-### 🧹 Clean the Prompt
-Remove unnecessary instructions and improve prompt quality.
-
-### ✅ Choose the Best Prompt
-Compare multiple prompts and identify the most effective version.
+![Welcome](screenshots/scenario-01.png)
 
 ---
 
-## What I Learned
+## Choose the Best Prompt
 
-- Clear prompts produce better AI responses.
-- Adding proper context improves output quality.
-- Well-defined constraints reduce ambiguity.
-- Structured prompts are easier for AI to understand.
-- Prompt engineering is an iterative process of testing and refinement.
+![Scenario 1](screenshots/scenario-02.png)
 
 ---
 
-## Project Outcome
+## Build the Prompt
 
-Successfully developed an interactive Prompt Puzzle application that helps users improve prompt engineering skills through hands-on practice, real-world scenarios, and performance analysis.
+![Scenario 2](screenshots/scenario-03.png)
+
+---
+
+## SQL Optimization Challenge
+
+![Scenario 3](screenshots/scenario-04.png)
+
+---
+
+## Clean the Prompt
+
+![Scenario 4](screenshots/scenario-05.png)
+
+---
+
+## API Design Challenge
+
+![Scenario 5](screenshots/scenario-06.png)
+
+---
+
+## Prompt Performance Report
+
+![Performance Report](screenshots/puzzel-dashboard.png)
+
+---
+
+## Generated HTML File
+
+- prompt-puzzle.html
+
+---
+
+# Prompt Performance Report
+
+**Prompt Score:** 631
+
+**Average Accuracy:** 92%
+
+**Expert Rank:** Prompt Strategist
+
+**Scenarios Completed:** 6
+
+**Hints Used:** 0
+
+---
+
+# Key Learnings
+
+- Effective prompts include clear roles, context, tasks, constraints, and expected output.
+- Removing unnecessary instructions improves AI response quality.
+- Well-structured prompts produce more accurate and efficient outputs.
+- Prompt engineering is an iterative process that improves through practice and refinement.
+- Interactive challenges are a practical way to strengthen prompt-writing skills.
+
+---
+
+# Project Outcome
+
+Successfully built and completed the Prompt Puzzle application, strengthening prompt engineering skills through real-world scenarios and interactive learning.
 
 ---
 
 #60DayClaudeChallenge
-#PromptEngineering
-#ClaudeAI
