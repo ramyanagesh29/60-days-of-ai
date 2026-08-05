@@ -73,7 +73,7 @@ Built an interactive Prompt Puzzle application using Claude AI to practice Promp
 
 ## Prompt Performance Report
 
-![Performance Report](screenshots/final-result.png)
+![Performance Report](screenshots/final-medical.png)
 
 ---
 
