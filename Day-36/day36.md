@@ -21,19 +21,19 @@ An interactive self-reflection web application created using Claude AI that help
 ## Screenshots
 
 ### Home Screen
-![Home](images/01-home-screen.png)
+![Home](screenshots/001-dashboard)
 
 ### Thinking Style Quiz
-![Quiz](images/02-thinking-style-quiz.png)
+![Quiz](screenshots/002-scenario)
 
 ### Priority Sorting
-![Priority](images/03-priority-sorting.png)
+![Priority](screenshots/003-chapter2)
 
 ### Thinking Timeline
-![Timeline](images/04-thinking-timeline.png)
+![Timeline](screenshots/004-chapter3)
 
 ### Reflection Journal
-![Reflection](images/05-reflection-journal.png)
+![Reflection](screenshots/005-reflection)
 
 ## Key Learnings
 - Learned how AI can generate complete interactive web applications.
