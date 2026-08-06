@@ -20,9 +20,6 @@ An interactive self-reflection web application created using Claude AI that help
 
 ## Screenshots
 
-### Home Screen
-![Home](screenshots/001-dashboard.png)
-
 ### Thinking Style Quiz
 ![Quiz](screenshots/002-scenario.png)
 
