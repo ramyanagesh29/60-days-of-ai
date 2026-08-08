@@ -130,13 +130,13 @@ Programming Mode provides realistic code snippets for typing practice, including
 
 ### 5. Analytics Dashboard
 
-![Analytics Dashboard](images/05-analytics-dashboard.png)
+![Analytics Dashboard](images/06-analytics-dashboard.png)
 
 The analytics dashboard displays WPM, accuracy, consistency, percentile, performance graphs, character statistics, error analysis and achievements.
 
 ### 6. Session History
 
-![Session History](images/06-session-history.png)
+![Session History](images/07-session-history.png)
 
 Recent sessions can be reviewed with their mode, category, WPM, accuracy and date.
 
