@@ -130,7 +130,7 @@ Programming Mode provides realistic code snippets for typing practice, including
 
 ### 5. Analytics Dashboard
 
-![Analytics Dashboard](images/06-analytics-dashboard.png)
+![Analytics Dashboard](images/06-performance-graph.png)
 
 The analytics dashboard displays WPM, accuracy, consistency, percentile, performance graphs, character statistics, error analysis and achievements.
 
