@@ -84,7 +84,7 @@ PDF.js is used for rendering PDF page previews, while pdf-lib is used for PDF do
 
 ## 1. PDF Splitter Dashboard
 
-![PDF Splitter Dashboard](images/Splitter dashboard.png)
+![PDF Splitter Dashboard](images/Splitter-dashboard.png)
 
 The splitter provides a drag-and-drop interface for uploading a PDF and selecting different splitting methods.
 
@@ -92,7 +92,7 @@ The splitter provides a drag-and-drop interface for uploading a PDF and selectin
 
 ## 2. PDF Splitter Results
 
-![PDF Splitter Results](images/Splitter result.png)
+![PDF Splitter Results](images/Splitter-result.png)
 
 After processing, the application displays the generated PDF files with their page counts and provides download options.
 
@@ -108,7 +108,7 @@ In my test, the application generated five output PDF files from the uploaded do
 
 ## 3. PDF Merger Dashboard
 
-![PDF Merger Dashboard](images/Merger dashboard.png)
+![PDF Merger Dashboard](images/Merger-dashboard.png)
 
 The merger allows multiple PDF files to be uploaded and arranged before creating the final document.
 
