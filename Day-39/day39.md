@@ -108,7 +108,7 @@ In my test, the application generated five output PDF files from the uploaded do
 
 ## 3. PDF Merger Dashboard
 
-![PDF Merger Dashboard](images/Merger-dashboard.png)
+![PDF Merger Dashboard](images/Merge-dashboard.png)
 
 The merger allows multiple PDF files to be uploaded and arranged before creating the final document.
 
