@@ -186,7 +186,7 @@ The assistant asks a technical interview question and allows the candidate to su
 
 ### 4. AI Feedback
 
-![AI Feedback](images/technical(need-work) .png)
+![AI Feedback](images/technical-need-work.png)
 
 The assistant evaluates the answer and identifies areas that need improvement.
 
