@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Learning Studio · Arrays & Linked Lists</title>
+<style>
+:root{
+  --bg:#0B0F19;
+  --panel:#111828;
+  --panel-2:#0E1420;
+  --line:#232C42;
+  --text:#E8ECF4;
+  --muted:#8A93A6;
+  --array:#2DD4BF;
+  --array-dim:#134E4A;
+  --list:#F5A623;
+  --list-dim:#4A3410;
+  --danger:#F26D6D;
+  --good:#4ADE80;
+  --radius:14px;
+  --mono: "SF Mono","Cascadia Code","Consolas","Menlo",monospace;
+  --sans: -apple-system, "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #14203a55, transparent),
+    radial-gradient(1000px 500px at 100% 0%, #2a1a3a44, transparent),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+}
+::selection{background:var(--array-dim); color:var(--text);}
+a{color:var(--array);}
+
+/* ---------- Top Progress Bar ---------- */
+#progressBar{
+  position:fixed; top:0; left:0; height:4px; width:0%;
+  background:linear-gradient(90deg,var(--array),var(--list));
+  z-index:1000; transition:width .3s ease;
+}
+
+/* ---------- Nav / Rail ---------- */
+.rail{
+  position:fixed; top:0; right:0; height:100%; width:230px;
+  background:rgba(17,24,40,.85); backdrop-filter:blur(10px);
+  border-left:1px solid var(--line); padding:24px 18px; z-index:900;
+  display:flex; flex-direction:column; gap:10px; overflow-y:auto;
+  transform:translateX(0); transition:transform .35s ease;
+}
+.rail.hidden{transform:translateX(100%);}
+.rail-toggle{
+  position:fixed; top:16px; right:16px; z-index:950;
+  background:var(--panel); border:1px solid var(--line); color:var(--text);
+  width:42px; height:42px; border-radius:10px; cursor:pointer; font-size:18px;
+  display:flex; align-items:center; justify-content:center;
+}
+.rail h4{margin:0 0 8px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted);}
+.rail-item{
+  display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px;
+  color:var(--muted); text-decoration:none; font-size:13.5px; cursor:pointer;
+  border:1px solid transparent;
+}
+.rail-item.active{background:var(--panel-2); color:var(--text); border-color:var(--line);}
+.rail-item .dot{width:8px; height:8px; border-radius:50%; background:var(--line); flex-shrink:0;}
+.rail-item.done .dot{background:var(--good);}
+.rail-item.active .dot{background:var(--array);}
+.rail-stats{margin-top:auto; padding-top:14px; border-top:1px solid var(--line); font-size:12px; color:var(--muted);}
+.rail-stats b{color:var(--text); font-family:var(--mono);}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:880px; margin:0 auto; padding:60px 28px 120px; position:relative;}
+@media (min-width:1000px){ .wrap{margin-right:250px;} }
+
+section{padding-top:40px; scroll-margin-top:30px;}
+
+/* ---------- Hero ---------- */
+.hero{padding:40px 0 20px;}
+.eyebrow{
+  font-family:var(--mono); font-size:12px; color:var(--array); letter-spacing:.1em;
+  display:flex; align-items:center; gap:10px; margin-bottom:18px;
+}
+.eyebrow::before{content:"0x00"; color:var(--muted);}
+h1.title{
+  font-family:var(--serif); font-size:clamp(34px,5vw,54px); font-weight:700; margin:0 0 14px;
+  line-height:1.08; letter-spacing:-.01em;
+}
+h1.title .hl{color:var(--array);}
+h1.title .hl2{color:var(--list);}
+.subtitle{color:var(--muted); font-size:17px; max-width:620px; margin-bottom:34px;}
+
+.hero-viz{
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--panel);
+  padding:22px; margin-bottom:36px; overflow:hidden;
+}
+.hero-viz-row{display:flex; gap:18px; align-items:center; flex-wrap:wrap; justify-content:center;}
+.mem-cell{
+  width:52px; height:52px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:15px; font-weight:600; flex-shrink:0;
+}
+.mem-cell.arr{background:var(--array-dim); border:1px solid var(--array); color:var(--array);}
+.mem-cell.node{background:var(--list-dim); border:1px solid var(--list); color:var(--list); position:relative;}
+.mem-arrow{color:var(--list); font-family:var(--mono); font-size:18px;}
+.viz-caption{text-align:center; font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:14px;}
+
+.info-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:10px;}
+.info-card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px;}
+.info-card .num{font-family:var(--mono); font-size:22px; color:var(--array); font-weight:700;}
+.info-card .label{font-size:12.5px; color:var(--muted); margin-top:4px;}
+
+.reward-box{
+  margin-top:24px; border:1px dashed var(--list); border-radius:12px; padding:16px 18px;
+  background:linear-gradient(135deg,#4A341022,transparent); display:flex; gap:14px; align-items:flex-start;
+}
+.reward-box .icon{font-size:26px;}
+.reward-box b{color:var(--list);}
+
+/* ---------- Section headers ---------- */
+.sec-eyebrow{font-family:var(--mono); font-size:11.5px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px;}
+h2.sec-title{font-family:var(--serif); font-size:clamp(26px,3.4vw,34px); margin:0 0 6px; letter-spacing:-.01em;}
+.sec-desc{color:var(--muted); margin-bottom:28px; max-width:640px;}
+
+.module-badge{
+  display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12px;
+  padding:5px 12px; border-radius:20px; border:1px solid var(--line); color:var(--muted); margin-bottom:14px;
+}
+.module-badge.m1{border-color:var(--array); color:var(--array);}
+.module-badge.m2{border-color:var(--list); color:var(--list);}
+.module-badge.m3{border-color:#A78BFA; color:#A78BFA;}
+.module-badge.m4{border-color:var(--danger); color:var(--danger);}
+
+.locked-panel{
+  border:1px solid var(--line); border-radius:var(--radius); padding:60px 24px; text-align:center;
+  color:var(--muted); background:var(--panel-2);
+}
+.locked-panel .lock-icon{font-size:32px; margin-bottom:10px;}
+
+/* ---------- Content blocks ---------- */
+.block{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:24px; margin-bottom:22px;}
+.block h3{margin-top:0; font-size:19px; font-family:var(--serif);}
+.block h4{font-size:15px; color:var(--array); margin-bottom:8px; font-family:var(--mono); text-transform:uppercase; letter-spacing:.04em;}
+.block p{color:#C7CEDC;}
+.block ul, .block ol{color:#C7CEDC; padding-left:22px;}
+.block li{margin-bottom:6px;}
+
+.two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+@media (max-width:700px){.two-col{grid-template-columns:1fr;}}
+
+.analogy{
+  border-left:3px solid var(--list); background:#F5A62311; border-radius:0 10px 10px 0; padding:14px 18px; margin:16px 0;
+}
+.analogy b{color:var(--list);}
+
+.example{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 18px; margin:14px 0;
+  font-family:var(--mono); font-size:13.5px; color:#B8E6E0; white-space:pre-wrap; overflow-x:auto;
+}
+
+.misconception{
+  border:1px solid var(--danger); background:#F26D6D14; border-radius:10px; padding:14px 18px; margin:14px 0;
+}
+.misconception b{color:var(--danger);}
+
+.takeaways{background:var(--array-dim); border:1px solid var(--array); border-radius:10px; padding:16px 18px; margin-top:18px;}
+.takeaways h4{color:var(--array); margin-top:0;}
+.takeaways ul{margin:0;}
+
+/* Comparison table */
+.cmp-table{width:100%; border-collapse:collapse; font-size:14px; margin:14px 0;}
+.cmp-table th,.cmp-table td{border:1px solid var(--line); padding:10px 12px; text-align:left;}
+.cmp-table th{background:var(--panel-2); color:var(--muted); font-family:var(--mono); font-size:12px; text-transform:uppercase;}
+.cmp-table td.arr-col{color:var(--array);}
+.cmp-table td.list-col{color:var(--list);}
+
+/* Diagram containers */
+.diagram{background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:20px; margin:16px 0; overflow-x:auto;}
+
+/* Exercise */
+.exercise{border:1px solid #A78BFA; background:#A78BFA14; border-radius:10px; padding:16px 18px; margin:16px 0;}
+.exercise h4{color:#A78BFA; margin-top:0;}
+.exercise textarea{
+  width:100%; min-height:90px; background:var(--bg); color:var(--text); border:1px solid var(--line);
+  border-radius:8px; padding:10px; font-family:var(--mono); font-size:13px; resize:vertical;
+}
+.exercise button{margin-top:10px;}
+.exercise-feedback{margin-top:10px; font-size:13.5px; padding:10px 12px; border-radius:8px; display:none;}
+.exercise-feedback.show{display:block;}
+.exercise-feedback.ok{background:#4ADE8018; border:1px solid var(--good); color:var(--good);}
+
+/* Buttons */
+button{
+  font-family:var(--sans); font-size:14px; font-weight:600; padding:10px 18px; border-radius:9px;
+  border:1px solid var(--array); background:var(--array-dim); color:var(--array); cursor:pointer;
+  transition:transform .15s ease, background .15s ease;
+}
+button:hover{background:var(--array); color:#04201D; transform:translateY(-1px);}
+button:disabled{opacity:.4; cursor:not-allowed; transform:none;}
+button.secondary{border-color:var(--line); background:transparent; color:var(--text);}
+button.secondary:hover{background:var(--panel-2); color:var(--text);}
+button.list-btn{border-color:var(--list); background:var(--list-dim); color:var(--list);}
+button.list-btn:hover{background:var(--list); color:#3A2400;}
+
+/* ---------- Interactive Array/List Simulators ---------- */
+.sim-controls{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;}
+.sim-controls input{
+  background:var(--bg); border:1px solid var(--line); color:var(--text); border-radius:8px;
+  padding:9px 12px; font-family:var(--mono); width:90px;
+}
+.sim-stage{min-height:110px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 0;}
+.sim-log{font-family:var(--mono); font-size:12.5px; color:var(--muted); margin-top:10px; min-height:18px;}
+.idx-label{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-align:center; margin-top:4px;}
+.cell-wrap{display:flex; flex-direction:column; align-items:center;}
+
+/* ---------- Quiz ---------- */
+.quiz{margin-top:34px;}
+.quiz-q{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:20px; margin-bottom:16px;}
+.quiz-q .qnum{font-family:var(--mono); color:var(--muted); font-size:12px; margin-bottom:6px;}
+.quiz-q .qtext{font-size:15.5px; margin-bottom:14px;}
+.quiz-opt{
+  display:block; width:100%; text-align:left; padding:11px 14px; margin-bottom:9px; border-radius:9px;
+  border:1px solid var(--line); background:var(--panel-2); color:var(--text); cursor:pointer; font-size:14px;
+}
+.quiz-opt:hover{border-color:var(--array);}
+.quiz-opt.selected{border-color:var(--array); background:var(--array-dim);}
+.quiz-opt.correct{border-color:var(--good); background:#4ADE8018; color:var(--good);}
+.quiz-opt.incorrect{border-color:var(--danger); background:#F26D6D18; color:var(--danger);}
+.quiz-opt:disabled{cursor:default;}
+.quiz-explain{
+  margin-top:10px; padding:10px 12px; border-radius:8px; background:var(--panel-2); font-size:13.5px;
+  color:var(--muted); display:none; border-left:3px solid var(--array);
+}
+.quiz-explain.show{display:block;}
+.quiz-summary{
+  text-align:center; padding:30px; border-radius:var(--radius); border:1px solid var(--line); background:var(--panel);
+}
+.quiz-summary .score{font-family:var(--mono); font-size:44px; font-weight:700; color:var(--array);}
+.quiz-summary .score.low{color:var(--danger);}
+.quiz-summary .score.mid{color:var(--list);}
+
+/* ---------- Final / Resources ---------- */
+.cheat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media (max-width:700px){.cheat-grid{grid-template-columns:1fr;}}
+.cheat-card{background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px;}
+.cheat-card h5{margin:0 0 8px; font-family:var(--mono); color:var(--array); font-size:13px;}
+.cheat-card table{width:100%; font-size:12.5px; border-collapse:collapse;}
+.cheat-card td{padding:3px 0; border-bottom:1px dashed var(--line); color:#C7CEDC;}
+.cheat-card td:last-child{text-align:right; font-family:var(--mono); color:var(--list);}
+
+.resource-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;}
+.resource-card{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px;}
+.resource-card h4{margin-top:0; font-family:var(--mono); font-size:13px; color:var(--list); text-transform:uppercase; letter-spacing:.05em;}
+.resource-card ul{padding-left:18px; margin:0; color:#C7CEDC; font-size:14px;}
+.resource-card li{margin-bottom:7px;}
+.kw-pill{
+  display:inline-block; background:var(--panel-2); border:1px solid var(--line); border-radius:16px;
+  padding:5px 12px; font-family:var(--mono); font-size:12px; margin:3px 4px 3px 0; color:var(--array);
+}
+.prompt-card{
+  background:var(--panel-2); border:1px solid var(--line); border-radius:9px; padding:12px 14px; margin-bottom:10px;
+  font-family:var(--mono); font-size:12.5px; color:#B8E6E0; position:relative;
+}
+.copy-btn{position:absolute; top:8px; right:8px; padding:4px 9px; font-size:11px;}
+
+/* Print */
+.print-btn{position:fixed; bottom:22px; right:22px; z-index:900; border-radius:50px; padding:12px 20px; box-shadow:0 6px 20px #00000066;}
+@media print{
+  .rail,.rail-toggle,#progressBar,.print-btn,.exercise button,.sim-controls,button{display:none !important;}
+  body{background:#fff; color:#000;}
+  .block,.info-card,.resource-card,.cheat-card{border:1px solid #ccc; background:#fff;}
+}
+
+footer{text-align:center; color:var(--muted); font-size:13px; padding:40px 0; font-family:var(--mono);}
+
+.fade-in{animation:fadeIn .5s ease both;}
+@keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+.completion-banner{
+  text-align:center; padding:50px 24px; border-radius:var(--radius); border:1px solid var(--good);
+  background:linear-gradient(135deg,#4ADE8014,transparent); margin-bottom:20px;
+}
+.completion-banner .big-icon{font-size:48px;}
+</style>
+</head>
+<body>
+
+<div id="progressBar"></div>
+<button class="rail-toggle" id="railToggle" aria-label="Toggle navigation">☰</button>
+
+<nav class="rail" id="rail">
+  <h4>Interactive Learning Studio</h4>
+  <div class="rail-item active" data-target="intro"><span class="dot"></span>Introduction</div>
+  <div class="rail-item" data-target="module1"><span class="dot"></span>1 · Array Foundations</div>
+  <div class="rail-item" data-target="module2"><span class="dot"></span>2 · Linked List Foundations</div>
+  <div class="rail-item" data-target="module3"><span class="dot"></span>3 · Applied Patterns</div>
+  <div class="rail-item" data-target="module4"><span class="dot"></span>4 · Mastery & Design</div>
+  <div class="rail-item" data-target="finale"><span class="dot"></span>Final Challenge</div>
+  <div class="rail-item" data-target="resources"><span class="dot"></span>Continue Learning</div>
+  <div class="rail-stats">
+    Progress: <b id="railProgress">0%</b><br>
+    Quiz avg: <b id="railQuizAvg">–</b>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ===================== INTRO ===================== -->
+<section id="intro" class="hero">
+  <div class="eyebrow">INTERACTIVE LEARNING STUDIO</div>
+  <h1 class="title">Arrays <span class="hl">&amp;</span> Linked Lists<span class="hl2">.</span></h1>
+  <p class="subtitle">The two foundational ways to hold a sequence of data in memory — one contiguous and indexed, one scattered and pointer-linked. Master both, and you'll understand the trade-offs behind nearly every data structure built on top of them.</p>
+
+  <div class="hero-viz">
+    <div class="hero-viz-row">
+      <div class="cell-wrap"><div class="mem-cell arr">12</div><div class="idx-label">0x00</div></div>
+      <div class="cell-wrap"><div class="mem-cell arr">7</div><div class="idx-label">0x04</div></div>
+      <div class="cell-wrap"><div class="mem-cell arr">54</div><div class="idx-label">0x08</div></div>
+      <div class="cell-wrap"><div class="mem-cell arr">3</div><div class="idx-label">0x0C</div></div>
+      <div style="width:1px;height:52px;background:var(--line);margin:0 10px;"></div>
+      <div class="cell-wrap"><div class="mem-cell node">12</div><div class="idx-label">0x9F</div></div>
+      <div class="mem-arrow">→</div>
+      <div class="cell-wrap"><div class="mem-cell node">7</div><div class="idx-label">0x2A</div></div>
+      <div class="mem-arrow">→</div>
+      <div class="cell-wrap"><div class="mem-cell node">54</div><div class="idx-label">0xC1</div></div>
+      <div class="mem-arrow">→</div>
+      <div class="cell-wrap"><div class="mem-cell node">3</div><div class="idx-label">0x77</div></div>
+    </div>
+    <div class="viz-caption">LEFT: array — contiguous, address = base + (index × size)  ·  RIGHT: linked list — scattered, each node stores the address of the next</div>
+  </div>
+
+  <div class="info-cards">
+    <div class="info-card"><div class="num">~65 min</div><div class="label">Estimated time</div></div>
+    <div class="info-card"><div class="num">4</div><div class="label">Modules</div></div>
+    <div class="info-card"><div class="num">16</div><div class="label">Quiz questions</div></div>
+    <div class="info-card"><div class="num">None</div><div class="label">Prerequisites</div></div>
+  </div>
+
+  <div class="block">
+    <h4>Learning Objectives</h4>
+    <ul>
+      <li>Explain how arrays and linked lists actually live in memory, and why that shapes their performance.</li>
+      <li>Implement and reason about core operations: access, search, insert, delete for both structures.</li>
+      <li>Compare Big-O trade-offs and choose the right structure for a given real-world scenario.</li>
+      <li>Build and manipulate singly, doubly, and circular linked lists — including reversal and cycle detection.</li>
+      <li>Apply two-pointer, sliding-window, and fast/slow-pointer techniques to solve classic interview problems.</li>
+      <li>Design a small system (e.g. an LRU cache or undo/redo stack) by combining both structures.</li>
+    </ul>
+    <h4 style="margin-top:18px;">Expected Outcomes</h4>
+    <p>By the end, you'll be able to walk into a whiteboard interview and confidently implement a linked list from scratch, explain why <code>array[i]</code> is O(1) but <code>list.get(i)</code> is O(n), and pick the right structure when designing a system.</p>
+  </div>
+
+  <div class="reward-box">
+    <div class="icon">🏆</div>
+    <div>
+      <b>Reward System:</b> Earn a badge for each module you complete with 75%+ on its quiz. Collect all 4 module badges plus the Final Challenge badge to unlock the <b>"Memory Architect"</b> completion certificate at the bottom of this page. Your progress bar at the top tracks it all live.
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:30px;">
+    <button onclick="scrollToSection('module1')">Begin Module 1 →</button>
+  </div>
+</section>
+
+<!-- ===================== MODULE 1 ===================== -->
+<section id="module1">
+  <div class="module-badge m1">MODULE 1 / 4 · FOUNDATIONAL</div>
+  <div class="sec-eyebrow">Foundations</div>
+  <h2 class="sec-title">Arrays: Contiguous Memory</h2>
+  <p class="sec-desc">Where the data lives, and why that single fact explains almost everything about how arrays behave.</p>
+
+  <div class="block">
+    <h3>What an array actually is</h3>
+    <p>An array is a block of memory cells sitting <b>right next to each other</b>, all the same size, holding the same type of value. The array variable itself just remembers one thing: the <b>base address</b> — where the block starts.</p>
+    <p>Every other position is computed, not stored. To find element at index <code>i</code>, the computer does simple arithmetic:</p>
+    <div class="example">address(i) = base_address + (i × element_size)
+
+// Example: base = 0x00, element_size = 4 bytes
+// address(0) = 0x00 + (0 × 4) = 0x00
+// address(2) = 0x00 + (2 × 4) = 0x08</div>
+    <div class="analogy"><b>Analogy — a street of identical houses:</b> imagine houses numbered 100, 104, 108, 112 — evenly spaced, same size, on one street. If you know house 100 is the start and each house is 4 meters wide, you can walk directly to house #7 without visiting the ones before it. That's exactly how <code>array[7]</code> works: direct math, not a walk.</div>
+
+    <h4>Diagram: index → address</h4>
+    <div class="diagram">
+      <svg viewBox="0 0 640 140" width="100%" height="140" xmlns="http://www.w3.org/2000/svg">
+        <text x="10" y="20" fill="#8A93A6" font-family="monospace" font-size="12">Array in memory (element size = 4 bytes)</text>
+        <g font-family="monospace" font-size="13">
+          <rect x="20" y="40" width="70" height="50" fill="#134E4A" stroke="#2DD4BF"/>
+          <text x="55" y="70" fill="#2DD4BF" text-anchor="middle">12</text>
+          <rect x="95" y="40" width="70" height="50" fill="#134E4A" stroke="#2DD4BF"/>
+          <text x="130" y="70" fill="#2DD4BF" text-anchor="middle">7</text>
+          <rect x="170" y="40" width="70" height="50" fill="#134E4A" stroke="#2DD4BF"/>
+          <text x="205" y="70" fill="#2DD4BF" text-anchor="middle">54</text>
+          <rect x="245" y="40" width="70" height="50" fill="#134E4A" stroke="#2DD4BF"/>
+          <text x="280" y="70" fill="#2DD4BF" text-anchor="middle">3</text>
+          <text x="55" y="108" fill="#8A93A6" text-anchor="middle">0x00</text>
+          <text x="130" y="108" fill="#8A93A6" text-anchor="middle">0x04</text>
+          <text x="205" y="108" fill="#8A93A6" text-anchor="middle">0x08</text>
+          <text x="280" y="108" fill="#8A93A6" text-anchor="middle">0x0C</text>
+          <text x="55" y="126" fill="#F5A623" text-anchor="middle">i=0</text>
+          <text x="130" y="126" fill="#F5A623" text-anchor="middle">i=1</text>
+          <text x="205" y="126" fill="#F5A623" text-anchor="middle">i=2</text>
+          <text x="280" y="126" fill="#F5A623" text-anchor="middle">i=3</text>
+          <text x="420" y="55" fill="#E8ECF4" font-size="13">address(2) = 0x00 + (2×4)</text>
+          <text x="420" y="75" fill="#2DD4BF" font-size="13">= 0x08 → jumps straight there</text>
+        </g>
+      </svg>
+    </div>
+
+    <h4>Static vs. Dynamic Arrays</h4>
+    <p>A <b>static array</b> has a fixed size decided at creation (e.g. C's <code>int arr[10]</code>). A <b>dynamic array</b> (JavaScript arrays, Python lists, Java ArrayList) appears to grow freely, but under the hood it's still a fixed-size block — when it fills up, it silently allocates a new, bigger block (usually double the size), copies everything over, and frees the old one.</p>
+    <div class="misconception"><b>Common misconception:</b> "Dynamic arrays can grow forever without cost." In reality, that resize-and-copy step is O(n) when it happens — it's just rare enough (doubling means it happens ~log(n) times) that the <i>average</i> cost per insertion stays O(1). This is called <b>amortized O(1)</b>, not literally O(1) every time.</div>
+
+    <h4>Core Operations & Complexity</h4>
+    <table class="cmp-table">
+      <tr><th>Operation</th><th>Time</th><th>Why</th></tr>
+      <tr><td>Access by index</td><td class="arr-col">O(1)</td><td>Direct address math</td></tr>
+      <tr><td>Search (unsorted)</td><td class="arr-col">O(n)</td><td>Must check each element</td></tr>
+      <tr><td>Insert / delete at end</td><td class="arr-col">O(1)*</td><td>*amortized; no shifting needed</td></tr>
+      <tr><td>Insert / delete at start/middle</td><td class="arr-col">O(n)</td><td>Every following element must shift</td></tr>
+    </table>
+
+    <h4>Try it: Array Simulator</h4>
+    <p>Insert and delete values and watch how shifting works.</p>
+    <div class="sim-controls">
+      <input type="text" id="arrValue" placeholder="value" maxlength="4">
+      <input type="number" id="arrIndex" placeholder="index" min="0">
+      <button onclick="arrInsert()">Insert at index</button>
+      <button class="secondary" onclick="arrDelete()">Delete at index</button>
+      <button class="secondary" onclick="arrReset()">Reset</button>
+    </div>
+    <div class="sim-stage" id="arrStage"></div>
+    <div class="sim-log" id="arrLog">Ready. Try: insert "9" at index 1.</div>
+  </div>
+
+  <div class="block exercise">
+    <h4>✏️ Practical Exercise</h4>
+    <p>You have array <code>[5, 8, 2, 9, 1]</code>. Write out, step by step, what happens internally (which elements move, and where) when you insert <code>7</code> at index 2. Then state the final array and its Big-O cost.</p>
+    <textarea placeholder="Type your step-by-step reasoning here..."></textarea>
+    <br>
+    <button onclick="revealExerciseAnswer(this)">Check my reasoning</button>
+    <div class="exercise-feedback">
+      <b>Expected reasoning:</b> Elements at index 2,3,4 (2,9,1) each shift one position right → index becomes 3,4,5. Insert 7 at index 2. Final array: <code>[5, 8, 7, 2, 9, 1]</code>. Cost: O(n) because up to n elements shifted, even though only one was "inserted."
+    </div>
+  </div>
+
+  <div class="takeaways">
+    <h4>Key Takeaways — Module 1</h4>
+    <ul>
+      <li>Arrays store elements contiguously; index access is pure arithmetic → O(1).</li>
+      <li>Dynamic arrays resize by doubling and copying — amortized O(1) insert at the end.</li>
+      <li>Inserting/deleting anywhere but the end costs O(n) due to shifting.</li>
+      <li>Arrays are cache-friendly: contiguous memory means fast sequential reads.</li>
+    </ul>
+  </div>
+
+  <div class="quiz" id="quiz1">
+    <h3 style="font-family:var(--serif);">Module 1 Quiz</h3>
+  </div>
+</section>
+
+<!-- ===================== MODULE 2 ===================== -->
+<section id="module2">
+  <div class="module-badge m2">MODULE 2 / 4 · FOUNDATIONAL</div>
+  <div class="sec-eyebrow">Foundations</div>
+  <h2 class="sec-title">Linked Lists: Scattered, Connected Memory</h2>
+  <p class="sec-desc">No contiguous block, no index math — just nodes holding data and an address to "the next one."</p>
+
+  <div class="locked-panel" id="module2-locked">
+    <div class="lock-icon">🔒</div>
+    Complete Module 1's quiz with 75% or higher to unlock this module.
+  </div>
+
+  <div id="module2-content" style="display:none;">
+    <div class="block">
+      <h3>What a linked list actually is</h3>
+      <p>A linked list is a chain of independent <b>nodes</b>. Each node holds two things: a value, and a pointer (memory address) to the next node. There's no shared block of memory — nodes can live anywhere, scattered across memory, connected only by these pointers.</p>
+      <div class="example">struct Node {
+  value: any
+  next: Node | null
+}
+// head → [12|•]→[7|•]→[54|•]→[3|null]</div>
+      <div class="analogy"><b>Analogy — a treasure hunt:</b> each clue doesn't tell you a location number; it tells you where to find the <i>next</i> clue. You can't skip to clue #4 — you must follow clue 1 → 2 → 3 → 4 in order. That's a linked list: no shortcuts, only "follow the pointer."</div>
+
+      <h4>Diagram: singly linked list</h4>
+      <div class="diagram">
+        <svg viewBox="0 0 640 130" width="100%" height="130" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="monospace" font-size="13">
+            <text x="10" y="20" fill="#8A93A6" font-size="12">head</text>
+            <line x1="35" y1="15" x2="35" y2="40" stroke="#F5A623"/>
+            <rect x="10" y="40" width="80" height="46" fill="#4A3410" stroke="#F5A623"/>
+            <line x1="55" y1="40" x2="55" y2="86" stroke="#F5A623"/>
+            <text x="32" y="68" fill="#F5A623" text-anchor="middle">12</text>
+            <text x="72" y="68" fill="#F5A623" text-anchor="middle">•</text>
+            <line x1="90" y1="63" x2="140" y2="63" stroke="#F5A623" marker-end="url(#arrow)"/>
+            <rect x="140" y="40" width="80" height="46" fill="#4A3410" stroke="#F5A623"/>
+            <line x1="185" y1="40" x2="185" y2="86" stroke="#F5A623"/>
+            <text x="162" y="68" fill="#F5A623" text-anchor="middle">7</text>
+            <text x="202" y="68" fill="#F5A623" text-anchor="middle">•</text>
+            <line x1="220" y1="63" x2="270" y2="63" stroke="#F5A623" marker-end="url(#arrow)"/>
+            <rect x="270" y="40" width="80" height="46" fill="#4A3410" stroke="#F5A623"/>
+            <line x1="315" y1="40" x2="315" y2="86" stroke="#F5A623"/>
+            <text x="292" y="68" fill="#F5A623" text-anchor="middle">54</text>
+            <text x="332" y="68" fill="#F5A623" text-anchor="middle">•</text>
+            <line x1="350" y1="63" x2="400" y2="63" stroke="#F5A623" marker-end="url(#arrow)"/>
+            <rect x="400" y="40" width="80" height="46" fill="#4A3410" stroke="#F5A623"/>
+            <line x1="445" y1="40" x2="445" y2="86" stroke="#F5A623"/>
+            <text x="422" y="68" fill="#F5A623" text-anchor="middle">3</text>
+            <text x="462" y="68" fill="#8A93A6" text-anchor="middle">∅</text>
+          </g>
+          <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#F5A623"/></marker></defs>
+        </svg>
+      </div>
+
+      <h4>Singly vs. Doubly vs. Circular</h4>
+      <div class="two-col">
+        <div>
+          <p><b>Singly linked list:</b> each node points forward only. Simple, lower memory, but you can't walk backward.</p>
+          <p><b>Doubly linked list:</b> each node has <code>next</code> AND <code>prev</code>. Enables backward traversal and O(1) deletion when you already hold the node — at the cost of extra memory per node.</p>
+        </div>
+        <div>
+          <p><b>Circular linked list:</b> the last node points back to the head instead of null. Useful for round-robin scheduling, playlists on loop, or turn-based games.</p>
+        </div>
+      </div>
+
+      <div class="misconception"><b>Common misconception:</b> "Linked lists are always better for insertion because it's O(1)." Insertion is only O(1) if you already have a reference to the node right before the insertion point. Finding that node in the first place is O(n) — so inserting "at position 500" is still effectively O(n) overall.</div>
+
+      <h4>Core Operations & Complexity</h4>
+      <table class="cmp-table">
+        <tr><th>Operation</th><th>Time</th><th>Why</th></tr>
+        <tr><td>Access by index</td><td class="list-col">O(n)</td><td>Must walk from head, no address math</td></tr>
+        <tr><td>Search</td><td class="list-col">O(n)</td><td>Sequential traversal only</td></tr>
+        <tr><td>Insert/delete at head</td><td class="list-col">O(1)</td><td>Just repoint the head pointer</td></tr>
+        <tr><td>Insert/delete at known node</td><td class="list-col">O(1)</td><td>Just repoint neighboring pointers</td></tr>
+      </table>
+
+      <h4>Arrays vs. Linked Lists — side by side</h4>
+      <table class="cmp-table">
+        <tr><th>Property</th><th>Array</th><th>Linked List</th></tr>
+        <tr><td>Memory layout</td><td class="arr-col">Contiguous</td><td class="list-col">Scattered</td></tr>
+        <tr><td>Random access</td><td class="arr-col">O(1)</td><td class="list-col">O(n)</td></tr>
+        <tr><td>Insert at start</td><td class="arr-col">O(n)</td><td class="list-col">O(1)</td></tr>
+        <tr><td>Extra memory per element</td><td class="arr-col">None</td><td class="list-col">1–2 pointers</td></tr>
+        <tr><td>Cache performance</td><td class="arr-col">Excellent</td><td class="list-col">Poor (pointer-chasing)</td></tr>
+      </table>
+
+      <h4>Try it: Linked List Simulator</h4>
+      <div class="sim-controls">
+        <input type="text" id="llValue" placeholder="value" maxlength="4">
+        <button class="list-btn" onclick="llInsertHead()">Insert at head</button>
+        <button class="list-btn" onclick="llInsertTail()">Insert at tail</button>
+        <button class="secondary" onclick="llDeleteHead()">Delete head</button>
+        <button class="secondary" onclick="llReset()">Reset</button>
+      </div>
+      <div class="sim-stage" id="llStage"></div>
+      <div class="sim-log" id="llLog">Ready. Try: insert "9" at head.</div>
+    </div>
+
+    <div class="block exercise">
+      <h4>✏️ Practical Exercise</h4>
+      <p>You maintain a music queue as a singly linked list: <code>head → SongA → SongB → SongC → null</code>. A user wants to remove "SongB". Describe exactly which pointer(s) change, and why you need a reference to SongA (the node <i>before</i> SongB) to do it in O(1).</p>
+      <textarea placeholder="Type your reasoning here..."></textarea>
+      <br>
+      <button onclick="revealExerciseAnswer(this)">Check my reasoning</button>
+      <div class="exercise-feedback">
+        <b>Expected reasoning:</b> SongA.next currently points to SongB. To remove SongB, set SongA.next = SongB.next (which is SongC). SongB is now unreferenced and gets garbage collected. This is O(1) <i>only</i> because we already had SongA — without it we'd need O(n) to find it by walking from head.
+      </div>
+    </div>
+
+    <div class="takeaways">
+      <h4>Key Takeaways — Module 2</h4>
+      <ul>
+        <li>Linked lists trade random access for flexible, cheap insertion/deletion at known points.</li>
+        <li>Doubly linked lists add backward traversal at the cost of extra memory.</li>
+        <li>Circular lists remove the "end" — last node points back to head.</li>
+        <li>O(1) insert/delete claims only hold if you already have the relevant node reference.</li>
+      </ul>
+    </div>
+
+    <div class="quiz" id="quiz2">
+      <h3 style="font-family:var(--serif);">Module 2 Quiz</h3>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 3 ===================== -->
+<section id="module3">
+  <div class="module-badge m3">MODULE 3 / 4 · APPLICATION</div>
+  <div class="sec-eyebrow">Practical Application</div>
+  <h2 class="sec-title">Applied Patterns & Techniques</h2>
+  <p class="sec-desc">The recurring tricks that show up across almost every array/linked-list interview problem.</p>
+
+  <div class="locked-panel" id="module3-locked">
+    <div class="lock-icon">🔒</div>
+    Complete Module 2's quiz with 75% or higher to unlock this module.
+  </div>
+
+  <div id="module3-content" style="display:none;">
+    <div class="block">
+      <h3>Two-Pointer Technique (Arrays)</h3>
+      <p>Instead of nested loops (O(n²)), use two indices moving toward or alongside each other to solve problems in O(n).</p>
+      <div class="example">// Is array a palindrome? e.g. [1,2,3,2,1]
+let left = 0, right = arr.length - 1;
+while (left < right) {
+  if (arr[left] !== arr[right]) return false;
+  left++; right--;
+}
+return true;</div>
+      <div class="analogy"><b>Analogy:</b> two people starting at opposite ends of a bookshelf, walking toward each other, checking that each pair of books matches — meeting in the middle instead of one person walking the whole shelf twice.</div>
+
+      <h3>Sliding Window (Arrays)</h3>
+      <p>Maintain a "window" (subarray) that expands and contracts as you scan once through the array — great for "max/min subarray of size k" or "longest substring" problems.</p>
+      <div class="diagram">
+        <svg viewBox="0 0 560 90" width="100%" height="90" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="monospace" font-size="13">
+            <rect x="10" y="20" width="50" height="40" fill="#134E4A" stroke="#2DD4BF"/><text x="35" y="45" fill="#2DD4BF" text-anchor="middle">4</text>
+            <rect x="60" y="20" width="50" height="40" fill="#134E4A" stroke="#2DD4BF" stroke-width="3"/><text x="85" y="45" fill="#2DD4BF" text-anchor="middle">2</text>
+            <rect x="110" y="20" width="50" height="40" fill="#134E4A" stroke="#2DD4BF" stroke-width="3"/><text x="135" y="45" fill="#2DD4BF" text-anchor="middle">9</text>
+            <rect x="160" y="20" width="50" height="40" fill="#0E1420" stroke="#232C42"/><text x="185" y="45" fill="#8A93A6" text-anchor="middle">1</text>
+            <rect x="210" y="20" width="50" height="40" fill="#0E1420" stroke="#232C42"/><text x="235" y="45" fill="#8A93A6" text-anchor="middle">7</text>
+            <text x="85" y="12" fill="#F5A623" font-size="11">window (k=2)</text>
+            <text x="300" y="45" fill="#8A93A6" font-size="12">slides right each step →</text>
+          </g>
+        </svg>
+      </div>
+
+      <h3>Fast &amp; Slow Pointers (Linked Lists)</h3>
+      <p>Two pointers traverse a linked list at different speeds (slow moves 1 step, fast moves 2). If the list has a cycle, they will eventually meet. If it doesn't, fast reaches <code>null</code> first.</p>
+      <div class="example">function hasCycle(head) {
+  let slow = head, fast = head;
+  while (fast && fast.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+    if (slow === fast) return true;
+  }
+  return false;
+}</div>
+      <div class="analogy"><b>Analogy — a race track:</b> a runner twice as fast as another, on a circular track, will always eventually lap the slower one. On a straight track (no cycle), the fast runner just finishes first — they never "meet."</div>
+
+      <h3>Reversing a Linked List</h3>
+      <p>A classic mastery-check: reverse all the <code>next</code> pointers so the list points the other way, using three tracking pointers (prev, current, next).</p>
+      <div class="example">function reverse(head) {
+  let prev = null, curr = head;
+  while (curr) {
+    let nextNode = curr.next;
+    curr.next = prev;
+    prev = curr;
+    curr = nextNode;
+  }
+  return prev; // new head
+}</div>
+
+      <div class="misconception"><b>Common misconception:</b> "You can reverse a list by just relabeling head and tail." Nodes don't know they're "first" or "last" — only pointers define order. Every single <code>next</code> pointer must be individually flipped.</div>
+
+      <h4>Try it: Reversal Visualizer</h4>
+      <div class="sim-controls">
+        <button class="list-btn" onclick="reverseStep()">Step reversal ▶</button>
+        <button class="secondary" onclick="reverseReset()">Reset</button>
+      </div>
+      <div class="sim-stage" id="revStage"></div>
+      <div class="sim-log" id="revLog">Original list: 12 → 7 → 54 → 3 → null. Click "Step reversal" to walk through it.</div>
+    </div>
+
+    <div class="block exercise">
+      <h4>✏️ Practical Exercise</h4>
+      <p>Given array <code>[3, 1, 4, 1, 5, 9, 2, 6]</code>, use the sliding window technique (mentally) to find the maximum sum of any 3 consecutive elements. Show each window's sum as it slides.</p>
+      <textarea placeholder="Type your window sums here..."></textarea>
+      <br>
+      <button onclick="revealExerciseAnswer(this)">Check my reasoning</button>
+      <div class="exercise-feedback">
+        <b>Expected reasoning:</b> Windows: [3,1,4]=8, [1,4,1]=6, [4,1,5]=10, [1,5,9]=15, [5,9,2]=16, [9,2,6]=17. Max = 17. Efficient approach: subtract the outgoing element and add the incoming one each slide, rather than re-summing — O(n) total instead of O(n×k).
+      </div>
+    </div>
+
+    <div class="takeaways">
+      <h4>Key Takeaways — Module 3</h4>
+      <ul>
+        <li>Two-pointer and sliding-window patterns turn O(n²) array problems into O(n).</li>
+        <li>Fast/slow pointers detect cycles in linked lists without extra memory (Floyd's algorithm).</li>
+        <li>Reversal requires tracking three pointers and flipping every link individually.</li>
+        <li>These patterns are the building blocks of most array/linked-list interview questions.</li>
+      </ul>
+    </div>
+
+    <div class="quiz" id="quiz3">
+      <h3 style="font-family:var(--serif);">Module 3 Quiz</h3>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== MODULE 4 ===================== -->
+<section id="module4">
+  <div class="module-badge m4">MODULE 4 / 4 · MASTERY</div>
+  <div class="sec-eyebrow">Mastery</div>
+  <h2 class="sec-title">Design Decisions & Real Systems</h2>
+  <p class="sec-desc">Combining both structures, and knowing exactly when to reach for which one.</p>
+
+  <div class="locked-panel" id="module4-locked">
+    <div class="lock-icon">🔒</div>
+    Complete Module 3's quiz with 75% or higher to unlock this module.
+  </div>
+
+  <div id="module4-content" style="display:none;">
+    <div class="block">
+      <h3>Choosing the right structure: a decision framework</h3>
+      <p>Ask three questions:</p>
+      <ol>
+        <li><b>Do I need random access by index?</b> → Array wins (O(1) vs O(n)).</li>
+        <li><b>Do I insert/delete frequently at the front or middle?</b> → Linked list wins (no shifting).</li>
+        <li><b>Do I care about memory locality / cache performance?</b> → Array wins (contiguous = fast CPU cache hits); linked lists scatter memory and cause "pointer chasing," which is slow on real hardware even though Big-O looks favorable.</li>
+      </ol>
+      <div class="misconception"><b>Common misconception:</b> "Big-O is the whole story." In practice, arrays often outperform linked lists even for operations where linked lists have better Big-O, because CPU caches love contiguous memory. Big-O ignores constant factors and hardware reality — always sanity-check with real-world context.</div>
+
+      <h3>Case study: designing an LRU Cache</h3>
+      <p>A Least-Recently-Used cache needs: O(1) lookup by key, and O(1) move-to-front / evict-oldest. Neither structure alone is enough:</p>
+      <ul>
+        <li>A <b>hash map</b> gives O(1) lookup by key.</li>
+        <li>A <b>doubly linked list</b> gives O(1) reordering (move a node to the front) and O(1) removal of the tail (oldest item) — because you already have direct node references from the hash map.</li>
+      </ul>
+      <p>Combined: hash map stores <code>key → node reference</code>; doubly linked list maintains usage order. This is exactly how production LRU caches (e.g. in Redis-like systems) are built.</p>
+
+      <h4>Diagram: LRU Cache structure</h4>
+      <div class="diagram">
+        <svg viewBox="0 0 620 160" width="100%" height="160" xmlns="http://www.w3.org/2000/svg">
+          <g font-family="monospace" font-size="12">
+            <text x="10" y="18" fill="#8A93A6">HashMap</text>
+            <rect x="10" y="26" width="130" height="24" fill="#0E1420" stroke="#232C42"/><text x="75" y="42" fill="#E8ECF4" text-anchor="middle">"A" → node@0x9F</text>
+            <rect x="10" y="54" width="130" height="24" fill="#0E1420" stroke="#232C42"/><text x="75" y="70" fill="#E8ECF4" text-anchor="middle">"B" → node@0x2A</text>
+            <rect x="10" y="82" width="130" height="24" fill="#0E1420" stroke="#232C42"/><text x="75" y="98" fill="#E8ECF4" text-anchor="middle">"C" → node@0xC1</text>
+
+            <text x="220" y="18" fill="#8A93A6">Doubly linked list (usage order, MRU → LRU)</text>
+            <rect x="220" y="40" width="70" height="46" fill="#4A3410" stroke="#F5A623"/><text x="255" y="68" fill="#F5A623" text-anchor="middle">A</text>
+            <line x1="290" y1="55" x2="330" y2="55" stroke="#F5A623" marker-end="url(#arrow2)"/>
+            <line x1="330" y1="70" x2="290" y2="70" stroke="#F5A623" marker-end="url(#arrow2)"/>
+            <rect x="330" y="40" width="70" height="46" fill="#4A3410" stroke="#F5A623"/><text x="365" y="68" fill="#F5A623" text-anchor="middle">B</text>
+            <line x1="400" y1="55" x2="440" y2="55" stroke="#F5A623" marker-end="url(#arrow2)"/>
+            <line x1="440" y1="70" x2="400" y2="70" stroke="#F5A623" marker-end="url(#arrow2)"/>
+            <rect x="440" y="40" width="70" height="46" fill="#4A3410" stroke="#F5A623"/><text x="475" y="68" fill="#F5A623" text-anchor="middle">C</text>
+            <text x="255" y="102" fill="#8A93A6" font-size="11">most recent</text>
+            <text x="475" y="102" fill="#8A93A6" font-size="11">evict this first</text>
+          </g>
+          <defs><marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#F5A623"/></marker></defs>
+        </svg>
+      </div>
+
+      <h3>Real-world uses at a glance</h3>
+      <table class="cmp-table">
+        <tr><th>System</th><th>Structure</th><th>Why</th></tr>
+        <tr><td>Image pixel buffers</td><td class="arr-col">Array (2D)</td><td>Fixed size, constant random access needed</td></tr>
+        <tr><td>Browser back/forward history</td><td class="list-col">Doubly linked list</td><td>Frequent insert/remove at ends, sequential navigation</td></tr>
+        <tr><td>Undo/redo stacks in editors</td><td class="list-col">Linked list (as stack)</td><td>Push/pop at one end only, unpredictable size</td></tr>
+        <tr><td>Music "next up" queue</td><td class="list-col">Circular linked list</td><td>Loops back to start automatically</td></tr>
+        <tr><td>Dynamic list rendering (UI)</td><td class="arr-col">Dynamic array</td><td>Iteration + occasional append is common; index access needed</td></tr>
+      </table>
+
+      <h4>Try it: Build an LRU Cache (mini)</h4>
+      <p>Simulate a capacity-3 LRU cache. Access a key to move it to "most recently used." When full, the least-recently-used key is evicted automatically.</p>
+      <div class="sim-controls">
+        <input type="text" id="lruKey" placeholder="key" maxlength="3">
+        <button class="list-btn" onclick="lruAccess()">Access key</button>
+        <button class="secondary" onclick="lruReset()">Reset</button>
+      </div>
+      <div class="sim-stage" id="lruStage"></div>
+      <div class="sim-log" id="lruLog">Capacity: 3. Try accessing "A", "B", "C", then "A" again, then "D" to see eviction.</div>
+    </div>
+
+    <div class="block exercise">
+      <h4>✏️ Practical Exercise</h4>
+      <p>You're designing a text editor's "undo" feature. Would you use an array or a linked list for the undo stack? Justify your choice using the three-question framework above, and describe what operations you'd need.</p>
+      <textarea placeholder="Type your design reasoning here..."></textarea>
+      <br>
+      <button onclick="revealExerciseAnswer(this)">Check my reasoning</button>
+      <div class="exercise-feedback">
+        <b>Expected reasoning:</b> Either works reasonably, but a dynamic array (used as a stack, push/pop only at the end) is usually preferred in practice: no random access needed mid-stack, operations are O(1) amortized at the end for arrays too, and arrays have better cache locality for the "replay all undo steps" scan. A linked list is also valid if memory is fragmented/unpredictable and you want to avoid resize-copy pauses.
+      </div>
+    </div>
+
+    <div class="takeaways">
+      <h4>Key Takeaways — Module 4</h4>
+      <ul>
+        <li>Use a 3-question framework: random access? frequent front/middle edits? cache locality?</li>
+        <li>Real systems often combine structures (e.g. hash map + doubly linked list for LRU cache).</li>
+        <li>Big-O doesn't capture hardware reality — contiguous memory usually wins in practice.</li>
+        <li>Matching structure to access pattern is the core skill of data structure design.</li>
+      </ul>
+    </div>
+
+    <div class="quiz" id="quiz4">
+      <h3 style="font-family:var(--serif);">Module 4 Quiz</h3>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FINALE ===================== -->
+<section id="finale">
+  <div class="locked-panel" id="finale-locked">
+    <div class="lock-icon">🔒</div>
+    Complete Module 4's quiz with 75% or higher to unlock the Final Challenge.
+  </div>
+
+  <div id="finale-content" style="display:none;">
+    <div class="sec-eyebrow">Capstone</div>
+    <h2 class="sec-title">Final Practical Challenge</h2>
+    <p class="sec-desc">Bring together everything: memory layout, complexity trade-offs, and pointer manipulation.</p>
+
+    <div class="block">
+      <h3>Challenge: Detect and Remove a Cycle</h3>
+      <p>You're given a singly linked list that <i>may</i> contain a cycle (a bug elsewhere in the codebase caused a node's <code>next</code> to accidentally point back to an earlier node). Your task, in plain-English pseudocode:</p>
+      <ol>
+        <li>Detect whether a cycle exists (which technique from Module 3 applies?).</li>
+        <li>If a cycle exists, find the exact node where it begins.</li>
+        <li>Break the cycle by setting the appropriate node's <code>next</code> to <code>null</code>.</li>
+      </ol>
+      <textarea style="width:100%; min-height:120px; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:10px; font-family:var(--mono); font-size:13px;" placeholder="Write your full solution approach here..."></textarea>
+      <br><br>
+      <button onclick="revealFinal()">Reveal model solution</button>
+      <div class="exercise-feedback" id="finalReveal">
+        <b>Model solution (Floyd's Cycle Detection, extended):</b><br>
+        1) Use fast/slow pointers — if they meet, a cycle exists.<br>
+        2) To find the start: reset one pointer to <code>head</code>, keep the other at the meeting point, then move both one step at a time — they meet exactly at the cycle's starting node (a property of the math behind Floyd's algorithm).<br>
+        3) Once you have the start node, traverse from it until <code>node.next === start</code>, then set that node's <code>next = null</code>.<br>
+        Overall: O(n) time, O(1) space — no extra memory needed, unlike a hash-set approach which would use O(n) space.
+      </div>
+    </div>
+
+    <div class="completion-banner" id="completionBanner" style="display:none;">
+      <div class="big-icon">🏅</div>
+      <h3>Memory Architect — Certificate of Completion</h3>
+      <p>You've completed all 4 modules and the Final Challenge for <b>Arrays &amp; Linked Lists</b>.</p>
+      <p style="color:var(--muted); font-size:13px;">Print this page (button, bottom-right) to save your certificate and notes.</p>
+    </div>
+
+    <h2 class="sec-title" style="margin-top:40px;">Cheat Sheet</h2>
+    <div class="cheat-grid">
+      <div class="cheat-card">
+        <h5>ARRAY COMPLEXITY</h5>
+        <table>
+          <tr><td>Access</td><td>O(1)</td></tr>
+          <tr><td>Search</td><td>O(n)</td></tr>
+          <tr><td>Insert/delete end</td><td>O(1)*</td></tr>
+          <tr><td>Insert/delete start/mid</td><td>O(n)</td></tr>
+        </table>
+      </div>
+      <div class="cheat-card">
+        <h5>LINKED LIST COMPLEXITY</h5>
+        <table>
+          <tr><td>Access</td><td>O(n)</td></tr>
+          <tr><td>Search</td><td>O(n)</td></tr>
+          <tr><td>Insert/delete at head</td><td>O(1)</td></tr>
+          <tr><td>Insert/delete at known node</td><td>O(1)</td></tr>
+        </table>
+      </div>
+      <div class="cheat-card">
+        <h5>KEY PATTERNS</h5>
+        <table>
+          <tr><td>Two-pointer</td><td>O(n)</td></tr>
+          <tr><td>Sliding window</td><td>O(n)</td></tr>
+          <tr><td>Fast/slow (cycle)</td><td>O(n)/O(1)sp</td></tr>
+          <tr><td>Reversal</td><td>O(n)</td></tr>
+        </table>
+      </div>
+      <div class="cheat-card">
+        <h5>PICK STRUCTURE WHEN...</h5>
+        <table>
+          <tr><td>Need index access</td><td>Array</td></tr>
+          <tr><td>Frequent front insert</td><td>Linked list</td></tr>
+          <tr><td>Cache-sensitive</td><td>Array</td></tr>
+          <tr><td>Unknown/volatile size</td><td>Linked list</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="block" style="margin-top:20px;">
+      <h4>Summary Notes</h4>
+      <p>Arrays are contiguous memory with O(1) index math but O(n) mid-insertions; linked lists are scattered nodes connected by pointers, giving O(1) edits at known points but O(n) access. Amortized doubling makes dynamic array appends cheap on average. Two-pointer, sliding-window, and fast/slow-pointer patterns solve most classic problems in O(n). Real systems (like LRU caches) often combine both structures to get the best of each. Choosing between them is a trade-off exercise, not a "one is better" question — and real hardware cache behavior matters as much as Big-O.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RESOURCES ===================== -->
+<section id="resources">
+  <div class="sec-eyebrow">Keep Going</div>
+  <h2 class="sec-title">Continue Learning</h2>
+  <p class="sec-desc">Where to go deeper after this tutorial.</p>
+
+  <div class="resource-grid">
+    <div class="resource-card">
+      <h4>📚 Books</h4>
+      <ul>
+        <li>"Introduction to Algorithms" (CLRS) — Cormen, Leiserson, Rivest, Stein</li>
+        <li>"Cracking the Coding Interview" — Gayle Laakmann McDowell</li>
+        <li>"Grokking Algorithms" — Aditya Bhargava (visual, beginner-friendly)</li>
+        <li>"The Algorithm Design Manual" — Steven Skiena</li>
+      </ul>
+    </div>
+    <div class="resource-card">
+      <h4>📄 Documentation</h4>
+      <ul>
+        <li>MDN Web Docs — Array (JavaScript)</li>
+        <li>Python docs — Data Structures (lists, collections.deque)</li>
+        <li>Java docs — LinkedList &amp; ArrayList class references</li>
+        <li>cppreference.com — std::vector &amp; std::list</li>
+      </ul>
+    </div>
+    <div class="resource-card">
+      <h4>🔬 Research Papers</h4>
+      <ul>
+        <li>Floyd, R.W. (1967) — "Nondeterministic Algorithms" (cycle detection origins)</li>
+        <li>Knuth, D. — "The Art of Computer Programming, Vol. 1: Fundamental Algorithms"</li>
+        <li>Brent, R.P. (1980) — "An improved Monte Carlo factorization algorithm" (alt. cycle detection)</li>
+      </ul>
+    </div>
+    <div class="resource-card">
+      <h4>👥 Communities</h4>
+      <ul>
+        <li>r/learnprogramming, r/algorithms (Reddit)</li>
+        <li>Stack Overflow — [data-structures] tag</li>
+        <li>freeCodeCamp forums</li>
+        <li>CS Discord servers (e.g. "The Programmer's Hangout")</li>
+      </ul>
+    </div>
+    <div class="resource-card">
+      <h4>💻 Practice Platforms</h4>
+      <ul>
+        <li>LeetCode — Arrays &amp; Linked List problem sets</li>
+        <li>HackerRank — Data Structures track</li>
+        <li>NeetCode.io — curated roadmap with video explanations</li>
+        <li>Codeforces — for timed practice under pressure</li>
+      </ul>
+    </div>
+    <div class="resource-card">
+      <h4>🔎 Search Keywords</h4>
+      <div>
+        <span class="kw-pill">amortized analysis</span>
+        <span class="kw-pill">Floyd's cycle detection</span>
+        <span class="kw-pill">doubly linked list</span>
+        <span class="kw-pill">dynamic array resizing</span>
+        <span class="kw-pill">LRU cache design</span>
+        <span class="kw-pill">two pointer technique</span>
+        <span class="kw-pill">sliding window algorithm</span>
+        <span class="kw-pill">pointer chasing cache miss</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="block" style="margin-top:20px;">
+    <h4>🤖 Additional AI Prompts for Further Learning</h4>
+    <div class="prompt-card">"Quiz me on array vs linked list Big-O until I get 10 in a row correct without hesitation."<button class="copy-btn secondary" onclick="copyPrompt(this)">Copy</button></div>
+    <div class="prompt-card">"Walk me through implementing a doubly linked list from scratch in [my preferred language], explaining each pointer update."<button class="copy-btn secondary" onclick="copyPrompt(this)">Copy</button></div>
+    <div class="prompt-card">"Give me 5 LeetCode-style linked list problems ordered from easy to hard, with hints but not full solutions."<button class="copy-btn secondary" onclick="copyPrompt(this)">Copy</button></div>
+    <div class="prompt-card">"Explain how a hash map + doubly linked list implements an LRU cache, then have me code it and review my solution."<button class="copy-btn secondary" onclick="copyPrompt(this)">Copy</button></div>
+  </div>
+</section>
+
+<footer>Interactive Learning Studio · Arrays &amp; Linked Lists · Built for deep, single-session mastery</footer>
+</div>
+
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save Notes</button>
+
+<script>
+/* ===================== STATE ===================== */
+const state = {
+  moduleUnlocked: [true,false,false,false,false], // intro-based; index1=m1 always unlocked
+  quizScores: {1:null,2:null,3:null,4:null},
+  finalDone:false
+};
+
+/* ===================== NAV ===================== */
+const railItems = document.querySelectorAll('.rail-item');
+railItems.forEach(item=>{
+  item.addEventListener('click', ()=> scrollToSection(item.dataset.target));
+});
+function scrollToSection(id){
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+document.getElementById('railToggle').addEventListener('click', ()=>{
+  document.getElementById('rail').classList.toggle('hidden');
+});
+
+const sections = document.querySelectorAll('section');
+function updateActiveRail(){
+  let currentId='intro';
+  sections.forEach(sec=>{
+    const rect = sec.getBoundingClientRect();
+    if(rect.top < 200) currentId = sec.id;
+  });
+  railItems.forEach(it=> it.classList.toggle('active', it.dataset.target===currentId));
+  // progress bar based on scroll
+  const scrollPct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('progressBar').style.width = Math.min(scrollPct,100)+'%';
+}
+window.addEventListener('scroll', updateActiveRail);
+updateActiveRail();
+
+function markRailDone(target){
+  const el = document.querySelector('.rail-item[data-target="'+target+'"]');
+  if(el) el.classList.add('done');
+}
+function updateRailStats(){
+  const scores = Object.values(state.quizScores).filter(s=>s!==null);
+  const modulesDone = scores.filter(s=>s>=75).length;
+  document.getElementById('railProgress').textContent = Math.round((modulesDone/4)*100)+'%';
+  if(scores.length){
+    const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+    document.getElementById('railQuizAvg').textContent = avg+'%';
+  }
+}
+
+/* ===================== EXERCISE REVEAL ===================== */
+function revealExerciseAnswer(btn){
+  const fb = btn.nextElementSibling;
+  fb.classList.add('show','ok');
+  btn.disabled = true;
+  btn.textContent = 'Reasoning revealed ✓';
+}
+function revealFinal(){
+  document.getElementById('finalReveal').classList.add('show','ok');
+  state.finalDone = true;
+  document.getElementById('completionBanner').style.display='block';
+  markRailDone('finale');
+}
+
+/* ===================== ARRAY SIMULATOR ===================== */
+let arrData = [12,7,54,3];
+function renderArr(){
+  const stage = document.getElementById('arrStage');
+  stage.innerHTML='';
+  arrData.forEach((v,i)=>{
+    const wrap = document.createElement('div'); wrap.className='cell-wrap fade-in';
+    const cell = document.createElement('div'); cell.className='mem-cell arr'; cell.textContent=v;
+    const label = document.createElement('div'); label.className='idx-label'; label.textContent='i='+i;
+    wrap.appendChild(cell); wrap.appendChild(label);
+    stage.appendChild(wrap);
+  });
+  if(arrData.length===0){ stage.innerHTML = '<span style="color:var(--muted)">Empty array</span>'; }
+}
+function arrInsert(){
+  const val = document.getElementById('arrValue').value.trim();
+  let idx = parseInt(document.getElementById('arrIndex').value);
+  if(val==='') { log('arrLog','Enter a value first.'); return; }
+  if(isNaN(idx)) idx = arrData.length;
+  idx = Math.max(0, Math.min(idx, arrData.length));
+  arrData.splice(idx,0,val);
+  renderArr();
+  log('arrLog', `Inserted "${val}" at index ${idx}. ${arrData.length-idx-1} element(s) shifted right. Cost: O(n).`);
+}
+function arrDelete(){
+  let idx = parseInt(document.getElementById('arrIndex').value);
+  if(isNaN(idx) || idx<0 || idx>=arrData.length){ log('arrLog','Enter a valid index to delete.'); return; }
+  const removed = arrData.splice(idx,1);
+  renderArr();
+  log('arrLog', `Deleted "${removed[0]}" from index ${idx}. Remaining elements shifted left. Cost: O(n).`);
+}
+function arrReset(){ arrData=[12,7,54,3]; renderArr(); log('arrLog','Reset to initial array.'); }
+function log(id,msg){ document.getElementById(id).textContent = msg; }
+renderArr();
+
+/* ===================== LINKED LIST SIMULATOR ===================== */
+let llData = [12,7,54,3];
+function renderLL(){
+  const stage = document.getElementById('llStage');
+  stage.innerHTML='';
+  llData.forEach((v,i)=>{
+    const wrap = document.createElement('div'); wrap.className='cell-wrap fade-in';
+    const cell = document.createElement('div'); cell.className='mem-cell node'; cell.textContent=v;
+    wrap.appendChild(cell);
+    stage.appendChild(wrap);
+    if(i<llData.length-1){
+      const arrow = document.createElement('div'); arrow.className='mem-arrow'; arrow.textContent='→';
+      stage.appendChild(arrow);
+    }
+  });
+  const nullSpan = document.createElement('span'); nullSpan.style.color='var(--muted)'; nullSpan.style.fontFamily='var(--mono)';
+  nullSpan.textContent=' → null';
+  stage.appendChild(nullSpan);
+  if(llData.length===0){ stage.innerHTML='<span style="color:var(--muted)">Empty list (head → null)</span>'; }
+}
+function llInsertHead(){
+  const val = document.getElementById('llValue').value.trim();
+  if(val===''){ log('llLog','Enter a value first.'); return; }
+  llData.unshift(val); renderLL();
+  log('llLog', `Inserted "${val}" at head. Only the head pointer changed. Cost: O(1).`);
+}
+function llInsertTail(){
+  const val = document.getElementById('llValue').value.trim();
+  if(val===''){ log('llLog','Enter a value first.'); return; }
+  llData.push(val); renderLL();
+  log('llLog', `Inserted "${val}" at tail. Had to traverse to the end first (unless a tail pointer is kept). Cost: O(n) without tail pointer, O(1) with one.`);
+}
+function llDeleteHead(){
+  if(llData.length===0){ log('llLog','List is already empty.'); return; }
+  const removed = llData.shift(); renderLL();
+  log('llLog', `Deleted head "${removed}". New head is now the next node. Cost: O(1).`);
+}
+function llReset(){ llData=[12,7,54,3]; renderLL(); log('llLog','Reset to initial list.'); }
+renderLL();
+
+/* ===================== REVERSAL VISUALIZER ===================== */
+let revOriginal = [12,7,54,3];
+let revPrev = [];
+let revStep = 0;
+function renderReversal(){
+  const stage = document.getElementById('revStage');
+  stage.innerHTML='';
+  const remaining = revOriginal.slice(revStep);
+  const reversedPart = revPrev.slice().reverse();
+  reversedPart.forEach((v,i)=>{
+    const wrap = document.createElement('div'); wrap.className='cell-wrap fade-in';
+    const cell = document.createElement('div'); cell.className='mem-cell node'; cell.style.borderColor='var(--good)'; cell.style.color='var(--good)'; cell.textContent=v;
+    wrap.appendChild(cell); stage.appendChild(wrap);
+    if(i<reversedPart.length-1){ const a=document.createElement('div'); a.className='mem-arrow'; a.style.color='var(--good)'; a.textContent='←'; stage.appendChild(a); }
+  });
+  if(reversedPart.length && remaining.length){
+    const a=document.createElement('div'); a.className='mem-arrow'; a.textContent='  null←  '; a.style.color='var(--muted)'; stage.appendChild(a);
+  }
+  remaining.forEach((v,i)=>{
+    const wrap = document.createElement('div'); wrap.className='cell-wrap fade-in';
+    const cell = document.createElement('div'); cell.className='mem-cell node'; cell.textContent=v;
+    wrap.appendChild(cell); stage.appendChild(wrap);
+    if(i<remaining.length-1){ const a=document.createElement('div'); a.className='mem-arrow'; a.textContent='→'; stage.appendChild(a); }
+  });
+}
+function reverseStep(){
+  if(revStep>=revOriginal.length){ log('revLog','Reversal complete! New head: '+revPrev[revPrev.length-1]+'. All pointers flipped.'); return; }
+  const val = revOriginal[revStep];
+  revPrev.push(val);
+  revStep++;
+  renderReversal();
+  log('revLog', `Flipped pointer for node "${val}". prev/curr/next all advance one step. (${revStep}/${revOriginal.length})`);
+}
+function reverseReset(){ revPrev=[]; revStep=0; renderReversal(); log('revLog','Reset. Click "Step reversal" to begin.'); }
+renderReversal();
+
+/* ===================== LRU SIMULATOR ===================== */
+let lru = []; // most recent at end
+const LRU_CAP = 3;
+function renderLRU(){
+  const stage = document.getElementById('lruStage');
+  stage.innerHTML='';
+  if(lru.length===0){ stage.innerHTML='<span style="color:var(--muted)">Cache empty</span>'; return; }
+  lru.forEach((k,i)=>{
+    const wrap = document.createElement('div'); wrap.className='cell-wrap fade-in';
+    const cell = document.createElement('div'); cell.className='mem-cell node'; cell.textContent=k;
+    const label = document.createElement('div'); label.className='idx-label'; label.textContent = i===lru.length-1 ? 'MRU' : (i===0? 'LRU':'');
+    wrap.appendChild(cell); wrap.appendChild(label);
+    stage.appendChild(wrap);
+    if(i<lru.length-1){ const a=document.createElement('div'); a.className='mem-arrow'; a.textContent='→'; stage.appendChild(a); }
+  });
+}
+function lruAccess(){
+  const key = document.getElementById('lruKey').value.trim();
+  if(key===''){ log('lruLog','Enter a key first.'); return; }
+  const existingIdx = lru.indexOf(key);
+  if(existingIdx>-1){
+    lru.splice(existingIdx,1); lru.push(key);
+    renderLRU();
+    log('lruLog', `"${key}" already cached — moved to most-recently-used (O(1) via doubly linked list).`);
+  } else {
+    if(lru.length>=LRU_CAP){
+      const evicted = lru.shift();
+      lru.push(key);
+      renderLRU();
+      log('lruLog', `Cache full — evicted "${evicted}" (least recently used), added "${key}".`);
+    } else {
+      lru.push(key);
+      renderLRU();
+      log('lruLog', `Added "${key}" to cache.`);
+    }
+  }
+}
+function lruReset(){ lru=[]; renderLRU(); log('lruLog','Cache reset.'); }
+renderLRU();
+
+/* ===================== QUIZ ENGINE ===================== */
+const quizzes = {
+  1:{
+    title:'Module 1',
+    questions:[
+      {q:'Why is array access by index O(1)?', opts:[
+        'The computer searches through each element until it finds the right one',
+        'The address is computed directly with arithmetic (base + index × size)',
+        'Arrays are always sorted, enabling binary search',
+        'The CPU caches every array in advance'
+      ], correct:1, explain:'Array access is direct math: base_address + (index × element_size). No searching or walking required.'},
+      {q:'A dynamic array in JavaScript just filled its internal capacity. What happens on the next push()?', opts:[
+        'An error is thrown immediately',
+        'The array silently allocates a bigger block and copies all elements over — an O(n) operation',
+        'Nothing; arrays have infinite capacity by default',
+        'The oldest element is automatically deleted to make room'
+      ], correct:1, explain:'Dynamic arrays resize (commonly doubling) and copy existing elements when capacity is exceeded — this single operation is O(n), though it happens rarely enough that appends average out to O(1) amortized.'},
+      {q:'Why is inserting an element at the START of an array O(n)?', opts:[
+        'Because arrays don\'t support insertion at all',
+        'Every existing element must shift one position to make room',
+        'The array must be re-sorted after insertion',
+        'It isn\'t — it\'s actually O(1)'
+      ], correct:1, explain:'Inserting at the start requires shifting every other element one slot to the right, which touches up to n elements.'},
+      {q:'Which property makes arrays especially fast for sequential reads on real hardware?', opts:[
+        'They use less memory than any other structure',
+        'Contiguous memory layout means great CPU cache locality',
+        'Arrays are always stored in registers',
+        'JavaScript compiles arrays to machine code'
+      ], correct:1, explain:'Because array elements sit next to each other in memory, the CPU can pull whole chunks into cache at once, making sequential access very fast — unlike scattered structures.'}
+    ]
+  },
+  2:{
+    title:'Module 2',
+    questions:[
+      {q:'What does each node in a singly linked list store?', opts:[
+        'A value and an index',
+        'A value and a pointer to the next node',
+        'Only a value',
+        'A value and pointers to both the previous and next nodes'
+      ], correct:1, explain:'Singly linked list nodes hold a value plus a single "next" pointer. (Doubly linked lists add a "prev" pointer too.)'},
+      {q:'Why is inserting at the HEAD of a linked list O(1)?', opts:[
+        'Because linked lists are always short',
+        'Only the head pointer needs to be repointed — no shifting of other nodes required',
+        'The new node is inserted using binary search',
+        'It isn\'t — it\'s O(n) like arrays'
+      ], correct:1, explain:'Inserting at the head just means creating a new node whose "next" points to the old head, then updating the head pointer — no other nodes move.'},
+      {q:'What is the key structural difference between a circular and a singly linked list?', opts:[
+        'Circular lists store values in reverse order',
+        'The last node of a circular list points back to the head instead of null',
+        'Circular lists cannot be traversed',
+        'Circular lists use arrays internally'
+      ], correct:1, explain:'A circular linked list\'s tail node points back to the head, forming a loop — useful for round-robin or looping structures like playlists.'},
+      {q:'Why does the claim "inserting into a linked list is always O(1)" often mislead?', opts:[
+        'Because linked lists cannot actually be modified',
+        'Because finding the insertion point (if not already known) still takes O(n)',
+        'Because insertion always requires resizing',
+        'Because it is actually O(log n)'
+      ], correct:1, explain:'The insert itself is O(1) only once you already hold a reference to the right node. Locating that node from the head is O(n), so "insert at position 500" is O(n) overall.'}
+    ]
+  },
+  3:{
+    title:'Module 3',
+    questions:[
+      {q:'What problem does the two-pointer technique typically solve efficiently?', opts:[
+        'Sorting an already-sorted array',
+        'Comparing/scanning from both ends (or two positions) in a single O(n) pass instead of nested loops',
+        'Converting an array into a linked list',
+        'Finding the memory address of an element'
+      ], correct:1, explain:'Two pointers moving toward or with each other let you avoid nested loops, turning many O(n²) problems into O(n).'},
+      {q:'In Floyd\'s fast/slow pointer cycle detection, what happens if the linked list has NO cycle?', opts:[
+        'The fast pointer reaches null/end first, confirming no cycle',
+        'The two pointers get stuck in an infinite loop',
+        'The program throws an error',
+        'The slow pointer overtakes the fast pointer'
+      ], correct:0, explain:'Without a cycle, the fast pointer (moving 2 steps at a time) simply reaches the end (null) before ever meeting the slow pointer.'},
+      {q:'When reversing a singly linked list iteratively, why do you need THREE tracking pointers (prev, curr, next)?', opts:[
+        'Because JavaScript requires exactly three variables per loop',
+        'You need to save the next node before overwriting curr.next, or you\'ll lose the rest of the list',
+        'Three pointers make the algorithm run faster',
+        'Only two pointers are actually needed'
+      ], correct:1, explain:'Before flipping curr.next to point backward (to prev), you must save a reference to the original next node — otherwise you lose access to the rest of the list.'},
+      {q:'A sliding window of size k scans an array of size n. What is the typical time complexity when implemented efficiently (add/remove one element per slide)?', opts:[
+        'O(n × k)', 'O(n)', 'O(k²)', 'O(log n)'
+      ], correct:1, explain:'By adding the incoming element and subtracting the outgoing one (instead of re-summing the whole window), each slide is O(1), giving O(n) total.'}
+    ]
+  },
+  4:{
+    title:'Module 4',
+    questions:[
+      {q:'Which combination of structures is classically used to build an O(1) LRU cache?', opts:[
+        'Two arrays', 'A hash map + a doubly linked list', 'A singly linked list only', 'A sorted array + binary search'
+      ], correct:1, explain:'The hash map gives O(1) lookup by key (storing node references); the doubly linked list gives O(1) reordering and O(1) removal of the least-recently-used tail node.'},
+      {q:'Why might an array outperform a linked list in practice even when Big-O suggests otherwise?', opts:[
+        'Arrays always have lower Big-O for every operation',
+        'CPU cache locality: contiguous memory means fewer cache misses than "pointer chasing" scattered nodes',
+        'Linked lists are deprecated in modern languages',
+        'Arrays use less total memory in every case'
+      ], correct:1, explain:'Big-O ignores constant factors and hardware behavior. Arrays\' contiguous layout plays much better with CPU caches than a linked list\'s scattered nodes.'},
+      {q:'For a browser\'s back/forward navigation history, which structure fits best and why?', opts:[
+        'Array, because index access is required',
+        'Doubly linked list, because you frequently move one step forward/backward and insert/remove at the current position',
+        'Circular linked list, because history loops forever',
+        'A 2D array, because pages have multiple dimensions'
+      ], correct:1, explain:'Back/forward is inherently about moving one node at a time in either direction and occasionally cutting off "forward" history — a doubly linked list handles this naturally.'},
+      {q:'According to the 3-question design framework in this module, when should you clearly prefer an array?', opts:[
+        'When you need frequent insertions at the very front of the collection',
+        'When you need frequent random access by index and cache-friendly performance',
+        'When the total number of elements is completely unknown and highly volatile',
+        'When you need O(1) deletion of arbitrary known nodes'
+      ], correct:1, explain:'Arrays win when you need direct index access and want to benefit from contiguous-memory cache performance — the two classic array strengths.'}
+    ]
+  }
+};
+
+function buildQuiz(moduleNum){
+  const data = quizzes[moduleNum];
+  const container = document.getElementById('quiz'+moduleNum);
+  const qWrap = document.createElement('div');
+  const answers = new Array(data.questions.length).fill(null);
+
+  data.questions.forEach((q,qi)=>{
+    const qDiv = document.createElement('div'); qDiv.className='quiz-q';
+    qDiv.innerHTML = `<div class="qnum">Question ${qi+1} of ${data.questions.length}</div><div class="qtext">${q.q}</div>`;
+    q.opts.forEach((opt,oi)=>{
+      const btn = document.createElement('button');
+      btn.className='quiz-opt'; btn.textContent=opt;
+      btn.onclick = ()=> selectAnswer(moduleNum, qi, oi);
+      qDiv.appendChild(btn);
+    });
+    const explain = document.createElement('div'); explain.className='quiz-explain'; explain.id=`explain-${moduleNum}-${qi}`;
+    explain.textContent = q.explain;
+    qDiv.appendChild(explain);
+    qWrap.appendChild(qDiv);
+  });
+
+  const summaryDiv = document.createElement('div');
+  summaryDiv.id = `summary-${moduleNum}`;
+  qWrap.appendChild(summaryDiv);
+
+  container.appendChild(qWrap);
+  container.dataset.answers = JSON.stringify(answers);
+}
+
+function selectAnswer(moduleNum, qIdx, optIdx){
+  const data = quizzes[moduleNum];
+  const q = data.questions[qIdx];
+  const container = document.getElementById('quiz'+moduleNum);
+  const answers = JSON.parse(container.dataset.answers);
+  if(answers[qIdx]!==null) return; // already answered
+  answers[qIdx] = optIdx;
+  container.dataset.answers = JSON.stringify(answers);
+
+  const qDivs = container.querySelectorAll('.quiz-q');
+  const qDiv = qDivs[qIdx];
+  const opts = qDiv.querySelectorAll('.quiz-opt');
+  opts.forEach((o,oi)=>{
+    o.disabled = true;
+    if(oi===q.correct) o.classList.add('correct');
+    else if(oi===optIdx) o.classList.add('incorrect');
+  });
+  qDiv.querySelector('.quiz-explain').classList.add('show');
+
+  if(answers.every(a=>a!==null)){
+    finishQuiz(moduleNum, answers);
+  }
+}
+
+function finishQuiz(moduleNum, answers){
+  const data = quizzes[moduleNum];
+  let correctCount = 0;
+  answers.forEach((a,i)=>{ if(a===data.questions[i].correct) correctCount++; });
+  const pct = Math.round((correctCount/data.questions.length)*100);
+  state.quizScores[moduleNum] = pct;
+  updateRailStats();
+
+  const summaryDiv = document.getElementById(`summary-${moduleNum}`);
+  let scoreClass = pct>=75?'':(pct>=50?'mid':'low');
+  summaryDiv.innerHTML = `
+    <div class="quiz-summary fade-in">
+      <div class="score ${scoreClass}">${pct}%</div>
+      <p>${correctCount} of ${data.questions.length} correct</p>
+      <p style="color:var(--muted)">${pct>=75 ? '🎉 Great work — module badge earned! Next module unlocked.' : 'Below 75% — review the module above, then retake the quiz to unlock the next module.'}</p>
+      ${pct<75 ? '<button onclick="retakeQuiz('+moduleNum+')">Retake Quiz</button>' : ''}
+    </div>`;
+
+  if(pct>=75){
+    markRailDone('module'+moduleNum);
+    unlockNext(moduleNum);
+  }
+}
+
+function retakeQuiz(moduleNum){
+  const container = document.getElementById('quiz'+moduleNum);
+  container.innerHTML = `<h3 style="font-family:var(--serif);">${quizzes[moduleNum].title} Quiz</h3>`;
+  buildQuiz(moduleNum);
+}
+
+function unlockNext(moduleNum){
+  const map = {1:'module2',2:'module3',3:'module4',4:'finale'};
+  const nextId = map[moduleNum];
+  if(!nextId) return;
+  const lockedPanel = document.getElementById(nextId+'-locked');
+  const contentPanel = document.getElementById(nextId+'-content');
+  if(lockedPanel) lockedPanel.style.display='none';
+  if(contentPanel){ contentPanel.style.display='block'; contentPanel.classList.add('fade-in'); }
+  if(nextId!=='finale' && !document.getElementById('quiz'+(moduleNum+1)).hasChildNodes()){
+    // already has h3, build the questions
+  }
+}
+
+// Build all quizzes (content hidden by lock panels until unlocked)
+buildQuiz(1); buildQuiz(2); buildQuiz(3); buildQuiz(4);
+updateRailStats();
+
+/* ===================== COPY PROMPT ===================== */
+function copyPrompt(btn){
+  const text = btn.parentElement.textContent.replace('Copy','').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    const old = btn.textContent; btn.textContent='Copied ✓';
+    setTimeout(()=> btn.textContent = old, 1500);
+  }).catch(()=>{ btn.textContent='Copy failed'; });
+}
+</script>
+</body>
+</html>
