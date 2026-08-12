@@ -338,7 +338,7 @@ Expenses
 
 Savings Goals
 
-![Savings Goals](images/Savings.png)
+![Savings-Goals](images/Savings.png)
 
 What-If Simulator
 
