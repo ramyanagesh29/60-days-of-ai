@@ -351,6 +351,7 @@ Learn & Tips
 
 📁 Project Structure
 
+```
 Day42/
 ├── day42.md
 ├── Personal_Financial_Command_Center.html
@@ -360,6 +361,7 @@ Day42/
 ├── Savings-Goals.png
 ├── What-If.png
 └── Learn-Tips.png
+```
 
 🔗 Challenge
 
