@@ -211,7 +211,7 @@ The application includes an interactive decision tree for choosing a suitable te
 
 The conclusion section provides learning resources, developer communities, search keywords and future AI automation opportunities.
 
-![Resources and Next Steps](screenshots/Conclusion.png)
+![Resources and Next Steps](screenshots/Conculsion.png)
 
 ---
 
