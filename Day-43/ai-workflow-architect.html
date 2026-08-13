@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow Architect — Idea to Deployment</title>
+<style>
+  :root{
+    --bg:#12151A;
+    --bg-raised:#1A1E25;
+    --bg-card:#1D2129;
+    --line:#2A2F3A;
+    --line-soft:#232833;
+    --text:#E7EAF0;
+    --text-dim:#9AA3B2;
+    --text-faint:#5D6472;
+    --signal:#4FD1C5;
+    --signal-dim:#2E8A82;
+    --amber:#E8A845;
+    --coral:#E36A5C;
+    --violet:#8B7FE8;
+    --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'SF Mono', 'Cascadia Code', Consolas, 'Courier New', monospace;
+    --radius: 3px;
+  }
+  html.light{
+    --bg:#F3F1EC;
+    --bg-raised:#FFFFFF;
+    --bg-card:#FFFFFF;
+    --line:#DAD6CC;
+    --line-soft:#E7E3D9;
+    --text:#1B1E23;
+    --text-dim:#5B6270;
+    --text-faint:#8B92A0;
+    --signal:#1D8A80;
+    --signal-dim:#4FD1C5;
+    --amber:#B5780F;
+    --coral:#C14634;
+    --violet:#5B4FCF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    transition:background .3s ease,color .3s ease;
+  }
+  ::selection{background:var(--signal);color:#0A0C10;}
+  a{color:var(--signal);}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(18,21,26,.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  html.light .topbar{background:rgba(243,241,236,.86);}
+  .topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:13px;letter-spacing:.06em;color:var(--text-dim);}
+  .brand b{color:var(--text);font-family:var(--font-display);font-size:16px;letter-spacing:0;}
+  .brand .dot{width:7px;height:7px;border-radius:50%;background:var(--signal);box-shadow:0 0 8px var(--signal);}
+  .topbar-actions{display:flex;gap:10px;align-items:center;}
+  .btn{
+    font-family:var(--font-mono);font-size:12px;letter-spacing:.03em;
+    background:transparent;border:1px solid var(--line);color:var(--text-dim);
+    padding:7px 12px;border-radius:var(--radius);cursor:pointer;
+    transition:all .15s ease;
+  }
+  .btn:hover{border-color:var(--signal);color:var(--text);}
+  .btn.primary{background:var(--signal);color:#0A0C10;border-color:var(--signal);font-weight:600;}
+  .btn.primary:hover{opacity:.88;}
+  .progress-pill{
+    font-family:var(--font-mono);font-size:12px;color:var(--text-dim);
+    display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line-soft);border-radius:20px;
+  }
+  .progress-pill .bar{width:64px;height:4px;background:var(--line-soft);border-radius:2px;overflow:hidden;}
+  .progress-pill .fill{height:100%;background:var(--signal);width:0%;transition:width .4s ease;}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:72px 0 56px;border-bottom:1px solid var(--line);position:relative;overflow:hidden;}
+  .hero-tag{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--signal);margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+  .hero-tag::before{content:'';width:22px;height:1px;background:var(--signal);}
+  .hero h1{
+    font-family:var(--font-display);
+    font-size:clamp(34px,5.4vw,58px);
+    line-height:1.05;
+    margin:0 0 20px;
+    max-width:820px;
+    font-weight:400;
+  }
+  .hero h1 em{font-style:italic;color:var(--signal);}
+  .hero p.lead{font-size:17px;color:var(--text-dim);max-width:620px;margin:0 0 32px;}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12px;color:var(--text-faint);}
+  .hero-meta span b{color:var(--text-dim);}
+  .hero-graphic{
+    position:absolute;right:-40px;top:40px;width:420px;height:340px;opacity:.55;pointer-events:none;
+  }
+  @media(max-width:900px){.hero-graphic{display:none;}}
+
+  /* ---------- SECTION SHELL ---------- */
+  section{padding:64px 0;border-bottom:1px solid var(--line);}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:36px;flex-wrap:wrap;gap:12px;}
+  .section-eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-faint);}
+  .section-head h2{font-family:var(--font-display);font-size:30px;font-weight:400;margin:6px 0 0;}
+
+  /* ---------- PIPELINE TIMELINE (signature element) ---------- */
+  .pipeline{position:relative;padding-left:0;}
+  .pipeline-track{position:relative;}
+  .pipeline-track::before{
+    content:'';position:absolute;left:29px;top:10px;bottom:10px;width:1px;
+    background:linear-gradient(var(--line) 0%, var(--line) 100%);
+  }
+  .stage{
+    position:relative;padding:0 0 0 72px;margin-bottom:6px;
+  }
+  .stage-node{
+    position:absolute;left:0;top:0;width:60px;height:60px;
+    border:1px solid var(--line);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--bg-card);z-index:2;
+    font-family:var(--font-mono);font-size:18px;color:var(--text-faint);
+    transition:all .2s ease;
+  }
+  .stage.done .stage-node{border-color:var(--signal);color:var(--signal);box-shadow:0 0 0 4px rgba(79,209,197,.08);}
+  .stage-card{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);
+    margin-bottom:34px;overflow:hidden;
+  }
+  .stage-card-head{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:20px 24px;cursor:pointer;user-select:none;
+  }
+  .stage-card-head:hover{background:var(--bg-raised);}
+  .stage-title-block .stage-index{font-family:var(--font-mono);font-size:11px;color:var(--signal);letter-spacing:.08em;text-transform:uppercase;}
+  .stage-title-block h3{font-family:var(--font-display);font-size:22px;font-weight:400;margin:4px 0 4px;}
+  .stage-title-block p{margin:0;color:var(--text-dim);font-size:13.5px;max-width:560px;}
+  .stage-head-right{display:flex;align-items:center;gap:14px;flex-shrink:0;}
+  .stage-time{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);border:1px solid var(--line-soft);padding:4px 9px;border-radius:12px;white-space:nowrap;}
+  .chevron{width:10px;height:10px;border-right:1px solid var(--text-dim);border-bottom:1px solid var(--text-dim);transform:rotate(45deg);transition:transform .2s ease;}
+  .stage-card.open .chevron{transform:rotate(-135deg);}
+  .stage-check{
+    width:20px;height:20px;border:1px solid var(--line);border-radius:4px;flex-shrink:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;background:var(--bg);
+  }
+  .stage-check.checked{background:var(--signal);border-color:var(--signal);}
+  .stage-check.checked::after{content:'✓';color:#0A0C10;font-size:13px;font-weight:700;}
+
+  .stage-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .stage-card.open .stage-body{max-height:4400px;}
+  .stage-body-inner{padding:4px 24px 28px;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:22px;}
+  @media(max-width:760px){.grid-2{grid-template-columns:1fr;}}
+
+  .block h4{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);
+    margin:0 0 10px;
+  }
+  .block ul{margin:0;padding-left:18px;color:var(--text-dim);font-size:14px;}
+  .block ul li{margin-bottom:6px;}
+  .block p{color:var(--text-dim);font-size:14px;margin:0;}
+
+  .tool-list{display:flex;flex-direction:column;gap:10px;}
+  .tool-item{
+    border:1px solid var(--line-soft);border-radius:var(--radius);padding:12px 14px;background:var(--bg-raised);
+  }
+  .tool-item .tool-name{font-weight:600;font-size:14px;color:var(--text);display:flex;justify-content:space-between;align-items:center;}
+  .tool-item .tool-name .tag{font-family:var(--font-mono);font-size:10px;color:var(--signal);border:1px solid var(--signal-dim);padding:1px 6px;border-radius:10px;text-transform:uppercase;letter-spacing:.05em;}
+  .tool-item .tool-why{font-size:13px;color:var(--text-dim);margin-top:5px;}
+  .tool-item .tool-alt{font-size:12px;color:var(--text-faint);margin-top:6px;font-family:var(--font-mono);}
+
+  .prompt-box{
+    background:#0D0F13;border:1px solid var(--line-soft);border-radius:var(--radius);
+    padding:14px 16px;font-family:var(--font-mono);font-size:12.5px;color:#B9F5EE;
+    margin-bottom:10px;position:relative;white-space:pre-wrap;line-height:1.6;
+  }
+  html.light .prompt-box{background:#F7F5EF;color:#1D5750;}
+  .prompt-box .copy{
+    position:absolute;top:8px;right:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-faint);
+    background:transparent;border:1px solid var(--line-soft);border-radius:3px;padding:3px 7px;cursor:pointer;
+  }
+  .prompt-box .copy:hover{color:var(--signal);border-color:var(--signal);}
+
+  .mistake{display:flex;gap:10px;font-size:13.5px;color:var(--text-dim);margin-bottom:8px;}
+  .mistake .x{color:var(--coral);flex-shrink:0;font-family:var(--font-mono);}
+  .practice{display:flex;gap:10px;font-size:13.5px;color:var(--text-dim);margin-bottom:8px;}
+  .practice .c{color:var(--signal);flex-shrink:0;font-family:var(--font-mono);}
+
+  .notes-area{width:100%;background:var(--bg-raised);border:1px solid var(--line-soft);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:13.5px;padding:12px;min-height:70px;resize:vertical;}
+  .notes-area:focus{outline:none;border-color:var(--signal);}
+  .bookmark-row{display:flex;justify-content:flex-end;margin-top:8px;}
+  .bookmark-btn{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;}
+  .bookmark-btn.active{color:var(--amber);}
+
+  /* ---------- COMPARISON TABLE ---------- */
+  table.compare{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.compare th, table.compare td{border:1px solid var(--line-soft);padding:12px 14px;text-align:left;}
+  table.compare th{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);background:var(--bg-raised);}
+  table.compare td{color:var(--text-dim);}
+  table.compare tr:hover td{background:var(--bg-raised);}
+  .best-badge{color:var(--signal);font-family:var(--font-mono);font-size:10px;border:1px solid var(--signal-dim);padding:1px 6px;border-radius:10px;margin-left:6px;}
+
+  /* ---------- DECISION TREE ---------- */
+  .tree{display:flex;flex-direction:column;gap:0;align-items:flex-start;}
+  .tree-q{
+    background:var(--bg-card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;margin-bottom:14px;width:100%;
+  }
+  .tree-q .qtext{font-size:14.5px;margin-bottom:12px;color:var(--text);}
+  .tree-options{display:flex;gap:10px;flex-wrap:wrap;}
+  .tree-opt{
+    font-family:var(--font-mono);font-size:12.5px;background:var(--bg-raised);border:1px solid var(--line-soft);
+    color:var(--text-dim);padding:8px 14px;border-radius:20px;cursor:pointer;transition:all .15s ease;
+  }
+  .tree-opt:hover{border-color:var(--signal);color:var(--text);}
+  .tree-opt.chosen{background:var(--signal);color:#0A0C10;border-color:var(--signal);}
+  .tree-result{
+    background:rgba(79,209,197,.07);border:1px solid var(--signal-dim);border-radius:var(--radius);padding:16px 20px;font-size:14px;color:var(--text);margin-top:4px;
+  }
+  .tree-result b{color:var(--signal);}
+
+  /* ---------- STACK GRID ---------- */
+  .stack-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:820px){.stack-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:560px){.stack-grid{grid-template-columns:1fr;}}
+  .stack-card{border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px;background:var(--bg-card);}
+  .stack-card .role{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);}
+  .stack-card .name{font-family:var(--font-display);font-size:19px;margin:6px 0 8px;}
+  .stack-card p{font-size:13px;color:var(--text-dim);margin:0;}
+
+  /* ---------- PILL LISTS ---------- */
+  .pill-list{display:flex;flex-wrap:wrap;gap:9px;}
+  .pill{font-family:var(--font-mono);font-size:12px;border:1px solid var(--line-soft);color:var(--text-dim);padding:6px 12px;border-radius:16px;background:var(--bg-raised);}
+
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:760px){.res-grid{grid-template-columns:1fr;}}
+  .res-card{border:1px solid var(--line);border-radius:var(--radius);padding:18px;background:var(--bg-card);}
+  .res-card h4{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--signal);margin:0 0 12px;}
+  .res-card ul{margin:0;padding-left:18px;color:var(--text-dim);font-size:13.5px;}
+  .res-card ul li{margin-bottom:7px;}
+
+  footer{padding:40px 0 60px;text-align:center;color:var(--text-faint);font-family:var(--font-mono);font-size:12px;}
+
+  @media print{
+    .topbar, .hero-graphic, .btn, .bookmark-btn, .stage-check{display:none !important;}
+    .stage-body{max-height:none !important;}
+    section{break-inside:avoid;border-bottom:none;}
+    body{background:#fff;color:#000;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="dot"></span><b>AI Workflow Architect</b><span>/ full-stack / feature-pipeline</span></div>
+    <div class="topbar-actions">
+      <div class="progress-pill"><span id="progressLabel">0/7 stages</span><div class="bar"><div class="fill" id="progressFill"></div></div></div>
+      <button class="btn" id="printBtn">Print guide</button>
+      <button class="btn" id="themeBtn">Light mode</button>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-tag">Software Development → Full Stack → Feature Delivery</div>
+    <h1>From idea to production, <em>mapped stage by stage.</em></h1>
+    <p class="lead">A complete, executable pipeline for taking one feature — full stack, MERN-style — from a rough idea through planning, design, backend, frontend, integration, deployment, and monitoring. Every stage names the AI tools, the prompts, and the traps.</p>
+    <div class="hero-meta">
+      <span><b>7</b> stages</span>
+      <span><b>~4–7 days</b> typical duration, solo dev</span>
+      <span><b>End-to-end</b> scope, no gaps</span>
+      <span><b>Local</b> progress + notes saved to this browser</span>
+    </div>
+  </div>
+  <svg class="hero-graphic" viewBox="0 0 420 340" fill="none">
+    <line x1="40" y1="20" x2="40" y2="320" stroke="var(--line)" stroke-width="1"/>
+    <circle cx="40" cy="40" r="6" fill="var(--signal)"/>
+    <circle cx="40" cy="110" r="6" fill="var(--line)"/>
+    <circle cx="40" cy="180" r="6" fill="var(--line)"/>
+    <circle cx="40" cy="250" r="6" fill="var(--line)"/>
+    <circle cx="40" cy="310" r="6" fill="var(--line)"/>
+    <line x1="40" y1="40" x2="180" y2="40" stroke="var(--line)" stroke-width="1"/>
+    <line x1="40" y1="110" x2="220" y2="110" stroke="var(--line)" stroke-width="1"/>
+    <line x1="40" y1="180" x2="160" y2="180" stroke="var(--line)" stroke-width="1"/>
+    <line x1="40" y1="250" x2="240" y2="250" stroke="var(--line)" stroke-width="1"/>
+    <line x1="40" y1="310" x2="190" y2="310" stroke="var(--line)" stroke-width="1"/>
+  </svg>
+</header>
+
+<section id="pipeline-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="section-eyebrow">The pipeline</div>
+        <h2>Seven stages, start to deploy</h2>
+      </div>
+      <div class="section-eyebrow" style="text-align:right;">Click a stage to expand · check off as you go</div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipeline-track" id="pipelineTrack"></div>
+    </div>
+  </div>
+</section>
+
+<section id="decision-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-eyebrow">Decision tree</div><h2>Which stack should this feature use?</h2></div>
+    </div>
+    <div class="tree" id="decisionTree"></div>
+  </div>
+</section>
+
+<section id="compare-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-eyebrow">Tool comparison</div><h2>AI coding assistants, side by side</h2></div>
+    </div>
+    <div style="overflow-x:auto;">
+    <table class="compare">
+      <thead><tr>
+        <th>Tool</th><th>Best for</th><th>Codebase awareness</th><th>Cost (typical)</th><th>Learning curve</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><b>Claude Code</b> <span class="best-badge">Recommended</span></td><td>Full feature builds, refactors, multi-file changes</td><td>Reads & edits whole repo</td><td>API usage-based</td><td>Low</td></tr>
+        <tr><td>Cursor</td><td>In-editor pair programming</td><td>Strong, IDE-native</td><td>$20/mo</td><td>Low</td></tr>
+        <tr><td>GitHub Copilot</td><td>Inline autocomplete while typing</td><td>File-level context</td><td>$10/mo</td><td>Very low</td></tr>
+        <tr><td>v0 by Vercel</td><td>Generating React UI from a prompt</td><td>None (single component)</td><td>Free tier + paid</td><td>Very low</td></tr>
+        <tr><td>Postman AI</td><td>API testing & mock servers</td><td>Collection-level</td><td>Free tier + paid</td><td>Low</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="stack-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-eyebrow">Conclusion</div><h2>Recommended AI stack</h2></div>
+    </div>
+    <div class="stack-grid" id="stackGrid"></div>
+  </div>
+</section>
+
+<section id="summary-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-eyebrow">Conclusion</div><h2>Workflow summary</h2></div>
+    </div>
+    <div class="grid-2">
+      <div class="block">
+        <h4>What this pipeline gets you</h4>
+        <p>A single feature — scoped, designed, built on both ends, tested, deployed, and watched — using AI at every stage to compress research, boilerplate, and debugging time, while keeping architecture and product decisions in your hands.</p>
+      </div>
+      <div class="block">
+        <h4>Where humans stay in the loop</h4>
+        <ul>
+          <li>Scoping the feature and saying no to scope creep</li>
+          <li>Reviewing every AI-generated diff before merge</li>
+          <li>Security-sensitive code: auth, payments, PII handling</li>
+          <li>Final go/no-go on production deploys</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="resources-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div><div class="section-eyebrow">Conclusion</div><h2>Resources & next steps</h2></div>
+    </div>
+    <div class="res-grid">
+      <div class="res-card">
+        <h4>Learning resources</h4>
+        <ul>
+          <li>The Odin Project — Full Stack JavaScript path</li>
+          <li>MDN Web Docs — HTTP, REST, and API references</li>
+          <li>Fireship — short conceptual videos on new tooling</li>
+          <li>Official docs: React, Express, MongoDB, Node.js</li>
+          <li>Anthropic's Claude Code docs — agentic dev workflows</li>
+        </ul>
+      </div>
+      <div class="res-card">
+        <h4>Communities</h4>
+        <ul>
+          <li>r/webdev and r/reactjs on Reddit</li>
+          <li>Dev.to full-stack and MERN tags</li>
+          <li>Local hackathon and college dev-club Discords</li>
+          <li>Stack Overflow, for well-scoped technical questions</li>
+          <li>Indie Hackers, for shipping-and-feedback loops</li>
+        </ul>
+      </div>
+      <div class="res-card">
+        <h4>Search keywords to go deeper</h4>
+        <div class="pill-list">
+          <span class="pill">MERN feature branch workflow</span>
+          <span class="pill">REST API design checklist</span>
+          <span class="pill">Claude Code agentic workflow</span>
+          <span class="pill">CI/CD for solo developers</span>
+          <span class="pill">JWT auth best practices</span>
+        </div>
+      </div>
+      <div class="res-card">
+        <h4>Future automation opportunities</h4>
+        <ul>
+          <li>Auto-generate PR descriptions and changelogs from diffs</li>
+          <li>AI-written test suites triggered on every commit</li>
+          <li>Automated accessibility and performance audits pre-merge</li>
+          <li>Self-updating API docs from route definitions</li>
+          <li>AI-triaged bug reports routed to the right stage</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>AI Workflow Architect · generated as a self-contained guide · your progress, notes, and bookmarks are saved only in this browser</footer>
+
+<script>
+/* ============ DATA ============ */
+const stages = [
+  {
+    id:'plan', num:'01', icon:'◇', time:'2–4 hrs',
+    title:'Discovery & Planning',
+    sub:'Turn a rough feature idea into a scoped spec with clear boundaries.',
+    objectives:['Define the problem the feature solves and for whom','Set explicit in-scope and out-of-scope boundaries','Produce a written spec other stages can build from'],
+    tasks:['Write a one-paragraph problem statement','List user stories in "As a ... I want ... so that ..." form','Identify data entities and rough API surface','Flag open questions and assumptions'],
+    tools:[
+      {name:'Claude (chat)', tag:'Primary', why:'Best for structured reasoning through ambiguous requirements and turning a vague idea into user stories and edge cases.', alt:'ChatGPT, Notion AI'},
+      {name:'Perplexity', tag:'Research', why:'Fast, cited answers when you need to check how similar features are typically built.', alt:'Google + manual reading'},
+    ],
+    prompts:[
+      'I want to build [feature] for [type of app]. Ask me clarifying questions one at a time until you have enough to write a one-page spec, then write it.',
+      'Given this spec: [paste], list every edge case and failure mode I should design for before writing code.'
+    ],
+    practices:['Write the spec before opening an editor','Get one other person (or Claude) to poke holes in scope','Timebox planning — a feature spec should not take longer than the smallest stage below it'],
+    mistakes:['Starting to code before the data model is sketched','Letting "nice to have" ideas creep into the v1 scope','Skipping edge cases because "we\'ll handle it later"'],
+    outputs:['One-page feature spec','List of user stories','Rough entity/data list'],
+    efficiency:'Paste your spec draft back into Claude and ask it to find contradictions — it catches scope drift faster than a second read-through.'
+  },
+  {
+    id:'design', num:'02', icon:'◈', time:'3–6 hrs',
+    title:'Design — UX & Architecture',
+    sub:'Decide how it looks and how it is structured before either is built.',
+    objectives:['Produce wireframes or a UI reference for the feature','Decide the architecture: routes, components, DB schema','Agree on the API contract between frontend and backend'],
+    tasks:['Sketch low-fidelity wireframes for each screen/state','Design the DB schema (fields, types, relationships)','Draft the REST endpoint list with request/response shapes','Choose state-management approach on the frontend'],
+    tools:[
+      {name:'v0 by Vercel', tag:'UI gen', why:'Generates working React + Tailwind UI from a text prompt, useful as a visual starting point rather than a blank canvas.', alt:'Figma + FigJam, Uizard'},
+      {name:'Claude (chat)', tag:'Architecture', why:'Strong at reasoning about schema normalization and API design trade-offs, and will explain the "why" behind each choice.', alt:'ChatGPT'},
+      {name:'Excalidraw', tag:'Diagramming', why:'Fast, low-friction diagramming for architecture sketches you can screenshot into docs.', alt:'draw.io, Miro'},
+    ],
+    prompts:[
+      'Given this spec: [paste], propose a MongoDB schema with fields, types, and relationships. Explain any normalization trade-offs.',
+      'Design a REST API for [feature]: list endpoints, HTTP methods, request bodies, and response shapes as a markdown table.'
+    ],
+    practices:['Lock the API contract before writing frontend or backend code','Name endpoints and fields the way the product spec names them, not internal jargon','Design for the empty and error states, not just the happy path'],
+    mistakes:['Designing the UI and the schema in isolation from each other','No plan for loading/error/empty states until QA finds it','Over-engineering the schema for hypothetical future features'],
+    outputs:['Wireframes or UI reference','Finalized DB schema','API contract document'],
+    efficiency:'Ask Claude to generate the API contract as a markdown table you can paste directly into your README — it becomes shared documentation, not throwaway planning.'
+  },
+  {
+    id:'backend', num:'03', icon:'⌁', time:'4–8 hrs',
+    title:'Backend Development',
+    sub:'Build the server, database models, and API endpoints.',
+    objectives:['Implement the DB models from the schema','Build and test each API endpoint against the contract','Add auth/authorization where the feature needs it'],
+    tasks:['Set up models (Mongoose schemas or equivalent)','Write route handlers and controllers','Add input validation and error handling','Write Postman/Thunder Client requests for manual testing'],
+    tools:[
+      {name:'Claude Code', tag:'Primary', why:'Can read your existing repo structure and generate models, routes, and controllers that match your existing conventions rather than generic boilerplate.', alt:'Cursor, GitHub Copilot'},
+      {name:'Postman (AI features)', tag:'Testing', why:'Generates test assertions and mock data for endpoints as you build them.', alt:'Thunder Client, Insomnia'},
+    ],
+    prompts:[
+      'Using the schema and API contract in [paste/attach], generate the Express routes and controllers for the [resource] resource, following the conventions already in /routes and /controllers.',
+      'Review this route handler for missing input validation, unhandled error cases, and security issues: [paste code]'
+    ],
+    practices:['Validate every input at the route boundary, not deep in business logic','Return consistent error shapes across all endpoints','Write one manual test request per endpoint before moving on'],
+    mistakes:['Trusting client input without validation','Inconsistent error response formats across endpoints','Hardcoding secrets instead of using environment variables'],
+    outputs:['Working API endpoints matching the contract','DB models','Manual test collection (Postman/Thunder Client)'],
+    efficiency:'Feed Claude Code your existing folder structure once at the start of the session — it will match naming and file patterns instead of you correcting it endpoint by endpoint.'
+  },
+  {
+    id:'frontend', num:'04', icon:'▣', time:'4–8 hrs',
+    title:'Frontend Development',
+    sub:'Build the UI and wire it to the API.',
+    objectives:['Build components matching the wireframes','Connect components to the API endpoints','Handle loading, error, and empty states in the UI'],
+    tasks:['Build reusable components (forms, lists, cards)','Wire up API calls with fetch/axios and state management','Add form validation and inline error messages','Style to match the design reference'],
+    tools:[
+      {name:'Claude Code', tag:'Primary', why:'Generates full components in your existing style, and can wire them to real endpoints when given the API contract from stage 2.', alt:'Cursor, v0 by Vercel'},
+      {name:'GitHub Copilot', tag:'Autocomplete', why:'Fast for repetitive JSX and boilerplate once the component pattern is established.', alt:'Tabnine'},
+    ],
+    prompts:[
+      'Build a React component for [feature] matching this API contract: [paste]. Include loading, error, and empty states. Match the styling conventions in [existing component].',
+      'This component re-renders too often: [paste code]. Identify the cause and refactor it.'
+    ],
+    practices:['Build one component fully — including error states — before starting the next','Keep API-calling logic in hooks or a services layer, not scattered in components','Test on mobile viewport widths as you go, not at the end'],
+    mistakes:['Building only the happy-path UI and bolting on error handling later','Prop-drilling instead of lifting state or using context appropriately','Ignoring responsive layout until a final pass'],
+    outputs:['Working UI wired to live API','Responsive layout across breakpoints','Form validation and error messaging'],
+    efficiency:'Ask Claude Code to build the loading/error/empty variants in the same pass as the happy path — retrofitting them later takes longer than including them up front.'
+  },
+  {
+    id:'integrate', num:'05', icon:'⇄', time:'3–5 hrs',
+    title:'Integration & Testing',
+    sub:'Confirm the whole feature works together, end to end.',
+    objectives:['Verify frontend and backend work together correctly','Catch bugs across the full request/response cycle','Write automated tests for critical paths'],
+    tasks:['Run through every user story manually, end to end','Write unit tests for core backend logic','Write integration tests for key API flows','Fix bugs found during manual and automated testing'],
+    tools:[
+      {name:'Claude Code', tag:'Test writing', why:'Generates unit and integration tests from existing code, including edge cases you may not think to write by hand.', alt:'GitHub Copilot'},
+      {name:'Jest / Vitest', tag:'Test runner', why:'Standard JS test runners; Claude can scaffold suites for either directly.', alt:'Mocha + Chai'},
+    ],
+    prompts:[
+      'Write Jest unit tests for this controller function, including edge cases for invalid input and unauthorized access: [paste code]',
+      'Here is a bug report: [describe]. Given this code: [paste], identify the likely cause and propose a fix.'
+    ],
+    practices:['Test the unhappy paths deliberately — invalid input, expired tokens, empty lists','Reproduce every reported bug before attempting a fix','Keep a running bug list rather than fixing ad hoc as you notice things'],
+    mistakes:['Only testing the flow you personally use most often','Marking a bug fixed without a regression test','Skipping tests under time pressure and never returning to them'],
+    outputs:['Passing test suite for critical paths','Bug list resolved or triaged','End-to-end manual walkthrough completed'],
+    efficiency:'Ask Claude to read your controller and generate the test cases you\'d likely forget — auth failures, empty arrays, malformed IDs — before you write the happy-path tests yourself.'
+  },
+  {
+    id:'deploy', num:'06', icon:'▲', time:'2–4 hrs',
+    title:'Deployment & DevOps',
+    sub:'Ship the feature to a live environment safely.',
+    objectives:['Deploy backend and frontend to production or staging','Set up environment variables and secrets safely','Confirm the deployed feature works identically to local'],
+    tasks:['Configure build and deploy pipeline (e.g. Vercel + Render/Railway)','Set environment variables in the hosting platform','Run a smoke test against the live URL','Set up a rollback plan before going live'],
+    tools:[
+      {name:'Claude Code', tag:'DevOps help', why:'Can write and debug CI/CD config (GitHub Actions, Dockerfiles) and diagnose deploy errors from logs.', alt:'ChatGPT'},
+      {name:'Vercel / Netlify', tag:'Frontend hosting', why:'Zero-config deploys for React apps with preview URLs per branch.', alt:'GitHub Pages'},
+      {name:'Render / Railway', tag:'Backend hosting', why:'Simple Node.js + MongoDB hosting for solo/small-team projects without managing servers.', alt:'AWS EC2, Fly.io'},
+    ],
+    prompts:[
+      'Here is my deploy error log: [paste]. Diagnose the likely cause and suggest a fix.',
+      'Write a GitHub Actions workflow that runs tests on every PR and deploys to [platform] on merge to main.'
+    ],
+    practices:['Never commit secrets — use environment variables and a .env.example file','Deploy to a staging URL before pointing production traffic at it','Keep the previous working deploy one click away for rollback'],
+    mistakes:['Hardcoded localhost URLs left in the frontend build','Missing environment variables causing silent failures in production','No rollback plan when a bad deploy reaches production'],
+    outputs:['Live, working deployment','CI/CD pipeline (optional but recommended)','Documented rollback procedure'],
+    efficiency:'Paste your exact deploy error into Claude rather than searching — it can usually pinpoint config-vs-code issues faster than trawling forum threads.'
+  },
+  {
+    id:'monitor', num:'07', icon:'◎', time:'ongoing',
+    title:'Monitoring & Iteration',
+    sub:'Watch how the feature performs and improve it with real data.',
+    objectives:['Track errors and performance in production','Gather usage feedback to guide the next iteration','Fix issues quickly when they surface post-launch'],
+    tasks:['Set up error tracking (e.g. Sentry) on frontend and backend','Add basic analytics events for key actions','Review logs weekly for the first month','Log follow-up improvements as a backlog, not urgent fixes'],
+    tools:[
+      {name:'Claude (chat)', tag:'Triage', why:'Good at reading error stack traces and logs pasted in and suggesting likely root causes and priority.', alt:'ChatGPT'},
+      {name:'Sentry', tag:'Error tracking', why:'Captures real production errors with stack traces and user context automatically.', alt:'LogRocket, Datadog'},
+    ],
+    prompts:[
+      'Here are this week\'s error logs: [paste]. Group them by likely root cause and rank by user impact.',
+      'Given this usage data: [paste], suggest three small iterations that would most improve this feature.'
+    ],
+    practices:['Set an error-rate threshold that triggers investigation, not just logging','Separate "must fix now" from "improve later" explicitly','Revisit the original spec after two weeks of real usage to see what was missed'],
+    mistakes:['Shipping and never checking error logs again','Treating every piece of feedback as equally urgent','No baseline metrics, so "did this help?" can\'t be answered later'],
+    outputs:['Error tracking dashboard live','A prioritized backlog of iterations','A short retro note on what shipped well and what didn\'t'],
+    efficiency:'Batch log review into one weekly session with Claude summarizing patterns, rather than reacting to every individual error notification as it arrives.'
+  },
+];
+
+const stack = [
+  {role:'Planning & spec', name:'Claude', desc:'Structured reasoning to turn vague ideas into a written scope.'},
+  {role:'UI generation', name:'v0 by Vercel', desc:'Fast first-draft React UI from a plain-text prompt.'},
+  {role:'Coding & refactors', name:'Claude Code', desc:'Repo-aware agentic coding across backend and frontend.'},
+  {role:'Inline autocomplete', name:'GitHub Copilot', desc:'Speeds up repetitive, well-established patterns as you type.'},
+  {role:'API testing', name:'Postman', desc:'Manual and automated endpoint testing with AI-assisted assertions.'},
+  {role:'Error monitoring', name:'Sentry', desc:'Production error tracking with stack traces and user context.'},
+];
+
+/* ============ STATE ============ */
+const state = JSON.parse(localStorage.getItem('awa_state') || '{}');
+state.done = state.done || {};
+state.notes = state.notes || {};
+state.bookmarks = state.bookmarks || {};
+function save(){ localStorage.setItem('awa_state', JSON.stringify(state)); }
+
+/* ============ RENDER STAGES ============ */
+const track = document.getElementById('pipelineTrack');
+stages.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'stage';
+  el.innerHTML = `
+    <div class="stage-node">${s.icon}</div>
+    <div class="stage-card" data-id="${s.id}">
+      <div class="stage-card-head">
+        <div class="stage-check" data-check="${s.id}"></div>
+        <div class="stage-title-block" style="flex:1;">
+          <div class="stage-index">Stage ${s.num}</div>
+          <h3>${s.title}</h3>
+          <p>${s.sub}</p>
+        </div>
+        <div class="stage-head-right">
+          <span class="stage-time">${s.time}</span>
+          <span class="chevron"></span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="stage-body-inner">
+          <div class="grid-2">
+            <div class="block">
+              <h4>Objectives</h4>
+              <ul>${s.objectives.map(o=>`<li>${o}</li>`).join('')}</ul>
+            </div>
+            <div class="block">
+              <h4>Tasks</h4>
+              <ul>${s.tasks.map(t=>`<li>${t}</li>`).join('')}</ul>
+            </div>
+          </div>
+
+          <div class="block" style="margin-bottom:22px;">
+            <h4>Best AI tools for this stage</h4>
+            <div class="tool-list">
+              ${s.tools.map(t=>`
+                <div class="tool-item">
+                  <div class="tool-name">${t.name} <span class="tag">${t.tag}</span></div>
+                  <div class="tool-why">${t.why}</div>
+                  <div class="tool-alt">Alternative: ${t.alt}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+
+          <div class="block" style="margin-bottom:22px;">
+            <h4>Prompt examples</h4>
+            ${s.prompts.map((p,idx)=>`
+              <div class="prompt-box">${p}<button class="copy" data-copy="${s.id}-${idx}">copy</button></div>
+            `).join('')}
+          </div>
+
+          <div class="grid-2">
+            <div class="block">
+              <h4>Best practices</h4>
+              ${s.practices.map(p=>`<div class="practice"><span class="c">✓</span><span>${p}</span></div>`).join('')}
+            </div>
+            <div class="block">
+              <h4>Common mistakes</h4>
+              ${s.mistakes.map(m=>`<div class="mistake"><span class="x">✕</span><span>${m}</span></div>`).join('')}
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="block">
+              <h4>Expected outputs</h4>
+              <ul>${s.outputs.map(o=>`<li>${o}</li>`).join('')}</ul>
+            </div>
+            <div class="block">
+              <h4>Efficiency tip</h4>
+              <p>${s.efficiency}</p>
+            </div>
+          </div>
+
+          <div class="block">
+            <h4>Your notes</h4>
+            <textarea class="notes-area" data-notes="${s.id}" placeholder="Jot down decisions, blockers, or reminders for this stage..."></textarea>
+            <div class="bookmark-row">
+              <button class="bookmark-btn" data-bookmark="${s.id}">☆ Bookmark this stage</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  `;
+  track.appendChild(el);
+});
+
+/* ============ STAGE CARD BEHAVIOR ============ */
+document.querySelectorAll('.stage-card-head').forEach(head=>{
+  head.addEventListener('click', (e)=>{
+    if(e.target.closest('.stage-check')) return;
+    head.closest('.stage-card').classList.toggle('open');
+  });
+});
+
+document.querySelectorAll('[data-check]').forEach(chk=>{
+  const id = chk.dataset.check;
+  if(state.done[id]) { chk.classList.add('checked'); chk.closest('.stage-card').classList.add('done'); document.querySelector(`.stage[data-id]`); }
+  chk.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    state.done[id] = !state.done[id];
+    chk.classList.toggle('checked');
+    const card = chk.closest('.stage-card');
+    card.parentElement.classList.toggle('done', state.done[id]);
+    save();
+    updateProgress();
+  });
+});
+// mark stage wrapper done class on load
+stages.forEach(s=>{
+  const wrapper = document.querySelector(`.stage-card[data-id="${s.id}"]`).parentElement;
+  if(state.done[s.id]){ wrapper.classList.add('done'); }
+});
+
+function updateProgress(){
+  const total = stages.length;
+  const done = stages.filter(s=>state.done[s.id]).length;
+  document.getElementById('progressLabel').textContent = `${done}/${total} stages`;
+  document.getElementById('progressFill').style.width = (done/total*100)+'%';
+}
+updateProgress();
+
+/* notes */
+document.querySelectorAll('[data-notes]').forEach(area=>{
+  const id = area.dataset.notes;
+  area.value = state.notes[id] || '';
+  area.addEventListener('input', ()=>{ state.notes[id] = area.value; save(); });
+});
+
+/* bookmarks */
+document.querySelectorAll('[data-bookmark]').forEach(btn=>{
+  const id = btn.dataset.bookmark;
+  if(state.bookmarks[id]){ btn.classList.add('active'); btn.textContent='★ Bookmarked'; }
+  btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    state.bookmarks[id] = !state.bookmarks[id];
+    btn.classList.toggle('active');
+    btn.textContent = state.bookmarks[id] ? '★ Bookmarked' : '☆ Bookmark this stage';
+    save();
+  });
+});
+
+/* copy prompts */
+document.querySelectorAll('[data-copy]').forEach(btn=>{
+  btn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const text = btn.parentElement.textContent.replace('copy','').trim();
+    navigator.clipboard.writeText(text).then(()=>{
+      const orig = btn.textContent; btn.textContent='copied'; setTimeout(()=>btn.textContent=orig,1200);
+    });
+  });
+});
+
+/* ============ DECISION TREE ============ */
+const treeData = {
+  q: 'How much traffic does this feature need to handle at launch?',
+  options: [
+    { label:'Just me / a demo', result:'Keep it simple: local MongoDB or a free-tier Atlas cluster, deploy frontend to Vercel free tier, backend to Render free tier. No caching layer needed yet.' },
+    { label:'Small user base (<1k)', result:'MongoDB Atlas free/shared tier, Render or Railway starter plan for backend, Vercel for frontend. Add basic rate limiting on write endpoints.' },
+    { label:'Growing product (1k–100k)', result:'Dedicated Atlas cluster, backend on Render/Railway paid tier or a small VPS, add Redis caching for hot reads, and Sentry for error monitoring from day one.' },
+    { label:'High traffic / scaling fast', result:'This is beyond a single-feature pipeline — bring in a DB architecture review, consider read replicas, a CDN in front of the frontend, and load testing before launch.' },
+  ]
+};
+const treeEl = document.getElementById('decisionTree');
+function renderTree(){
+  treeEl.innerHTML = `
+    <div class="tree-q">
+      <div class="qtext">${treeData.q}</div>
+      <div class="tree-options">
+        ${treeData.options.map((o,i)=>`<div class="tree-opt" data-i="${i}">${o.label}</div>`).join('')}
+      </div>
+      <div class="tree-result" id="treeResult" style="display:none;"></div>
+    </div>
+  `;
+  treeEl.querySelectorAll('.tree-opt').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      treeEl.querySelectorAll('.tree-opt').forEach(o=>o.classList.remove('chosen'));
+      opt.classList.add('chosen');
+      const res = document.getElementById('treeResult');
+      res.style.display='block';
+      res.innerHTML = `<b>Suggested path —</b> ${treeData.options[opt.dataset.i].result}`;
+    });
+  });
+}
+renderTree();
+
+/* ============ STACK GRID ============ */
+const stackGrid = document.getElementById('stackGrid');
+stack.forEach(s=>{
+  const el = document.createElement('div');
+  el.className = 'stack-card';
+  el.innerHTML = `<div class="role">${s.role}</div><div class="name">${s.name}</div><p>${s.desc}</p>`;
+  stackGrid.appendChild(el);
+});
+
+/* ============ THEME TOGGLE ============ */
+const themeBtn = document.getElementById('themeBtn');
+function applyTheme(light){
+  document.documentElement.classList.toggle('light', light);
+  themeBtn.textContent = light ? 'Dark mode' : 'Light mode';
+  localStorage.setItem('awa_theme', light ? 'light' : 'dark');
+}
+applyTheme(localStorage.getItem('awa_theme') === 'light');
+themeBtn.addEventListener('click', ()=> applyTheme(!document.documentElement.classList.contains('light')));
+
+/* ============ PRINT ============ */
+document.getElementById('printBtn').addEventListener('click', ()=>{
+  document.querySelectorAll('.stage-card').forEach(c=>c.classList.add('open'));
+  window.print();
+});
+</script>
+</body>
+</html>
