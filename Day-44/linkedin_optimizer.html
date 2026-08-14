@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI LinkedIn Profile Optimizer</title>
+<style>
+  :root{
+    --bg:#0a0e1a;
+    --bg2:#0f1424;
+    --card:#131a2e;
+    --card-hover:#171f38;
+    --border:#232c47;
+    --text:#e8ebf5;
+    --text-dim:#8b93b0;
+    --accent:#6d7bff;
+    --accent2:#9b6dff;
+    --green:#3ddc97;
+    --red:#ff6b6b;
+    --orange:#ffb347;
+    --font-display:'Georgia', 'Times New Roman', serif;
+    --font-body:-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  [data-theme="light"]{
+    --bg:#f5f6fb;
+    --bg2:#ffffff;
+    --card:#ffffff;
+    --card-hover:#f0f2fa;
+    --border:#dde1f0;
+    --text:#161a2c;
+    --text-dim:#5c6280;
+    --accent:#4d5cff;
+    --accent2:#8348ff;
+    --green:#0f9d63;
+    --red:#e0483f;
+    --orange:#d98a1a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.6;
+    transition:background .3s, color .3s;
+    min-height:100vh;
+  }
+  .app{display:flex;min-height:100vh;}
+  /* SIDEBAR */
+  .sidebar{
+    width:250px;
+    background:var(--bg2);
+    border-right:1px solid var(--border);
+    padding:24px 16px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    flex-shrink:0;
+  }
+  .brand{
+    font-family:var(--font-display);
+    font-size:1.15rem;
+    font-weight:700;
+    margin-bottom:4px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .brand-sub{font-size:.72rem;color:var(--text-dim);margin-bottom:24px;letter-spacing:.03em;}
+  .progress-wrap{margin-bottom:20px;}
+  .progress-label{font-size:.7rem;color:var(--text-dim);display:flex;justify-content:space-between;margin-bottom:6px;}
+  .progress-bar{height:6px;background:var(--border);border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .4s ease;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:8px;
+    font-size:.85rem;color:var(--text-dim);
+    cursor:pointer;margin-bottom:2px;
+    transition:background .15s, color .15s;
+    border:1px solid transparent;
+  }
+  .nav-item .num{
+    font-size:.65rem;width:20px;height:20px;border-radius:6px;
+    background:var(--border);display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;color:var(--text-dim);
+  }
+  .nav-item:hover{background:var(--card-hover);color:var(--text);}
+  .nav-item.active{background:var(--card);color:var(--text);border-color:var(--border);}
+  .nav-item.active .num{background:var(--accent);color:#fff;}
+  .theme-toggle{
+    margin-top:16px;width:100%;padding:9px;border-radius:8px;
+    background:var(--card);border:1px solid var(--border);color:var(--text);
+    cursor:pointer;font-size:.78rem;
+  }
+  /* MAIN */
+  .main{flex:1;padding:40px 48px;max-width:920px;}
+  .section{display:none;animation:fadeIn .4s ease;}
+  .section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  h1.page-title{
+    font-family:var(--font-display);
+    font-size:2rem;margin-bottom:6px;
+  }
+  .page-sub{color:var(--text-dim);font-size:.95rem;margin-bottom:32px;}
+  .eyebrow{
+    font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--accent);font-weight:600;margin-bottom:8px;
+  }
+  .card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:14px;padding:24px;margin-bottom:20px;
+    transition:border-color .2s, transform .2s;
+  }
+  .card:hover{border-color:var(--accent);}
+  .card h3{font-size:1.05rem;margin-bottom:10px;}
+  .score-circle{
+    width:64px;height:64px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:1.1rem;flex-shrink:0;
+    border:3px solid var(--border);
+  }
+  .score-row{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+  .score-good{border-color:var(--green);color:var(--green);}
+  .score-mid{border-color:var(--orange);color:var(--orange);}
+  .score-bad{border-color:var(--red);color:var(--red);}
+  .tag{
+    display:inline-block;padding:3px 10px;border-radius:99px;
+    font-size:.7rem;font-weight:600;margin-right:6px;margin-bottom:6px;
+  }
+  .tag-green{background:rgba(61,220,151,.15);color:var(--green);}
+  .tag-red{background:rgba(255,107,107,.15);color:var(--red);}
+  .tag-blue{background:rgba(109,123,255,.15);color:var(--accent);}
+  .quote{
+    border-left:3px solid var(--accent);padding:10px 16px;
+    background:var(--bg2);border-radius:0 8px 8px 0;
+    font-style:italic;color:var(--text-dim);margin:10px 0;font-size:.9rem;
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:10px 18px;border-radius:9px;border:none;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;font-weight:600;font-size:.85rem;cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(109,123,255,.35);}
+  .btn-outline{
+    background:transparent;border:1px solid var(--border);color:var(--text);
+  }
+  .btn-outline:hover{box-shadow:none;border-color:var(--accent);}
+  .btn-sm{padding:6px 12px;font-size:.75rem;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+  .rewrite-box{
+    background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+    padding:16px;margin:10px 0;position:relative;font-size:.9rem;white-space:pre-wrap;
+  }
+  .copy-btn{
+    position:absolute;top:10px;right:10px;font-size:.7rem;
+    padding:5px 10px;
+  }
+  .before-after{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:640px){.before-after{grid-template-columns:1fr;}}
+  .ba-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);margin-bottom:6px;}
+  .scorecard-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 0;border-bottom:1px solid var(--border);
+  }
+  .scorecard-row:last-child{border-bottom:none;}
+  .sc-bars{display:flex;align-items:center;gap:10px;flex:1;margin:0 20px;}
+  .sc-bar-track{flex:1;height:8px;background:var(--border);border-radius:99px;overflow:hidden;position:relative;}
+  .sc-bar-before{position:absolute;height:100%;background:var(--red);opacity:.5;border-radius:99px;}
+  .sc-bar-after{position:absolute;height:100%;background:var(--green);border-radius:99px;transition:width 1s ease;}
+  .delta{color:var(--green);font-weight:700;font-size:.85rem;}
+  .day-card{
+    display:flex;gap:16px;align-items:flex-start;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:20px;margin-bottom:14px;
+  }
+  .day-num{
+    width:42px;height:42px;border-radius:10px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;
+  }
+  .checklist label{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:.88rem;cursor:pointer;}
+  .checklist input{accent-color:var(--accent);width:16px;height:16px;}
+  .hero-final{
+    text-align:center;padding:40px 20px;
+  }
+  .big-score{font-family:var(--font-display);font-size:4rem;font-weight:700;
+    background:linear-gradient(135deg,var(--green),var(--accent));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .keyword-pill{
+    display:inline-block;background:var(--bg2);border:1px solid var(--border);
+    padding:4px 12px;border-radius:99px;font-size:.75rem;margin:3px;color:var(--text-dim);
+  }
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+    background:var(--card);border:1px solid var(--accent);color:var(--text);
+    padding:12px 20px;border-radius:10px;font-size:.85rem;
+    transition:transform .3s ease;z-index:999;box-shadow:0 10px 30px rgba(0,0,0,.3);
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .missing{color:var(--orange);font-size:.82rem;font-style:italic;}
+  @media print{
+    .sidebar,.btn-row,.theme-toggle{display:none !important;}
+    .section{display:block !important;page-break-after:always;}
+    .main{max-width:100%;padding:0;}
+    body{background:#fff;color:#000;}
+  }
+  @media(max-width:800px){
+    .app{flex-direction:column;}
+    .sidebar{width:100%;height:auto;position:relative;}
+    .main{padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar">
+    <div class="brand">AI LinkedIn<br>Optimizer</div>
+    <div class="brand-sub">Ramya N — Profile Rebuild</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Progress</span><span id="progPct">8%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:8%"></div></div>
+    </div>
+    <div id="navList"></div>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- 1. WELCOME -->
+    <section class="section active" data-section="0">
+      <div class="eyebrow">Welcome</div>
+      <h1 class="page-title">Let's fix what your profile isn't saying yet</h1>
+      <p class="page-sub">A full roast-and-rebuild of your LinkedIn, built only from what you actually told me — no invented achievements, no fake numbers.</p>
+      <div class="card">
+        <h3>What's inside</h3>
+        <p style="color:var(--text-dim);font-size:.9rem;margin-top:8px;">Your current profile → a section-by-section roast → a rebuilt headline, About, and experience → a before/after scorecard → a 7-day activation plan.</p>
+        <div class="btn-row">
+          <button class="btn" onclick="goTo(1)">Start: Review My Profile →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. PROFILE INPUT -->
+    <section class="section" data-section="1">
+      <div class="eyebrow">Step 1</div>
+      <h1 class="page-title">Your Current Profile</h1>
+      <p class="page-sub">Exactly what you provided — nothing added.</p>
+
+      <div class="card">
+        <h3>Headline</h3>
+        <div class="quote">"CSE Student | Learning MERN Stack | Passionate About Web & App Development | Exploring AI/ML"</div>
+      </div>
+      <div class="card">
+        <h3>About</h3>
+        <div class="quote">"I'm a Computer Science student passionate about building real-world applications through Web and Mobile development. Currently working with MERN stack and learning AI/ML concepts. I enjoy solving problems, exploring new technologies, and contributing to meaningful projects."</div>
+      </div>
+      <div class="card">
+        <h3>Experience</h3>
+        <p style="font-size:.9rem;"><strong>Full Stack Development Intern</strong> — Code-A-Nova<br>
+        Duration: 3 months (2 completed, 1 remaining)<br>
+        Projects: Inventory Management System, Event Management System<br>
+        <span class="missing">Missing: confirmed tech stack details (Node/Express/JWT), team vs solo, metrics.</span></p>
+      </div>
+      <div class="card">
+        <h3>Skills</h3>
+        <span class="tag tag-blue">Java (OOPs)</span>
+        <span class="tag tag-blue">MongoDB</span>
+        <span class="tag tag-blue">SQL</span>
+        <span class="tag tag-blue">HTML</span>
+        <span class="tag tag-blue">CSS</span>
+        <span class="tag tag-blue">Basic AI knowledge</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="goTo(2)">Run the Roast →</button>
+      </div>
+    </section>
+
+    <!-- 3. PROFILE ROAST -->
+    <section class="section" data-section="2">
+      <div class="eyebrow">Step 2</div>
+      <h1 class="page-title">Profile Roast</h1>
+      <p class="page-sub">Direct, honest, section by section.</p>
+
+      <div class="card">
+        <div class="score-row"><div class="score-circle score-bad">4/10</div><div><h3>Headline</h3><span style="font-size:.8rem;color:var(--text-dim);">Recruiter reaction: "Another CSE student learning MERN — nothing to click into."</span></div></div>
+        <p style="font-size:.88rem;">Soft verbs ("Learning," "Exploring") with no searchable tech keywords or target role. Costs you visibility in recruiter search filters.</p>
+      </div>
+      <div class="card">
+        <div class="score-row"><div class="score-circle score-bad">4/10</div><div><h3>About — First 2 Lines</h3><span style="font-size:.8rem;color:var(--text-dim);">Generic hook, easy to scroll past.</span></div></div>
+        <p style="font-size:.88rem;">No mention of your real internship or projects in the visible preview before "see more."</p>
+      </div>
+      <div class="card">
+        <div class="score-row"><div class="score-circle score-mid">5/10</div><div><h3>About — Full Section</h3><span style="font-size:.8rem;color:var(--text-dim);">Honest but thin — no proof of work.</span></div></div>
+        <p style="font-size:.88rem;">Lists intentions ("passionate," "enjoy") but no evidence: Code-A-Nova and your two projects aren't mentioned at all.</p>
+      </div>
+      <div class="card">
+        <div class="score-row"><div class="score-circle score-bad">0/10</div><div><h3>Experience</h3><span style="font-size:.8rem;color:var(--text-dim);">Currently missing from profile.</span></div></div>
+        <p style="font-size:.88rem;">Your biggest opportunity: a real ongoing internship with two named projects, currently invisible to recruiters.</p>
+      </div>
+      <div class="card">
+        <div class="score-row"><div class="score-circle score-bad">4/10</div><div><h3>Skills & Keywords</h3><span style="font-size:.8rem;color:var(--text-dim);">Mismatch with headline's "MERN" claim.</span></div></div>
+        <p style="font-size:.88rem;">Headline says "MERN Stack" but Express/Node/React aren't in your skills list — confusing for both recruiters and LinkedIn's search matching.</p>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div class="eyebrow">Overall Profile Strength</div>
+        <div class="big-score">34<span style="font-size:1.5rem;color:var(--text-dim);">/100</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="goTo(3)">See Before Scorecard →</button>
+      </div>
+    </section>
+
+    <!-- 4. BEFORE SCORECARD -->
+    <section class="section" data-section="3">
+      <div class="eyebrow">Step 3</div>
+      <h1 class="page-title">Before Scorecard</h1>
+      <p class="page-sub">Your starting point, at a glance.</p>
+      <div class="card" id="beforeScorecard"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="rebuildProfile()">Rebuild My Profile →</button>
+      </div>
+    </section>
+
+    <!-- 5. HEADLINE REBUILD -->
+    <section class="section" data-section="4">
+      <div class="eyebrow">Step 4</div>
+      <h1 class="page-title">Headline Rebuild</h1>
+      <p class="page-sub">Three real options — pick what fits your current goal.</p>
+
+      <div class="card">
+        <h3>Option 1 — Keyword Optimized</h3>
+        <div class="rewrite-box" id="h1text">Full Stack Development Intern @ Code-A-Nova | MongoDB, SQL, Java (OOPs) | Aspiring Full Stack Developer
+          <button class="btn btn-outline btn-sm copy-btn" onclick="copyText('h1text',this)">Copy</button></div>
+        <p style="font-size:.85rem;color:var(--text-dim);">Best for: recruiter search visibility. Leads with real role + company, actual tech, target identity.</p>
+      </div>
+      <div class="card">
+        <h3>Option 2 — Value Proposition</h3>
+        <div class="rewrite-box" id="h2text">Building full-stack apps (Inventory & Event Management Systems) | Java, MongoDB, SQL | Open to SDE Internships & Full-Time Roles
+          <button class="btn btn-outline btn-sm copy-btn" onclick="copyText('h2text',this)">Copy</button></div>
+        <p style="font-size:.85rem;color:var(--text-dim);">Best for: showing proof of output, not just intent.</p>
+      </div>
+      <div class="card">
+        <h3>Option 3 — Personal Brand</h3>
+        <div class="rewrite-box" id="h3text">4th-Year CSE Student → Full Stack Dev in Progress | Java & MongoDB | Turning Coursework into Real Projects
+          <button class="btn btn-outline btn-sm copy-btn" onclick="copyText('h3text',this)">Copy</button></div>
+        <p style="font-size:.85rem;color:var(--text-dim);">Best for: personal brand and networking-first goals.</p>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="goTo(5)">Next: About Rebuild →</button></div>
+    </section>
+
+    <!-- 6. ABOUT REBUILD -->
+    <section class="section" data-section="5">
+      <div class="eyebrow">Step 5</div>
+      <h1 class="page-title">About Rebuild</h1>
+      <div class="card">
+        <div class="rewrite-box" id="aboutText">Currently building an Inventory Management System and an Event Management System as a Full Stack Development Intern at Code-A-Nova — and using every bug along the way to actually learn the stack, not just the syllabus.
+
+I'm a 4th-year Computer Science student who'd rather ship something small and working than talk about something big and theoretical. Right now that means splitting time between my internship and coursework: solidifying Java and OOPs fundamentals, writing SQL queries that don't fall over, and working hands-on with MongoDB.
+
+Skills I'm actively using: Java (OOPs), MongoDB, SQL, HTML, CSS — plus early exposure to AI/ML concepts I'm continuing to build on.
+
+During my internship, I've completed two full-stack projects — an Inventory Management System and an Event Management System — with one month of the internship still remaining.
+
+My goal right now is straightforward: land a full-stack developer role or internship where I can keep building real things and keep getting better at it.
+
+If you're hiring for internships/entry-level full-stack roles, or just want to talk shop about MERN, Java, or databases — I'd love to connect.
+          <button class="btn btn-outline btn-sm copy-btn" onclick="copyText('aboutText',this)">Copy</button></div>
+        <div class="eyebrow" style="margin-top:16px;">Keywords Used</div>
+        <span class="keyword-pill">Full Stack Development</span><span class="keyword-pill">Inventory Management System</span><span class="keyword-pill">Event Management System</span><span class="keyword-pill">Java</span><span class="keyword-pill">OOPs</span><span class="keyword-pill">MongoDB</span><span class="keyword-pill">SQL</span><span class="keyword-pill">HTML/CSS</span><span class="keyword-pill">Internship</span>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="goTo(6)">Next: Experience Rebuild →</button></div>
+    </section>
+
+    <!-- 7. EXPERIENCE REBUILD -->
+    <section class="section" data-section="6">
+      <div class="eyebrow">Step 6</div>
+      <h1 class="page-title">Experience Rebuild</h1>
+      <div class="card">
+        <h3>Code-A-Nova — Full Stack Development Intern</h3>
+        <span style="font-size:.8rem;color:var(--text-dim);">3 months (2 completed, 1 remaining)</span>
+        <div class="before-after" style="margin-top:14px;">
+          <div>
+            <div class="ba-label">Before</div>
+            <p style="font-size:.85rem;color:var(--text-dim);">Not currently listed on profile</p>
+          </div>
+          <div>
+            <div class="ba-label">After</div>
+            <p style="font-size:.85rem;">Built an Inventory Management System, applying Java/OOPs alongside MongoDB and SQL.</p>
+          </div>
+        </div>
+        <div class="rewrite-box" id="expText" style="margin-top:14px;">• Built an Inventory Management System as part of a hands-on full stack development internship, applying Java and OOPs fundamentals alongside MongoDB and SQL.
+• Developed an Event Management System, working through the full build cycle from data modeling to functional application.
+• Potential metric to add: number of features/modules built, or team size (once confirmed).
+          <button class="btn btn-outline btn-sm copy-btn" onclick="copyText('expText',this)">Copy</button></div>
+        <p class="missing">Confirm tech stack (Node/Express/JWT?) and team vs. solo to sharpen these bullets further.</p>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="goTo(7)">Next: Skills →</button></div>
+    </section>
+
+    <!-- 8. SKILLS -->
+    <section class="section" data-section="7">
+      <div class="eyebrow">Step 7</div>
+      <h1 class="page-title">Skills Recommendations</h1>
+      <div class="card">
+        <h3>Top 10 to Prioritize</h3>
+        <ol style="font-size:.88rem;padding-left:18px;">
+          <li>Java — core interview language</li>
+          <li>SQL — universal backend requirement</li>
+          <li>MongoDB — matches real project experience</li>
+          <li>Object-Oriented Programming — frequently tested for freshers</li>
+          <li>HTML — foundational</li>
+          <li>CSS — front-end range</li>
+          <li>Full Stack Development — matches internship title</li>
+          <li>Problem Solving — backed by real project work</li>
+          <li>Git/GitHub — <span class="missing">Missing: confirm and add</span></li>
+          <li>REST APIs — <span class="missing">Missing: confirm and add</span></li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>Deprioritize</h3>
+        <span class="tag tag-red">Basic AI knowledge</span>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px;">Keep off the pinned skills list for now — better as a line in About until it's stronger.</p>
+      </div>
+      <div class="card">
+        <h3>Top 3 to Pin</h3>
+        <span class="tag tag-green">Java</span><span class="tag tag-green">MongoDB</span><span class="tag tag-green">Full Stack Development</span>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="goTo(8)">Next: Before vs After →</button></div>
+    </section>
+
+    <!-- 9. BEFORE VS AFTER -->
+    <section class="section" data-section="8">
+      <div class="eyebrow">Step 8</div>
+      <h1 class="page-title">Before vs After Scorecard</h1>
+      <div class="card" id="scorecardFull"></div>
+      <div class="card" style="text-align:center;">
+        <div class="eyebrow">Overall</div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div><div class="score-circle score-bad" style="width:80px;height:80px;font-size:1.3rem;">34</div><div style="font-size:.7rem;color:var(--text-dim);margin-top:4px;">Before</div></div>
+          <div style="font-size:1.5rem;color:var(--text-dim);">→</div>
+          <div><div class="score-circle score-good" style="width:80px;height:80px;font-size:1.3rem;">76</div><div style="font-size:.7rem;color:var(--text-dim);margin-top:4px;">After</div></div>
+          <div class="delta">+42</div>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="goTo(9)">See 7-Day Plan →</button></div>
+    </section>
+
+    <!-- 10. 7-DAY PLAN -->
+    <section class="section" data-section="9">
+      <div class="eyebrow">Step 9</div>
+      <h1 class="page-title">7-Day Activation Plan</h1>
+
+      <div class="day-card"><div class="day-num">1</div><div>
+        <h3>Profile Rebuild Checklist</h3>
+        <div class="checklist" style="margin-top:10px;">
+          <label><input type="checkbox"><span>Update headline</span></label>
+          <label><input type="checkbox"><span>Replace About section</span></label>
+          <label><input type="checkbox"><span>Add Code-A-Nova experience</span></label>
+          <label><input type="checkbox"><span>Update & reorder Skills</span></label>
+          <label><input type="checkbox"><span>Pin top 3 skills</span></label>
+          <label><input type="checkbox"><span>Turn on "Open to Work"</span></label>
+        </div>
+      </div></div>
+
+      <div class="day-card"><div class="day-num">2</div><div>
+        <h3>Post #1 — "I rebuilt my profile"</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px;">Opens with the realization that "learning MERN" doesn't show up in recruiter search — specifics do. Mentions Code-A-Nova and both projects. Invites others to share their own rebuild lessons.</p>
+      </div></div>
+
+      <div class="day-card"><div class="day-num">3</div><div>
+        <h3>Connections</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px;">Target: recruiters at Infosys/TCS/Wipro-type companies, alumni from your college now in SWE roles, developers/engineers in full-stack positions.</p>
+        <div class="quote">"Hi [Name], I'm a final-year CSE student building full-stack projects (MongoDB/Java/SQL) during my internship at Code-A-Nova. Would love to connect and learn from your journey."</div>
+      </div></div>
+
+      <div class="day-card"><div class="day-num">4</div><div>
+        <h3>Value Comments</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px;">Formula: Agree + Add Insight + Ask a Question.</p>
+        <div class="quote">"Agree that the choice really depends on the data shape. I've been working with MongoDB on internship projects and found the flexibility great early on — curious how you decide when to switch to SQL as an app scales?"</div>
+      </div></div>
+
+      <div class="day-card"><div class="day-num">5</div><div>
+        <h3>Post #2 — A real lesson</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px;">Building the Event Management System taught more about database design than coursework — modeling events/attendees/registrations in MongoDB forced real relationship thinking.</p>
+      </div></div>
+
+      <div class="day-card"><div class="day-num">6</div><div>
+        <h3>Engagement</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px;">3–5 thoughtful comments/week, 5–10 personalized connection requests/week, weekly posting rhythm.</p>
+      </div></div>
+
+      <div class="day-card"><div class="day-num">7</div><div>
+        <h3>Review Your Metrics</h3>
+        <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px;">Profile views (headline/photo pull), search appearances (keyword coverage), connection acceptance rate (outreach quality), post impressions & engagement (content relevance).</p>
+      </div></div>
+
+      <div class="btn-row"><button class="btn" onclick="goTo(10)">What I Learned →</button></div>
+    </section>
+
+    <!-- 11. WHAT I LEARNED -->
+    <section class="section" data-section="10">
+      <div class="eyebrow">Step 10</div>
+      <h1 class="page-title">What I Learned Today</h1>
+      <div class="card hero-final">
+        <p style="font-style:italic;color:var(--text-dim);">"I let AI roast my LinkedIn profile today. Here's what changed:"</p>
+        <div style="display:flex;justify-content:center;gap:24px;margin:20px 0;">
+          <div><div class="big-score" style="font-size:2.2rem;">34</div><div style="font-size:.7rem;color:var(--text-dim);">Before</div></div>
+          <div style="font-size:1.5rem;color:var(--text-dim);align-self:center;">→</div>
+          <div><div class="big-score" style="font-size:2.2rem;">76</div><div style="font-size:.7rem;color:var(--text-dim);">After</div></div>
+        </div>
+        <div style="text-align:left;max-width:480px;margin:0 auto;font-size:.88rem;">
+          <p><strong>Top 3 mistakes:</strong></p>
+          <p>1. Headline used passive words instead of naming real work</p>
+          <p>2. Internship & projects weren't on the profile at all</p>
+          <p>3. Skills list didn't match the "MERN Stack" headline claim</p>
+          <p style="margin-top:14px;"><strong>#1 thing that made the biggest difference:</strong><br>Adding the real Code-A-Nova internship with named projects — proof beats passion.</p>
+        </div>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="goTo(11)">Final Summary →</button></div>
+    </section>
+
+    <!-- 12. FINAL SUMMARY -->
+    <section class="section" data-section="11">
+      <div class="eyebrow">Step 11</div>
+      <h1 class="page-title">Final Summary</h1>
+      <div class="card">
+        <p style="font-size:.9rem;">You now have a rebuilt headline, About section, experience bullets, and a prioritized skills list — all built strictly from what you told me. Two gaps remain open for you to confirm: your exact tech stack (Node/Express/JWT?) and whether the internship work was solo or team-based. Confirming these will push your After score further.</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="window.print()">🖨️ Print Report</button>
+        <button class="btn btn-outline" onclick="startOver()">↺ Start Over</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+const sections = [
+  "Welcome","Profile Input","Profile Roast","Before Scorecard","Headline Rebuild",
+  "About Rebuild","Experience Rebuild","Skills","Before vs After","7-Day Plan",
+  "What I Learned","Final Summary"
+];
+let current = 0;
+
+function buildNav(){
+  const nav = document.getElementById('navList');
+  nav.innerHTML = '';
+  sections.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.className = 'nav-item' + (i===current?' active':'');
+    div.innerHTML = `<span class="num">${i+1}</span><span>${s}</span>`;
+    div.onclick = ()=>goTo(i);
+    nav.appendChild(div);
+  });
+}
+
+function goTo(i){
+  current = i;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`.section[data-section="${i}"]`).classList.add('active');
+  buildNav();
+  const pct = Math.round(((i+1)/sections.length)*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent = pct+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleTheme(){
+  const root = document.documentElement;
+  const cur = root.getAttribute('data-theme');
+  root.setAttribute('data-theme', cur==='light' ? 'dark' : 'light');
+}
+
+function copyText(id, btn){
+  const el = document.getElementById(id);
+  let text = el.innerText.replace('Copy','').trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('Copied to clipboard');
+  }).catch(()=>{
+    showToast('Could not copy — select text manually');
+  });
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function rebuildProfile(){
+  showToast('Profile rebuilt below ↓');
+  goTo(4);
+}
+
+function startOver(){
+  goTo(0);
+  document.querySelectorAll('.checklist input').forEach(c=>c.checked=false);
+}
+
+const scoreData = [
+  {label:'Headline', before:4, after:8},
+  {label:'About Hook', before:4, after:8},
+  {label:'About Full', before:5, after:8},
+  {label:'Experience', before:0, after:7},
+  {label:'Skills & Keywords', before:4, after:7}
+];
+
+function renderScorecards(){
+  const before = document.getElementById('beforeScorecard');
+  before.innerHTML = scoreData.map(d=>`
+    <div class="scorecard-row">
+      <span style="width:150px;font-size:.85rem;">${d.label}</span>
+      <div class="sc-bars"><div class="sc-bar-track"><div class="sc-bar-before" style="width:${d.before*10}%"></div></div></div>
+      <span style="font-size:.85rem;color:var(--red);">${d.before}/10</span>
+    </div>`).join('');
+
+  const full = document.getElementById('scorecardFull');
+  full.innerHTML = scoreData.map(d=>`
+    <div class="scorecard-row">
+      <span style="width:140px;font-size:.85rem;">${d.label}</span>
+      <div class="sc-bars">
+        <div class="sc-bar-track"><div class="sc-bar-after" style="width:${d.after*10}%"></div></div>
+      </div>
+      <span style="font-size:.8rem;color:var(--text-dim);">${d.before}→${d.after}</span>
+      <span class="delta">+${d.after-d.before}</span>
+    </div>`).join('');
+}
+
+buildNav();
+renderScorecards();
+</script>
+</body>
+</html>
