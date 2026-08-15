@@ -46,7 +46,7 @@ A single self-contained interactive HTML dashboard (no external dependencies) in
 
 3.The Verdict
 
-![Veridect](screenshots/Verdict.png)
+![Veridect](screenshots/The-Verdict.png)
 
 4.Sharable Card
 
