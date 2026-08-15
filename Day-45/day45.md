@@ -36,7 +36,22 @@ A single self-contained interactive HTML dashboard (no external dependencies) in
 
 ##Screenshots
 
-1.Header Section
+1.Decision Report
+
+![Decision Report](screenshots/Decision-Report.png)
+
+2.Decision Matrix
+
+![Decision Matrix](screenshots/Decision-Matrix.png)
+
+3.The Verdict
+
+![Veridect](screenshots/Verdict.png)
+
+4.Sharable Card
+
+![Sharable Card](screenshots/Sharable-Card.png)
+
 
 ---
 *Part of the ABTalks 60-Day Claude Challenge — Day 45*
