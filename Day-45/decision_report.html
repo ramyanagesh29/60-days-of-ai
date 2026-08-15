@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Report — Placement Prep Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-main:#0f0f14;
+    --bg-card:#1a1a24;
+    --bg-card-alt:#1e1e2e;
+    --text-primary:#f0f0f5;
+    --text-secondary:#8888a0;
+    --accent-green:#34d399;
+    --accent-red:#f87171;
+    --accent-blue:#60a5fa;
+    --accent-gold:#fbbf24;
+    --accent-purple:#a78bfa;
+    --border-subtle:rgba(255,255,255,0.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg-main);
+    color:var(--text-primary);
+    font-family:'Inter','Segoe UI',system-ui,sans-serif;
+    padding:32px 16px 60px;
+  }
+  .wrap{max-width:720px;margin:0 auto;}
+  header.banner{
+    text-align:center;
+    padding:20px 8px 24px;
+  }
+  header.banner h1{
+    font-size:28px;font-weight:800;letter-spacing:0.5px;
+  }
+  header.banner .sub{
+    color:var(--text-secondary);font-size:16px;margin-top:8px;
+  }
+  header.banner .date{
+    color:var(--text-secondary);font-size:12px;margin-top:6px;
+  }
+  .gradient-line{
+    height:3px;border-radius:2px;margin-top:20px;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-purple),var(--accent-gold));
+  }
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border-subtle);
+    border-radius:16px;
+    padding:28px;
+    margin-top:28px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.3);
+    transition:transform 0.2s ease;
+    border-left:4px solid var(--accent-blue);
+  }
+  .card:hover{transform:translateY(-2px);}
+  .card h2{
+    font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+    margin-bottom:16px;
+  }
+  .card p, .card li{
+    font-size:15px;line-height:1.7;color:var(--text-primary);
+  }
+  .muted{color:var(--text-secondary);}
+  .label{
+    font-size:12px;font-weight:600;color:var(--text-secondary);
+    text-transform:uppercase;letter-spacing:0.5px;
+  }
+
+  /* Section accents */
+  #sec1{border-left-color:var(--accent-blue);}
+  #sec2{border-left-color:var(--accent-green);}
+  #sec3{border-left-color:var(--accent-purple);}
+  #sec4{border-left-color:var(--accent-blue);}
+  #sec5{border-left-color:var(--accent-red);}
+  #sec6{border-left-color:var(--accent-green);}
+  #sec7{
+    border-left-color:var(--accent-gold);
+    background:var(--bg-card-alt);
+    padding:36px 28px;
+    box-shadow:0 0 20px rgba(251,191,36,0.15), 0 4px 24px rgba(0,0,0,0.3);
+  }
+  #sec8{border-left-color:var(--accent-gold);}
+
+  h2.blue{color:var(--accent-blue);}
+  h2.green{color:var(--accent-green);}
+  h2.purple{color:var(--accent-purple);}
+  h2.red{color:var(--accent-red);}
+  h2.gold{color:var(--accent-gold);}
+
+  /* Option cards */
+  .option-card{
+    background:var(--bg-card-alt);
+    border-radius:12px;
+    padding:20px;
+    margin-top:16px;
+    border:1px solid var(--border-subtle);
+  }
+  .option-card h3{
+    font-size:16px;font-weight:700;margin-bottom:10px;
+  }
+  .tag{
+    display:inline-block;font-size:12px;font-weight:600;
+    padding:3px 10px;border-radius:20px;margin-bottom:4px;
+  }
+  .tag.strength{background:rgba(52,211,153,0.15);color:var(--accent-green);}
+  .tag.weak{background:rgba(248,113,113,0.15);color:var(--accent-red);}
+  .tag.hidden{background:rgba(96,165,250,0.15);color:var(--accent-blue);}
+  .tag.value{background:rgba(167,139,250,0.15);color:var(--accent-purple);}
+  .option-card .row{margin-top:10px;}
+
+  /* Assumption buster */
+  ul.list{padding-left:18px;margin-top:6px;}
+  ul.list li{margin-bottom:6px;}
+  .bias-chip{
+    display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-purple);
+    font-size:13px;font-weight:600;padding:4px 12px;border-radius:20px;margin:4px 6px 0 0;
+  }
+
+  /* Matrix */
+  .matrix-row{
+    display:flex;align-items:center;margin-bottom:14px;
+    gap:12px;
+  }
+  .matrix-label{width:40%;font-size:13px;color:var(--text-secondary);font-weight:500;}
+  .matrix-bars{width:60%;display:flex;flex-direction:column;gap:6px;}
+  .bar-container{
+    position:relative;height:26px;background:rgba(255,255,255,0.05);
+    border-radius:8px;overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;border-radius:8px;
+    display:flex;align-items:center;justify-content:flex-end;padding-right:8px;
+    color:#fff;font-weight:700;font-size:12px;
+    width:0%;
+    animation:growBar 0.8s ease-out forwards;
+  }
+  @keyframes growBar{from{width:0%;}to{width:var(--target-width);}}
+  .fillA{background:linear-gradient(90deg,#60a5fa,#3b82f6);}
+  .fillB{background:linear-gradient(90deg,#34d399,#10b981);}
+  .fillC{background:linear-gradient(90deg,#a78bfa,#8b5cf6);}
+  .matrix-legend{display:flex;gap:18px;margin-bottom:18px;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dotA{background:#60a5fa;}
+  .dotB{background:#34d399;}
+  .dotC{background:#a78bfa;}
+  .total-row{
+    margin-top:20px;padding:14px 16px;border-radius:10px;
+    background:rgba(255,255,255,0.04);
+    display:flex;justify-content:space-between;align-items:center;
+    font-weight:700;font-size:15px;
+  }
+  .winner-badge{
+    background:rgba(251,191,36,0.15);color:var(--accent-gold);
+    font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:8px;
+  }
+
+  /* Premortem */
+  .pm-block{margin-top:16px;padding-top:16px;border-top:1px solid var(--border-subtle);}
+  .pm-block:first-child{margin-top:0;padding-top:0;border-top:none;}
+  .pm-block h3{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--accent-red);}
+
+  /* 7 day plan */
+  .day-row{
+    display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border-subtle);
+  }
+  .day-row:last-child{border-bottom:none;}
+  .day-num{
+    min-width:64px;font-weight:700;color:var(--accent-green);font-size:13px;
+  }
+
+  /* Verdict */
+  .verdict-winner{
+    font-size:30px;font-weight:800;color:var(--accent-gold);margin-bottom:10px;
+  }
+  .hard-truth{
+    font-style:italic;color:var(--text-secondary);margin-top:14px;font-size:14px;
+  }
+
+  /* Shareable */
+  .share-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;}
+  .mini-card{
+    flex:1 1 30%;min-width:180px;
+    background:var(--bg-card-alt);border-radius:12px;padding:16px;
+    border:1px solid var(--border-subtle);display:flex;flex-direction:column;
+    justify-content:space-between;min-height:180px;
+  }
+  .mini-card h4{font-size:13px;color:var(--text-secondary);text-transform:uppercase;margin-bottom:10px;}
+  .mini-card .big{font-size:15px;font-weight:700;margin-bottom:4px;}
+  .mini-score{font-size:22px;font-weight:800;color:var(--accent-gold);}
+  .watermark{font-size:10px;color:var(--text-secondary);margin-top:10px;text-align:center;}
+
+  footer{
+    text-align:center;color:var(--text-secondary);font-size:12px;margin-top:40px;
+  }
+
+  @media(max-width:600px){
+    .card{padding:20px 16px;}
+    .matrix-row{flex-direction:column;align-items:flex-start;}
+    .matrix-label{width:100%;margin-bottom:6px;}
+    .matrix-bars{width:100%;}
+    .share-row{flex-direction:column;}
+    header.banner h1{font-size:24px;}
+    .verdict-winner{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="banner">
+    <h1>DECISION REPORT</h1>
+    <div class="sub">How to structure DSA, communication, projects & quant prep before October on-campus drives</div>
+    <div class="date">Generated August 15, 2026</div>
+    <div class="gradient-line"></div>
+  </header>
+
+  <!-- SECTION 1 -->
+  <section class="card" id="sec1">
+    <h2 class="blue">The Real Decision</h2>
+    <p>You're not choosing between two options — you're choosing how to <strong>sequence and split limited hours</strong> across DSA, communication, quant, and projects before October drives, while still handling 7th sem academics and 10-15 hrs/week lost to travel.</p>
+    <p style="margin-top:10px;">The hard part isn't knowing what to study. It's that everything feels equally urgent, so nothing gets a real block of time — and that's what's driving the overlap and anxiety.</p>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="card" id="sec2">
+    <h2 class="green">The Case For Each Approach</h2>
+
+    <div class="option-card">
+      <h3>Option A — Sequential Focus (deep-dive one area at a time)</h3>
+      <div class="row"><span class="tag strength">Strongest Case</span><p>You get real depth fast — e.g. 3 weeks of pure DSA can move you from weak to interview-ready, since there's no context-switching tax.</p></div>
+      <div class="row"><span class="tag hidden">Hidden Upside</span><p>Momentum and visible progress in one area builds confidence you carry into the next — less mental overlap, more "I've actually finished something."</p></div>
+      <div class="row"><span class="tag weak">Biggest Weakness</span><p>Whatever you sequence last (likely communication or projects) gets rushed right before drives — the worst time to under-prepare it.</p></div>
+      <div class="row"><span class="tag value">Best if you value</span><p>Depth, focus, and finishing things — not doing five things at 60%.</p></div>
+    </div>
+
+    <div class="option-card">
+      <h3>Option B — Weekly Rotation (all 4 areas, fixed slots every week)</h3>
+      <div class="row"><span class="tag strength">Strongest Case</span><p>Every area gets consistent touch-time from week 1, so nothing is "started too late" by October.</p></div>
+      <div class="row"><span class="tag hidden">Hidden Upside</span><p>Communication and quant — the areas people neglect till the last month — actually get built as a habit, not a panic cram.</p></div>
+      <div class="row"><span class="tag weak">Biggest Weakness</span><p>With only 2-3 hrs/day free, thin slices across 4 areas can feel slow — you may not "finish" any one thing until close to October.</p></div>
+      <div class="row"><span class="tag value">Best if you value</span><p>Steady, balanced readiness over deep expertise in one area by test time.</p></div>
+    </div>
+
+    <div class="option-card">
+      <h3>Option C — Minimum Viable Prep (light touch on all, cut scope hard)</h3>
+      <div class="row"><span class="tag strength">Strongest Case</span><p>Realistic given travel + academics — you protect sleep and sem performance while still covering drive basics.</p></div>
+      <div class="row"><span class="tag hidden">Hidden Upside</span><p>Forces you to identify the actual minimum bar for on-campus drives instead of over-preparing for things that don't matter yet.</p></div>
+      <div class="row"><span class="tag weak">Biggest Weakness</span><p>Risk of being "just okay" everywhere in a pool of students who went deep in at least one area.</p></div>
+      <div class="row"><span class="tag value">Best if you value</span><p>Sustainability and protecting your CGPA over maximizing placement odds.</p></div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="card" id="sec3">
+    <h2 class="purple">Assumption Buster</h2>
+    <p class="label">Assumptions you may be making</p>
+    <ul class="list">
+      <li>That "having a plan" means covering everything equally — it usually means deciding what NOT to do yet.</li>
+      <li>That travel time is fully lost time — some of it can carry audio-based prep (aptitude formulas, spoken English practice, DSA concept explainers).</li>
+      <li>That 2-3 months means you're starting from zero — you're not; existing MERN projects and current CGPA already give you a base to build on, not a blank slate.</li>
+    </ul>
+    <p class="label" style="margin-top:16px;">Biases at play</p>
+    <div>
+      <span class="bias-chip">Overwhelm Paralysis</span>
+      <span class="bias-chip">All-or-Nothing Thinking</span>
+    </div>
+    <p style="margin-top:14px;"><strong>What you're definitely ignoring:</strong> you haven't written down actual weekly hours available — "no plan" partly means you've never done the math on 2-3 hrs/day × 5 days minus travel minus academics. Until that number exists, any plan will feel like guessing.</p>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="card" id="sec4">
+    <h2 class="blue">Decision Matrix</h2>
+    <div class="matrix-legend">
+      <div class="legend-item"><span class="dot dotA"></span>Option A — Sequential</div>
+      <div class="legend-item"><span class="dot dotB"></span>Option B — Rotation</div>
+      <div class="legend-item"><span class="dot dotC"></span>Option C — Minimum Viable</div>
+    </div>
+
+    <div id="matrix-rows"></div>
+
+    <div class="total-row">
+      <span>TOTAL (out of 70)</span>
+      <span>A: 44 &nbsp;|&nbsp; B: 54 <span class="winner-badge">WINNER</span> &nbsp;|&nbsp; C: 39</span>
+    </div>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="card" id="sec5">
+    <h2 class="red">Premortem — 12 Months From Now, It Failed</h2>
+
+    <div class="pm-block">
+      <h3>Option A (Sequential) failed because...</h3>
+      <ul class="list">
+        <li>Communication got pushed to "later" and later never came before drives.</li>
+        <li>DSA depth was strong but interviews also tested communication, which was rushed.</li>
+        <li>You burned out mid-sequence when academics spiked (internals/exams) and lost the streak.</li>
+      </ul>
+      <p style="margin-top:8px;"><strong>Early warning sign:</strong> you're 5+ weeks in and haven't touched communication or quant at all.</p>
+      <p><strong>Prevention action:</strong> hard-cap each sequential block at 3 weeks max, no exceptions, before rotating.</p>
+    </div>
+
+    <div class="pm-block">
+      <h3>Option B (Rotation) failed because...</h3>
+      <ul class="list">
+        <li>Daily slices were too thin to build real DSA problem-solving speed.</li>
+        <li>Weeks got "rebalanced" reactively instead of following the fixed slots.</li>
+        <li>No single area reached interview-ready level by October.</li>
+      </ul>
+      <p style="margin-top:8px;"><strong>Early warning sign:</strong> you can't recall solving a genuinely hard DSA problem in the last 2 weeks — only easy/medium repeats.</p>
+      <p><strong>Prevention action:</strong> track weekly "difficulty level reached" per area, not just hours logged.</p>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="card" id="sec6">
+    <h2 class="green">7-Day Test Plan</h2>
+    <div class="day-row"><span class="day-num">Day 1-2</span><p>Log actual free hours (after academics + travel) and map current level in DSA, communication, quant, projects.</p></div>
+    <div class="day-row"><span class="day-num">Day 3-4</span><p>Run one real rotation day: fixed slots for DSA + one other area, using travel time for audio-based prep only.</p></div>
+    <div class="day-row"><span class="day-num">Day 5-6</span><p>Talk to a senior or placed student about what on-campus drives actually tested last year — DSA weight vs communication vs aptitude.</p></div>
+    <div class="day-row"><span class="day-num">Day 7</span><p>Decide: if rotation felt sustainable and you touched all 4 areas without dropping academics, commit to Option B for the full 2-3 months.</p></div>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section class="card" id="sec7">
+    <h2 class="gold">The Verdict</h2>
+    <div class="verdict-winner">Option B — Weekly Rotation</div>
+    <p>It wins because your real fear isn't any single subject — it's overlap and losing the timeline. Rotation guarantees every area gets built weekly, so nothing gets discovered "too late" right before drives.</p>
+    <p class="hard-truth">The hard truth: rotation only works if you actually write down fixed weekly slots today — "spreading attention" without a written schedule is just a softer version of the overlap you're already scared of.</p>
+    <p style="margin-top:10px;"><strong>What could flip it:</strong> if the Day 7 test shows thin daily slices genuinely can't move your DSA level — then shift to a hybrid: sequential DSA block first, rotation for the rest.</p>
+  </section>
+
+  <!-- SECTION 8 -->
+  <section class="card" id="sec8">
+    <h2 class="gold">Shareable Cards</h2>
+    <div class="share-row">
+      <div class="mini-card">
+        <h4>Matrix Summary</h4>
+        <div>
+          <div class="big">Sequential: 44/70</div>
+          <div class="big">Rotation: 54/70</div>
+          <div class="big">Min Viable: 39/70</div>
+        </div>
+        <div class="watermark">Built with Claude AI</div>
+      </div>
+      <div class="mini-card">
+        <h4>Verdict</h4>
+        <div>
+          <div class="mini-score">Rotation</div>
+          <p style="font-size:13px;margin-top:6px;">Fixed weekly slots for DSA, communication, quant & projects beat sequencing — nothing gets left behind.</p>
+        </div>
+        <div class="watermark">Built with Claude AI</div>
+      </div>
+      <div class="mini-card">
+        <h4>LinkedIn Hook</h4>
+        <div>
+          <div class="big">"I almost let overwhelm plan my prep for me."</div>
+          <p style="font-size:13px;margin-top:6px;">3 months. 4 skill areas. One rotation schedule that finally made it click. #ABTalks60DayChallenge</p>
+        </div>
+        <div class="watermark">Built with Claude AI</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Built with Claude AI | ABTalks 60-Day Challenge</footer>
+</div>
+
+<script>
+  const dims = [
+    {label:"Life/Career Upside", a:7, b:8, c:5},
+    {label:"Financial Safety", a:6, b:7, c:8},
+    {label:"Growth & Learning", a:7, b:8, c:4},
+    {label:"Stress Level (10=low)", a:5, b:7, c:9},
+    {label:"Reversibility (10=easy)", a:8, b:9, c:7},
+    {label:"Long-term Alignment", a:6, b:8, c:4},
+    {label:"Regret Risk (10=low)", a:5, b:7, c:2}
+  ];
+
+  const container = document.getElementById('matrix-rows');
+  let delay = 0;
+  dims.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'matrix-row';
+    row.innerHTML = `
+      <div class="matrix-label">${d.label}</div>
+      <div class="matrix-bars">
+        <div class="bar-container"><div class="bar-fill fillA" style="--target-width:${d.a*10}%; animation-delay:${delay}s;">${d.a}</div></div>
+        <div class="bar-container"><div class="bar-fill fillB" style="--target-width:${d.b*10}%; animation-delay:${delay+0.1}s;">${d.b}</div></div>
+        <div class="bar-container"><div class="bar-fill fillC" style="--target-width:${d.c*10}%; animation-delay:${delay+0.2}s;">${d.c}</div></div>
+      </div>
+    `;
+    container.appendChild(row);
+    delay += 0.1;
+  });
+</script>
+
+</body>
+</html>
