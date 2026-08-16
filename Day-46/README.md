@@ -73,6 +73,28 @@ Whichever condition fires first ends the loop and branches to the Final Reviewer
 - Add a human-in-the-loop approval gate before Final Reviewer
 - Persist Memory Manager notes across sessions via localStorage
 
+## 🖼️ Screenshots
+
+### Setup & Workflow
+![Hero + Config](./screenshots/01-Hero_Section.png)
+*Configure the spec, target score, and stop-condition sensitivity, then watch the live agent loop diagram.*
+
+### Status Bar + Stop Banner + Intermediate Outputs
+![Status and outputs](./screenshots/PLan.png)
+*Live status tracking, stop-reason banner, and tabbed access to every code revision.*
+
+### Round-by-Round Evaluation History
+![Evaluation history](./screenshots/Round-by-history.png)
+*Full Evaluator report and Critic feedback — 100% live model output, not scripted text.*
+
+### Activity Log
+![Activity log](./screenshots/Activity-log.png)
+*Real-time log of every agent call in the pipeline.*
+
+### Final Summary & Architecture
+![Architecture overview](./screenshots/Architecture.png)
+*Execution stats, final code, and a breakdown of what each agent contributed.*
+
 ## 📅 Part of
 
 **ABTalks 60-Day Claude Challenge** — Day 46 
