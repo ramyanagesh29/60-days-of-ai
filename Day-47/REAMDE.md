@@ -30,7 +30,7 @@ Structured AI output usually means asking for JSON — and JSON parsing breaks c
 
 ![Hero section](./screenshots/01-Hero_Section.png)
 
-![Setup form](./screenshots/setup-form.png)
+![Setup form](./screenshots/Commitement.png)
 
 ![Review committee in session](./screenshots/Review.png)
 
