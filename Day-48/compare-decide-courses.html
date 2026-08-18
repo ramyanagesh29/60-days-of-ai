@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Placement Prep Course Chooser — Scaler vs Coding Ninjas vs GFG vs Apna College</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+    --text:#e8eaf0; --muted:#9aa1b0; --accent:#6ee7b7; --accent2:#7c9eff;
+    --warn:#ffb454; --danger:#ff6b6b; --radius:14px;
+    font-family:'Segoe UI',Roboto,-apple-system,BlinkMacSystemFont,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0b0d11,#0f1115 300px);color:var(--text);line-height:1.5}
+  header{padding:32px 24px 16px;max-width:1180px;margin:0 auto}
+  header h1{font-size:1.7rem;margin:0 0 6px;letter-spacing:-0.02em}
+  header p{color:var(--muted);margin:0;font-size:.95rem;max-width:760px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 60px}
+  .badge{display:inline-block;background:var(--panel2);border:1px solid var(--border);color:var(--accent2);
+    font-size:.72rem;padding:3px 9px;border-radius:99px;margin-right:6px;margin-top:10px}
+  .grid{display:grid;grid-template-columns:300px 1fr;gap:22px;margin-top:26px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .card h2{font-size:1rem;margin:0 0 14px;color:var(--text)}
+  .weight-row{margin-bottom:16px}
+  .weight-row label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  .weight-row output{color:var(--accent);font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .reset-btn{width:100%;margin-top:6px;background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    padding:9px;border-radius:9px;cursor:pointer;font-size:.85rem}
+  .reset-btn:hover{border-color:var(--accent2)}
+  .weight-total{font-size:.75rem;color:var(--muted);margin-top:8px}
+  .ranklist{display:flex;flex-direction:column;gap:12px}
+  .rankcard{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;
+    display:grid;grid-template-columns:44px 1fr 110px;gap:14px;align-items:center;transition:transform .15s ease}
+  .rankcard:hover{transform:translateY(-2px)}
+  .rankcard.top{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .pos{font-size:1.4rem;font-weight:700;color:var(--muted);text-align:center}
+  .rankcard.top .pos{color:var(--accent)}
+  .rname{font-weight:600;font-size:1.02rem;margin-bottom:2px}
+  .rsub{font-size:.78rem;color:var(--muted)}
+  .scorebox{text-align:right}
+  .score{font-size:1.3rem;font-weight:700;color:var(--accent2)}
+  .scorelabel{font-size:.7rem;color:var(--muted)}
+  .barbg{height:6px;background:var(--panel2);border-radius:99px;margin-top:8px;overflow:hidden}
+  .barfill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px}
+  .detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;font-size:.72rem}
+  @media (max-width:700px){.detail-grid{grid-template-columns:repeat(2,1fr)}}
+  .dcell{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px}
+  .dcell .k{color:var(--muted);display:block;margin-bottom:2px}
+  .dcell .v{color:var(--text);font-weight:600}
+  .est{color:var(--warn) !important}
+  .est-flag{display:inline-block;background:rgba(255,180,84,.12);color:var(--warn);border:1px solid rgba(255,180,84,.35);
+    font-size:.62rem;padding:1px 6px;border-radius:6px;margin-left:5px;vertical-align:middle}
+  section.panels{margin-top:30px}
+  details{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden}
+  details summary{cursor:pointer;padding:16px 20px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center}
+  details summary::-webkit-details-marker{display:none}
+  details summary:after{content:'+';color:var(--muted);font-size:1.2rem}
+  details[open] summary:after{content:'–'}
+  .details-body{padding:0 20px 20px;color:var(--muted);font-size:.88rem}
+  .source-item{padding:10px 0;border-bottom:1px dashed var(--border)}
+  .source-item:last-child{border-bottom:none}
+  .source-item a{color:var(--accent2);text-decoration:none;font-size:.85rem}
+  .source-item a:hover{text-decoration:underline}
+  .source-item .stag{font-size:.68rem;color:var(--muted)}
+  .conflict{background:var(--panel2);border-left:3px solid var(--warn);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:.85rem}
+  footer{color:var(--muted);font-size:.75rem;text-align:center;padding:20px;border-top:1px solid var(--border)}
+  .loading{display:flex;align-items:center;gap:10px;color:var(--muted);padding:30px;justify-content:center}
+  .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:var(--radius)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Which placement-prep course should you take?</h1>
+  <p>Comparing four real options for CS students stacking DSA/placement prep alongside a degree: <strong>Scaler Academy</strong>, <strong>Coding Ninjas</strong>, <strong>GeeksforGeeks DSA Self-Paced</strong>, and <strong>Apna College (Sigma batch)</strong>. Adjust the weights on the left to match what matters to <em>you</em> — the ranking updates instantly.</p>
+  <span class="badge">4 options</span><span class="badge">4 criteria</span><span class="badge">Live re-ranking</span><span class="badge">Sourced data</span>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <div class="card" id="weightPanel">
+      <h2>⚖️ Your priorities</h2>
+      <div id="weightSliders"></div>
+      <button class="reset-btn" id="resetBtn">Reset to equal weights</button>
+      <div class="weight-total" id="weightTotal"></div>
+    </div>
+
+    <div>
+      <div id="rankArea" class="ranklist">
+        <div class="loading"><div class="spinner"></div> Calculating your ranking…</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="panels" id="panels"></section>
+</div>
+
+<footer>
+  Built as a decision-support tool, not financial or admissions advice. Prices, policies, and placement claims change frequently — always confirm on the official page before paying. Data compiled August 2026.
+</footer>
+
+<script>
+/* ---------------- DATA LAYER ---------------- */
+/* Every numeric "score" (1-10) is Claude's own normalization of the sourced facts below —
+   it is explicitly an analytical judgment, not a number pulled from any source.
+   Raw facts and dollar/rupee figures ARE sourced (see citations). isEstimate=true
+   marks facts that could not be confirmed on an official/primary page. */
+
+const SOURCES = [
+  {id:'scaler-official', name:'Scaler Academy — official program page', url:'https://www.scaler.com/academy/', note:'Program structure, duration, career support, alumni network claims.'},
+  {id:'scaler-brochure', name:'Scaler Academy Program Brochure (fee structure)', url:'https://www.scribd.com/document/565625987/Scaler-Academy-Program-Brochure', note:'₹2.5L tuition figure with scholarships to ₹25K, EMI from ₹7,200/mo.'},
+  {id:'scaler-reviews', name:'Scaler Academy — Course Report (learner reviews)', url:'https://www.coursereport.com/schools/scaler-academy', note:'Independent learner review platform; placement rated 3/5 by a verified reviewer, fee flagged as the weak point.'},
+  {id:'cn-fees-blog', name:'Coding Ninjas — official fees & ROI blog (2026)', url:'https://www.codingninjas.com/blog/faqs/coding-ninjas-fees-course-roi/', note:'EMI plans, 7-day refund policy, hiring-partner network claims.'},
+  {id:'cn-reviews-blog', name:'Coding Ninjas — official reviews/fees FAQ (2026)', url:'https://www.codingninjas.com/blog/faqs/coding-ninjas-reviews-fees-2026/', note:'Confirms no job guarantee/ISA — placement assistance only.'},
+  {id:'cn-shiksha', name:'Coding Ninjas fee listing — Shiksha.com', url:'https://www.shiksha.com/college/coding-ninjas-pitampura-delhi-112111/fees', note:'Third-party aggregator fee range, marked "estimated" by the source itself.'},
+  {id:'cn-onlinecourseing', name:'Coding Ninjas independent review — onlinecourseing.com', url:'https://onlinecourseing.com/coding-ninjas-review/', note:'Independent verdict: ₹6,000–₹55,000+ historically depending on tier; best for structure-seekers, not budget learners.'},
+  {id:'gfg-official', name:'GeeksforGeeks — DSA Self-Paced course page (official)', url:'https://www.geeksforgeeks.org/courses/dsa-self-paced', note:'Official price ₹3,899, optional 24/7 doubt support add-on ₹1,499, curriculum outline.'},
+  {id:'gfg-collegedunia', name:'GeeksforGeeks fee listing — Collegedunia', url:'https://collegedunia.com/institute/8403-geeksforgeeks-noida/courses-fees', note:'Confirms ₹3,899 / 60-hour listing on a third-party aggregator.'},
+  {id:'apna-sigma', name:'Apna College — Sigma Batch page (official)', url:'https://www.apnacollege.in/course/sigma-batch', note:'Duration (~8.5 months combined DSA+Dev), self-paced format, 2-year access, community/TA support.'},
+  {id:'apna-quora', name:'Reader discussion on Apna College pricing — Quora', url:'https://www.quora.com/Is-Apna-College-DSA-worth-it', note:'Anecdotal only — cited because Apna College does not publish list prices publicly without starting checkout. Used solely to flag the cost figure as an estimate.'}
+];
+
+/*
+  score: 1 (worst) – 10 (best) for that criterion, Claude's normalization.
+  cost: lower spend = higher score. placement: strength of placement support = higher score.
+  depth: breadth/depth of DSA+System Design+dev content = higher score.
+  time: LOWER time commitment (fits better alongside a full CS degree) = higher score,
+        since this tool is explicitly built for a student stacking this on top of coursework.
+*/
+const OPTIONS = [
+  {
+    id:'scaler',
+    name:'Scaler Academy',
+    tag:'Full-time, mentor-led, 12-month program',
+    facts:{
+      cost:{label:'Cost', value:'≈ ₹2.5L–3.5L+', detail:'Official brochure lists ₹2.5L with scholarships up to ₹25K; multiple 2024–25 learner posts and reviews cite ₹3L+ for the flagship track.', sources:['scaler-brochure','scaler-reviews'], estimate:false, score:2},
+      placement:{label:'Placement support', value:'Dedicated career team + 1L+ alumni network', detail:'In-house recruitment team, structured career support, and access to a 100,000+ alumni community are advertised directly on the program page. An independent reviewer rated actual placement outcomes 3/5, noting results still depend on individual effort.', sources:['scaler-official','scaler-reviews'], estimate:false, score:9},
+      depth:{label:'Content depth', value:'DSA + System Design + Full-stack + AI eng.', detail:'Curriculum spans DSA, system design (HLD/LLD), full-stack + AI-integrated engineering, with live mentorship, in-house judges and AI mock interviews.', sources:['scaler-official'], estimate:false, score:10},
+      time:{label:'Time commitment', value:'~12 months, largely full-time', detail:'Positioned as an intensive 12-month program — the heaviest weekly time ask of the four options, harder to run alongside a full college course load.', sources:['scaler-official'], estimate:false, score:2}
+    }
+  },
+  {
+    id:'codingninjas',
+    name:'Coding Ninjas',
+    tag:'Structured bootcamp, live TA + AI doubt support',
+    facts:{
+      cost:{label:'Cost', value:'≈ ₹50,000–₹1,60,000 (tiered)', detail:'2026 official pricing blog states courses "typically priced between ₹50,000 to ₹1,60,000" across Basic/Standard/Pro/Premium tiers, with no-cost EMI from ~₹5,000–8,000/month. Third-party listings show a wider historical range (₹6,000–₹55,000+ for older/individual courses).', sources:['cn-reviews-blog','cn-shiksha','cn-onlinecourseing'], estimate:false, score:5},
+      placement:{label:'Placement support', value:'Placement assistance (no guarantee/ISA)', detail:'Company explicitly states it does NOT offer a job guarantee or ISA — it provides placement assistance: ATS resume help, mock interviews, and access to 1,000+ hiring partners.', sources:['cn-reviews-blog','cn-fees-blog'], estimate:false, score:7},
+      depth:{label:'Content depth', value:'DSA + Full-stack + GenAI-integrated tracks', detail:'Curriculum vetted by IIT/Stanford alumni per the company, recently integrated GenAI-driven coding into core tracks; "Ninja AI" gives 24/7 doubt resolution alongside human mentors.', sources:['cn-fees-blog'], estimate:false, score:7},
+      time:{label:'Time commitment', value:'~6–9 months typical', detail:'Official ROI page targets getting learners "job-ready in 6–9 months," a moderate weekly commitment compared to Scaler.', sources:['cn-fees-blog'], estimate:false, score:6}
+    }
+  },
+  {
+    id:'gfg',
+    name:'GeeksforGeeks — DSA Self-Paced',
+    tag:'Self-paced video course, no live cohort',
+    facts:{
+      cost:{label:'Cost', value:'₹3,899 (+₹1,499 optional doubt add-on)', detail:'Official course page lists a discounted price of ₹3,899, with an optional 24/7 one-on-one doubt-support add-on for ₹1,499, valid one year.', sources:['gfg-official','gfg-collegedunia'], estimate:false, score:10},
+      placement:{label:'Placement support', value:'No dedicated placement cell', detail:'The official course page does not advertise a placement team, hiring-partner network, or resume/interview coaching service — only content, hint videos, and doubt support. Treated as the weakest placement layer of the four.', sources:['gfg-official'], estimate:false, score:3},
+      depth:{label:'Content depth', value:'DSA only (no system design / full-stack)', detail:'60 hours of self-paced video covering DSA fundamentals through advanced topics, with practice problems, editorials, and project videos — but scoped to DSA, not system design or full-stack development.', sources:['gfg-official'], estimate:false, score:6},
+      time:{label:'Time commitment', value:'Fully self-paced, ~60 hrs of content', detail:'No live schedule — learners fit ~60 hours of video + practice around their own timetable, with 1-year access to doubt support. The lightest, most flexible option of the four.', sources:['gfg-official'], estimate:false, score:9}
+    }
+  },
+  {
+    id:'apnacollege',
+    name:'Apna College — Sigma Batch',
+    tag:'Self-paced DSA + full-stack combo, Hinglish instruction',
+    facts:{
+      cost:{label:'Cost', value:'Est. ₹6,000–₹10,000 (unconfirmed)', detail:'Apna College does not publish a list price on its public batch pages — pricing is only shown after starting checkout. This figure is an ESTIMATE inferred from third-party learner discussion, not an official quoted price.', sources:['apna-quora'], estimate:true, score:9},
+      placement:{label:'Placement support', value:'Community + TA doubt support (no placement cell)', detail:'The official Sigma batch page mentions an "exclusive community" and dedicated TAs for doubts, plus learner testimonials citing placement success — but no in-house placement/recruitment team or hiring-partner network is documented on the official page.', sources:['apna-sigma'], estimate:false, score:5},
+      depth:{label:'Content depth', value:'DSA + Full-stack Web Dev + Aptitude combo', detail:'Sigma batch bundles a DSA track with a full MERN-stack web development track and quant aptitude prep, positioned as a complete placement-prep package.', sources:['apna-sigma'], estimate:false, score:8},
+      time:{label:'Time commitment', value:'~8.5 months combined (self-paced)', detail:'Official FAQ states the DSA portion runs ~4 months and the development portion ~4.5 months (≈8.5 months total), self-paced with lectures unlocked on alternate days and 2 years of access.', sources:['apna-sigma'], estimate:false, score:5}
+    }
+  }
+];
+
+const CRITERIA = [
+  {key:'cost', label:'Cost'},
+  {key:'placement', label:'Placement / job assistance'},
+  {key:'depth', label:'Content depth (DSA + System Design)'},
+  {key:'time', label:'Time commitment (fits around a degree)'}
+];
+
+/* ---------------- STATE ---------------- */
+let weights = {cost:25, placement:25, depth:25, time:25};
+
+/* ---------------- RENDER: WEIGHT SLIDERS ---------------- */
+function renderSliders(){
+  const el = document.getElementById('weightSliders');
+  el.innerHTML = '';
+  CRITERIA.forEach(c=>{
+    const row = document.createElement('div');
+    row.className = 'weight-row';
+    row.innerHTML = `
+      <label>${c.label} <output id="out-${c.key}">${weights[c.key]}%</output></label>
+      <input type="range" min="0" max="100" value="${weights[c.key]}" id="slider-${c.key}">
+    `;
+    el.appendChild(row);
+  });
+  CRITERIA.forEach(c=>{
+    document.getElementById(`slider-${c.key}`).addEventListener('input', e=>{
+      weights[c.key] = parseInt(e.target.value,10);
+      document.getElementById(`out-${c.key}`).textContent = weights[c.key] + '%';
+      render();
+    });
+  });
+  updateWeightTotal();
+}
+
+function updateWeightTotal(){
+  const total = CRITERIA.reduce((s,c)=>s+weights[c.key],0);
+  const totalEl = document.getElementById('weightTotal');
+  if(total === 0){
+    totalEl.innerHTML = `<span style="color:var(--danger)">All weights are 0 — showing an even split so the ranking stays meaningful.</span>`;
+  } else {
+    totalEl.textContent = `Weights are normalized automatically — they don't need to add to 100%.`;
+  }
+}
+
+/* ---------------- SCORING ---------------- */
+function computeScores(){
+  const total = CRITERIA.reduce((s,c)=>s+weights[c.key],0);
+  const norm = {};
+  CRITERIA.forEach(c=>{ norm[c.key] = total === 0 ? (1/CRITERIA.length) : weights[c.key]/total; });
+
+  return OPTIONS.map(opt=>{
+    let weighted = 0;
+    CRITERIA.forEach(c=>{
+      weighted += opt.facts[c.key].score * norm[c.key];
+    });
+    return {...opt, finalScore: weighted};
+  }).sort((a,b)=> b.finalScore - a.finalScore);
+}
+
+/* ---------------- RENDER: RANK LIST ---------------- */
+function render(){
+  updateWeightTotal();
+  const ranked = computeScores();
+  const el = document.getElementById('rankArea');
+  el.innerHTML = '';
+
+  if(ranked.length === 0){
+    el.innerHTML = `<div class="empty">No options to compare yet.</div>`;
+    return;
+  }
+
+  const maxScore = Math.max(...ranked.map(r=>r.finalScore), 1);
+
+  ranked.forEach((opt, idx)=>{
+    const card = document.createElement('div');
+    card.className = 'rankcard' + (idx===0 ? ' top' : '');
+    const pct = (opt.finalScore / maxScore) * 100;
+
+    const detailCells = CRITERIA.map(c=>{
+      const f = opt.facts[c.key];
+      return `<div class="dcell">
+        <span class="k">${f.label}${f.estimate ? '<span class=\"est-flag\">ESTIMATE</span>' : ''}</span>
+        <span class="v ${f.estimate?'est':''}">${f.value}</span>
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="pos">#${idx+1}</div>
+      <div>
+        <div class="rname">${opt.name}</div>
+        <div class="rsub">${opt.tag}</div>
+        <div class="barbg"><div class="barfill" style="width:${pct}%"></div></div>
+        <div class="detail-grid">${detailCells}</div>
+      </div>
+      <div class="scorebox">
+        <div class="score">${opt.finalScore.toFixed(1)}</div>
+        <div class="scorelabel">/ 10 match score</div>
+      </div>
+    `;
+    el.appendChild(card);
+  });
+}
+
+/* ---------------- RENDER: SOURCES + METHODOLOGY PANELS ---------------- */
+function renderPanels(){
+  const el = document.getElementById('panels');
+
+  const sourcesHtml = SOURCES.map(s=>`
+    <div class="source-item">
+      <div><a href="${s.url}" target="_blank" rel="noopener">${s.name}</a></div>
+      <div class="stag">${s.note}</div>
+    </div>
+  `).join('');
+
+  el.innerHTML = `
+    <details open>
+      <summary>📚 Sources used (${SOURCES.length})</summary>
+      <div class="details-body">${sourcesHtml}</div>
+    </details>
+
+    <details>
+      <summary>🔍 How this was researched</summary>
+      <div class="details-body">
+        <p>Every fact shown above (prices, durations, placement claims, curriculum scope) was pulled from official program pages where available, cross-checked against a second independent or aggregator source where possible.</p>
+        <div class="conflict"><strong>Conflict — Scaler cost:</strong> the official brochure quotes ₹2.5L with scholarships to ₹25K, but multiple 2024–25 learner posts and review threads cite ₹3L–3.5L+ for the current flagship track. Resolved by showing a range (₹2.5L–3.5L+) rather than a single number, since Scaler's pricing varies by track, cohort, and scholarship eligibility and isn't published as one fixed figure.</p>
+        <div class="conflict"><strong>Conflict — Coding Ninjas cost:</strong> the 2026 official blog states ₹50,000–₹1,60,000 for current tiered bootcamps, while an independent review site cites a much wider historical range (₹6,000–₹55,000+) for older/individual courses. Resolved by using the official 2026 figure as the primary number and noting the wider historical range for context.</p>
+        <div class="conflict"><strong>Gap — Apna College cost:</strong> Apna College does not publish list prices on its public batch pages; the price only appears after starting checkout. No officially citable number exists, so this data point is explicitly flagged as an <strong>ESTIMATE</strong> based on third-party learner discussion rather than a primary source — treat it as the least reliable figure in this comparison.</p>
+        <p><strong>Scoring method:</strong> the 1–10 "match score" per criterion is Claude's own normalization of the sourced facts (e.g. turning "no job guarantee, but 1,000+ hiring partners" into a comparable number against "dedicated career team + 100K alumni"). These scores are analytical judgments, not numbers taken directly from any source — the underlying facts they're based on are cited and shown in full above so you can disagree with the scoring and weigh things your own way.</p>
+        <p><strong>Time-commitment scoring logic:</strong> because this tool was built for a student stacking a course on top of a full CS degree, a *lower* weekly/monthly time demand scores *higher* on "time commitment" — Scaler's intensive 12-month full-time format scores lowest here, GFG's fully self-paced format scores highest.</p>
+      </div>
+    </details>
+  `;
+}
+
+/* ---------------- INIT ---------------- */
+function init(){
+  try{
+    renderSliders();
+    render();
+    renderPanels();
+  } catch(err){
+    document.getElementById('rankArea').innerHTML = `<div class="empty">Something went wrong rendering the comparison. Try refreshing the page.</div>`;
+    console.error(err);
+  }
+}
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  weights = {cost:25, placement:25, depth:25, time:25};
+  renderSliders();
+  render();
+});
+
+init();
+</script>
+</body>
+</html>
