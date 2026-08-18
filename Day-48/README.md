@@ -1,4 +1,4 @@
-Day 48 — Compare & Decide: Placement Prep Course Chooser
+#Day 48 — Compare & Decide: Placement Prep Course Chooser
 
 Part of the ABTalks 60-Day Claude Challenge 🚀
 
