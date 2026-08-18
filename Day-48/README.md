@@ -1,4 +1,5 @@
-#Day 48 — Compare & Decide: Placement Prep Course Chooser
+Readme · MD
+Day 48 — Compare & Decide: Placement Prep Course Chooser
 
 Part of the ABTalks 60-Day Claude Challenge 🚀
 
@@ -22,6 +23,16 @@ Sources panel — every data point traces back to a named, linked source (11 cit
 Estimate flags — Apna College doesn't publish public pricing, so its cost figure is explicitly marked as an unconfirmed estimate, not presented as fact.
 Responsive, dark-themed UI — clean card layout, no external CSS/JS dependencies.
 Graceful edge-case handling — zero-weight state, loading state, and render-failure fallback are all handled.
+📸 Screenshots
+
+Live ranking with adjustable weight sliders Ranking re-sorts instantly as weights change — each card shows the sourced facts behind its score, with estimates clearly flagged.
+
+![screenshots/Placement-prep.png]
+
+Sources panel Every fact in the tool traces back to a named, clickable source — official pages first, independent reviews for cross-checking.
+
+![screenshots/Source.png]
+
 🛠️ Tech Stack
 Pure HTML/CSS/JavaScript — single file, zero dependencies
 No frameworks, no build step — open it directly in a browser
@@ -33,5 +44,4 @@ This is a decision-support tool, not financial or admissions advice. The 1–10 
 
 Open compare-decide-courses.html in any browser — no setup needed.
 
-📅 Day 48 of 60 — [ABTalks Claude Challenge]
-🔗 Connect: LinkedIn · GitHub
+📅 Day 48 of 60 — ABTalks Claude Challenge 🔗 Connect: LinkedIn · GitHub
