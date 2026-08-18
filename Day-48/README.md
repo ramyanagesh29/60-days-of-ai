@@ -27,11 +27,11 @@ Graceful edge-case handling — zero-weight state, loading state, and render-fai
 
 Live ranking with adjustable weight sliders Ranking re-sorts instantly as weights change — each card shows the sourced facts behind its score, with estimates clearly flagged.
 
-![screenshots/Placement-prep.png]
+![Placement](./screenshots/Placement-prep.png)
 
 Sources panel Every fact in the tool traces back to a named, clickable source — official pages first, independent reviews for cross-checking.
 
-![screenshots/Source.png]
+![Source](./screenshots/Source.png)
 
 🛠️ Tech Stack
 Pure HTML/CSS/JavaScript — single file, zero dependencies
