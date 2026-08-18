@@ -42,6 +42,6 @@ This is a decision-support tool, not financial or admissions advice. The 1–10 
 
 🔗 Try It
 
-Open compare-decide-courses.html in any browser — no setup needed.
+Open ![compare](./compare-decide-courses.html) in any browser — no setup needed.
 
 📅 Day 48 of 60 — ABTalks Claude Challenge 🔗 Connect: LinkedIn · GitHub
