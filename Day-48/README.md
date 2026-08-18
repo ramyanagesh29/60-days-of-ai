@@ -1,4 +1,3 @@
-Readme · MD
 Day 48 — Compare & Decide: Placement Prep Course Chooser
 
 Part of the ABTalks 60-Day Claude Challenge 🚀
@@ -44,4 +43,4 @@ This is a decision-support tool, not financial or admissions advice. The 1–10 
 
 Open ![compare](./compare-decide-courses.html) in any browser — no setup needed.
 
-📅 Day 48 of 60 — ABTalks Claude Challenge 🔗 Connect: LinkedIn · GitHub
+📅 Day 48 of 60 — ABTalks Claude Challenge 🔗 Linkden Connect:https://www.linkedin.com/in/ramya-n2918  · GitHub link:https://github.com/ramyanagesh29
