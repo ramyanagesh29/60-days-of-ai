@@ -27,8 +27,7 @@ Open `personal-ai-playbook.html` in any browser. No build step, no server.
 ![Loop Builder](Loop-Builder.png)
 
 **My Workflows** — saved, searchable, and filterable workflow library
-![My Workflows](My-workflow.png)## Screenshots
-_(add below)_
+![My Workflows](My-workflow.png)
 
 ## Why I built this
 Day 49 of my 60-Day Claude Challenge — Day 48 in Karnataka, I use AI daily across builds, placement prep, and content work, and kept rewriting the same kinds of prompts. This turns those patterns into reusable systems instead of one-off prompts.
