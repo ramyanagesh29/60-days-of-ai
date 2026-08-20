@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defend Your Experience</title>
+<style>
+:root{
+  --bg-0:#0a0e1a;
+  --bg-1:#0f1420;
+  --panel:rgba(255,255,255,0.04);
+  --panel-brd:rgba(255,255,255,0.09);
+  --panel-brd-hi:rgba(167,139,250,0.35);
+  --txt-hi:#f4f2ff;
+  --txt:#c9cbe0;
+  --txt-dim:#8688a3;
+  --purple:#a78bfa;
+  --purple-2:#7c5cf4;
+  --blue:#60a5fa;
+  --green:#4ade80;
+  --amber:#fbbf24;
+  --red:#f87171;
+  --grad:linear-gradient(135deg,#7c5cf4 0%,#a78bfa 50%,#60a5fa 100%);
+  --shadow:0 20px 60px -20px rgba(0,0,0,0.6);
+  --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Segoe UI',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(124,92,244,0.16), transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(96,165,250,0.12), transparent 45%),
+    linear-gradient(180deg,var(--bg-0),var(--bg-1));
+  min-height:100vh;color:var(--txt);
+}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:rgba(167,139,250,0.3);border-radius:8px;}
+.app{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+
+/* header */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-icon{width:42px;height:42px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 24px -8px rgba(124,92,244,0.7);}
+.brand h1{font-size:19px;font-weight:700;color:var(--txt-hi);letter-spacing:-0.02em;}
+.brand p{font-size:12px;color:var(--txt-dim);margin-top:2px;}
+.topbtns{display:flex;gap:8px;}
+.btn{
+  background:var(--panel);border:1px solid var(--panel-brd);color:var(--txt);
+  padding:9px 16px;border-radius:11px;font-size:13px;cursor:pointer;
+  transition:.2s;font-weight:500;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{border-color:var(--panel-brd-hi);background:rgba(167,139,250,0.08);}
+.btn-primary{background:var(--grad);border:none;color:#0a0e1a;font-weight:700;}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* card */
+.card{
+  background:var(--panel);backdrop-filter:blur(20px);
+  border:1px solid var(--panel-brd);border-radius:var(--radius);
+  padding:26px;box-shadow:var(--shadow);
+}
+
+/* ===== SCREEN: LANDING/UPLOAD ===== */
+.hero{text-align:center;padding:30px 10px 10px;}
+.hero h2{font-size:30px;font-weight:800;color:var(--txt-hi);letter-spacing:-0.03em;margin-bottom:10px;}
+.hero p{color:var(--txt-dim);font-size:15px;max-width:560px;margin:0 auto;line-height:1.6;}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0 32px;}
+.how div{background:rgba(255,255,255,0.02);border:1px solid var(--panel-brd);border-radius:14px;padding:16px;}
+.how .n{width:26px;height:26px;border-radius:8px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#0a0e1a;margin-bottom:10px;}
+.how h4{font-size:13.5px;color:var(--txt-hi);margin-bottom:5px;}
+.how p{font-size:12px;color:var(--txt-dim);line-height:1.5;}
+
+.dropzone{
+  border:2px dashed var(--panel-brd);border-radius:16px;padding:40px 20px;
+  text-align:center;cursor:pointer;transition:.2s;background:rgba(255,255,255,0.015);
+}
+.dropzone.drag{border-color:var(--purple);background:rgba(167,139,250,0.08);}
+.dropzone .ic{font-size:34px;margin-bottom:10px;}
+.dropzone h3{color:var(--txt-hi);font-size:15px;margin-bottom:6px;}
+.dropzone p{font-size:12.5px;color:var(--txt-dim);}
+#fileInput{display:none;}
+
+.orline{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--txt-dim);font-size:12px;}
+.orline::before,.orline::after{content:"";flex:1;height:1px;background:var(--panel-brd);}
+
+textarea.pastearea{
+  width:100%;min-height:150px;background:rgba(255,255,255,0.02);
+  border:1px solid var(--panel-brd);border-radius:14px;color:var(--txt-hi);
+  padding:16px;font-size:13.5px;font-family:inherit;resize:vertical;line-height:1.6;
+}
+textarea.pastearea:focus{outline:none;border-color:var(--purple);}
+
+.filechip{display:flex;align-items:center;gap:10px;background:rgba(167,139,250,0.09);border:1px solid var(--panel-brd-hi);border-radius:12px;padding:10px 14px;margin-top:14px;font-size:13px;color:var(--txt-hi);}
+.filechip .x{margin-left:auto;cursor:pointer;color:var(--txt-dim);}
+
+/* audience/style pickers */
+.pickgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px;}
+.pickcard{border:1px solid var(--panel-brd);border-radius:13px;padding:14px;cursor:pointer;transition:.2s;background:rgba(255,255,255,0.02);}
+.pickcard:hover{border-color:var(--panel-brd-hi);}
+.pickcard.sel{border-color:var(--purple);background:rgba(167,139,250,0.1);box-shadow:0 0 0 1px var(--purple) inset;}
+.pickcard h4{font-size:13.5px;color:var(--txt-hi);margin-bottom:3px;}
+.pickcard p{font-size:11.5px;color:var(--txt-dim);}
+
+.section-label{font-size:11px;text-transform:uppercase;letter-spacing:0.09em;color:var(--purple);font-weight:700;margin:22px 0 10px;}
+
+/* ===== SCREEN: EXTRACTING ===== */
+.loadwrap{text-align:center;padding:70px 20px;}
+.spinner{width:52px;height:52px;border-radius:50%;border:3px solid rgba(167,139,250,0.15);border-top-color:var(--purple);margin:0 auto 22px;animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loadwrap h3{color:var(--txt-hi);font-size:16px;margin-bottom:6px;}
+.loadwrap p{color:var(--txt-dim);font-size:13px;}
+
+/* ===== SCREEN: CLAIMS REVIEW ===== */
+.claimlist{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+.claimrow{background:rgba(255,255,255,0.02);border:1px solid var(--panel-brd);border-radius:12px;padding:13px 15px;display:flex;gap:12px;align-items:flex-start;}
+.claimrow .tag{font-size:10px;padding:3px 8px;border-radius:6px;font-weight:700;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em;}
+.tag-strong{background:rgba(74,222,128,0.15);color:var(--green);}
+.tag-vague{background:rgba(251,191,36,0.15);color:var(--amber);}
+.tag-risky{background:rgba(248,113,113,0.15);color:var(--red);}
+.claimrow .ctext{font-size:13px;color:var(--txt);line-height:1.5;flex:1;}
+.claimrow .csrc{font-size:11px;color:var(--txt-dim);margin-top:3px;}
+
+/* ===== SCREEN: INTERVIEW ===== */
+.interviewgrid{display:grid;grid-template-columns:1fr 300px;gap:20px;}
+@media(max-width:860px){.interviewgrid{grid-template-columns:1fr;}}
+
+.progresswrap{margin-bottom:18px;}
+.progressbar{height:7px;border-radius:6px;background:rgba(255,255,255,0.06);overflow:hidden;}
+.progressfill{height:100%;background:var(--grad);border-radius:6px;transition:width .5s ease;}
+.progresstext{display:flex;justify-content:space-between;font-size:11.5px;color:var(--txt-dim);margin-top:6px;}
+
+.chatpanel{min-height:420px;display:flex;flex-direction:column;}
+.chatlog{flex:1;overflow-y:auto;max-height:520px;padding-right:4px;display:flex;flex-direction:column;gap:14px;}
+.msg{max-width:92%;padding:13px 16px;border-radius:14px;font-size:13.5px;line-height:1.6;}
+.msg.interviewer{background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:var(--txt-hi);align-self:flex-start;border-bottom-left-radius:4px;}
+.msg.user{background:rgba(96,165,250,0.1);border:1px solid rgba(96,165,250,0.25);color:var(--txt-hi);align-self:flex-end;border-bottom-right-radius:4px;}
+.msg.system{background:rgba(255,255,255,0.03);border:1px dashed var(--panel-brd);color:var(--txt-dim);align-self:center;font-size:12px;font-style:italic;}
+.msg .role-label{font-size:10px;text-transform:uppercase;letter-spacing:.06em;opacity:.65;margin-bottom:5px;font-weight:700;}
+.typing{display:flex;gap:4px;align-self:flex-start;padding:13px 16px;}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:bounce 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-5px);opacity:1;}}
+
+.composer{display:flex;gap:8px;margin-top:14px;}
+.composer textarea{
+  flex:1;background:rgba(255,255,255,0.03);border:1px solid var(--panel-brd);
+  border-radius:12px;color:var(--txt-hi);padding:12px 14px;font-size:13.5px;
+  font-family:inherit;resize:none;min-height:48px;max-height:150px;line-height:1.5;
+}
+.composer textarea:focus{outline:none;border-color:var(--purple);}
+.sendbtn{background:var(--grad);border:none;border-radius:12px;width:48px;height:48px;flex-shrink:0;cursor:pointer;font-size:17px;color:#0a0e1a;font-weight:800;transition:.2s;}
+.sendbtn:hover{filter:brightness(1.1);}
+.sendbtn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* sidebar */
+.sidecard{margin-bottom:16px;}
+.sidecard h4{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--purple);margin-bottom:12px;font-weight:700;}
+.confrow{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;}
+.confrow .lbl{flex:1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.confbar{width:70px;height:5px;border-radius:4px;background:rgba(255,255,255,0.07);overflow:hidden;}
+.confbar i{display:block;height:100%;border-radius:4px;}
+.confval{width:26px;text-align:right;color:var(--txt-dim);font-size:11px;}
+
+.currentclaim{background:rgba(167,139,250,0.06);border:1px solid var(--panel-brd-hi);border-radius:12px;padding:12px;font-size:12px;color:var(--txt);line-height:1.5;margin-bottom:14px;}
+.currentclaim b{color:var(--purple);display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+
+/* ===== REPORT ===== */
+.reportheader{text-align:center;padding:10px 0 24px;}
+.scorecircle{width:130px;height:130px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;background:conic-gradient(var(--purple) calc(var(--pct)*1%), rgba(255,255,255,0.08) 0);}
+.scorecircle::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--bg-1);}
+.scorecircle .val{position:relative;font-size:30px;font-weight:800;color:var(--txt-hi);}
+.scorecircle .lbl{position:relative;font-size:10px;color:var(--txt-dim);text-transform:uppercase;letter-spacing:.06em;}
+
+.reportgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;}
+@media(max-width:700px){.reportgrid{grid-template-columns:1fr;}}
+.reportstat{background:rgba(255,255,255,0.02);border:1px solid var(--panel-brd);border-radius:14px;padding:16px;text-align:center;}
+.reportstat .num{font-size:24px;font-weight:800;}
+.reportstat .lbl{font-size:11px;color:var(--txt-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+
+.claimreport{background:rgba(255,255,255,0.02);border:1px solid var(--panel-brd);border-radius:14px;padding:16px 18px;margin-bottom:12px;}
+.claimreport .head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;}
+.claimreport .head h4{font-size:13.5px;color:var(--txt-hi);flex:1;}
+.badge{font-size:10.5px;padding:4px 10px;border-radius:8px;font-weight:700;white-space:nowrap;}
+.badge-well{background:rgba(74,222,128,0.15);color:var(--green);}
+.badge-partial{background:rgba(251,191,36,0.15);color:var(--amber);}
+.badge-weak{background:rgba(248,113,113,0.15);color:var(--red);}
+.claimreport p{font-size:12.5px;color:var(--txt-dim);line-height:1.6;margin-top:6px;}
+.claimreport .tip{background:rgba(96,165,250,0.07);border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 8px 8px 0;font-size:12px;color:var(--txt);margin-top:8px;}
+
+.emptystate{text-align:center;padding:50px 20px;color:var(--txt-dim);}
+.emptystate .ic{font-size:36px;margin-bottom:14px;}
+
+.hidden{display:none !important;}
+.errbanner{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#fca5a5;padding:11px 15px;border-radius:12px;font-size:12.5px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.errbanner button{background:none;border:1px solid rgba(248,113,113,0.4);color:#fca5a5;border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;}
+
+.footer-actions{display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap;}
+
+.historywrap{margin-top:22px;}
+.histitem{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid var(--panel-brd);border-radius:11px;margin-bottom:8px;font-size:12.5px;cursor:pointer;transition:.15s;}
+.histitem:hover{border-color:var(--panel-brd-hi);}
+.histitem .l{color:var(--txt-hi);}
+.histitem .r{color:var(--txt-dim);font-size:11px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <h1>Defend Your Experience</h1>
+        <p>An AI skeptic that stress-tests your story before a real interviewer does</p>
+      </div>
+    </div>
+    <div class="topbtns">
+      <button class="btn" id="historyBtn">📜 History</button>
+      <button class="btn" id="newSessionBtn">＋ New Session</button>
+    </div>
+  </div>
+
+  <div id="errZone"></div>
+
+  <!-- ================= SCREEN 1: UPLOAD ================= -->
+  <div id="screen-upload" class="card">
+    <div class="hero">
+      <h2>Can you defend what you claim?</h2>
+      <p>Upload or paste your resume, LinkedIn profile, project write-up, or performance review. This tool won't polish it — it will interrogate it, the way a skeptical interviewer would.</p>
+    </div>
+
+    <div class="how">
+      <div><div class="n">1</div><h4>Share your material</h4><p>Paste text or drop a file. We extract every claim worth defending.</p></div>
+      <div><div class="n">2</div><h4>Face the interview</h4><p>An adaptive AI interviewer probes each claim with follow-ups based on your actual answers.</p></div>
+      <div><div class="n">3</div><h4>Get your Defense Report</h4><p>See which stories are interview-ready and which need more evidence.</p></div>
+    </div>
+
+    <div class="section-label">Your material</div>
+    <div class="dropzone" id="dropzone">
+      <div class="ic">📎</div>
+      <h3>Drag & drop a file here, or click to browse</h3>
+      <p>.txt, .md, .pdf, .docx, .csv — or just paste below</p>
+      <input type="file" id="fileInput" accept=".txt,.md,.pdf,.docx,.csv,.json">
+    </div>
+    <div id="fileChipZone"></div>
+
+    <div class="orline">OR PASTE TEXT</div>
+    <textarea class="pastearea" id="pasteArea" placeholder="Paste your resume text, LinkedIn About section, project description, performance review, or startup pitch here..."></textarea>
+
+    <div class="section-label">Who's the audience?</div>
+    <div class="pickgrid" id="audienceGrid">
+      <div class="pickcard" data-val="Campus placement recruiter / HR screener"><h4>🎓 Campus Recruiter / HR</h4><p>Screening for fit, communication, basics</p></div>
+      <div class="pickcard" data-val="Technical interviewer (coding & system design)"><h4>💻 Technical Interviewer</h4><p>Digs into implementation & architecture</p></div>
+      <div class="pickcard" data-val="Hiring manager (behavioral round)"><h4>🧑‍💼 Hiring Manager</h4><p>Focused on ownership, judgment, impact</p></div>
+      <div class="pickcard" data-val="Mixed panel interview (recruiter + tech + manager)"><h4>👥 Mixed Panel</h4><p>All angles at once — toughest mode</p></div>
+    </div>
+
+    <div class="section-label">Interview intensity</div>
+    <div class="pickgrid" id="intensityGrid">
+      <div class="pickcard" data-val="supportive"><h4>🙂 Supportive</h4><p>Gentle probing, encouraging tone</p></div>
+      <div class="pickcard" data-val="standard"><h4>⚖️ Standard</h4><p>Realistic, fair but firm follow-ups</p></div>
+      <div class="pickcard" data-val="hostile"><h4>🔥 Hostile / Stress</h4><p>Aggressive skepticism, interrupts weak claims</p></div>
+    </div>
+
+    <div class="footer-actions">
+      <button class="btn btn-primary" id="analyzeBtn" style="padding:12px 30px;font-size:14px;">Analyze My Experience →</button>
+    </div>
+
+    <div id="historyPanel" class="historywrap hidden">
+      <div class="section-label">Past sessions</div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN 2: EXTRACTING ================= -->
+  <div id="screen-extract" class="card hidden">
+    <div class="loadwrap">
+      <div class="spinner"></div>
+      <h3 id="extractTitle">Reading your material...</h3>
+      <p id="extractSub">Pulling out every claim worth defending</p>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN 3: CLAIMS REVIEW ================= -->
+  <div id="screen-claims" class="card hidden">
+    <h2 style="color:var(--txt-hi);font-size:19px;margin-bottom:4px;">Here's what we'll defend</h2>
+    <p style="color:var(--txt-dim);font-size:13px;margin-bottom:6px;">We pulled <span id="claimCount">0</span> claims from your material. Flags show our first read — the interview will test whether they hold up.</p>
+    <div class="claimlist" id="claimList"></div>
+    <div class="footer-actions">
+      <button class="btn" id="backToUploadBtn">← Edit material</button>
+      <button class="btn btn-primary" id="startInterviewBtn" style="padding:12px 30px;font-size:14px;">Start the Interview →</button>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN 4: INTERVIEW ================= -->
+  <div id="screen-interview" class="hidden">
+    <div class="progresswrap">
+      <div class="progressbar"><div class="progressfill" id="progressFill" style="width:0%"></div></div>
+      <div class="progresstext"><span id="progressLabel">Claim 1 of N</span><span id="progressPct">0%</span></div>
+    </div>
+    <div class="interviewgrid">
+      <div class="card chatpanel">
+        <div class="chatlog" id="chatLog"></div>
+        <div class="composer">
+          <textarea id="answerInput" placeholder="Type your answer... (Enter to send, Shift+Enter for new line)"></textarea>
+          <button class="sendbtn" id="sendBtn">↑</button>
+        </div>
+      </div>
+      <div>
+        <div class="card sidecard">
+          <h4>Current focus</h4>
+          <div class="currentclaim" id="currentClaimBox"><b>Claim</b>Loading...</div>
+        </div>
+        <div class="card sidecard">
+          <h4>Confidence tracker</h4>
+          <div id="confidenceList"></div>
+        </div>
+        <div class="card sidecard">
+          <button class="btn" id="skipBtn" style="width:100%;">Skip this claim →</button>
+          <button class="btn" id="finishEarlyBtn" style="width:100%;margin-top:8px;">Finish & see report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SCREEN 5: REPORT ================= -->
+  <div id="screen-report" class="card hidden">
+    <div class="reportheader">
+      <div class="scorecircle" id="scoreCircle" style="--pct:0;">
+        <div class="val" id="scoreVal">0</div>
+        <div class="lbl">Defense Score</div>
+      </div>
+      <h2 style="color:var(--txt-hi);font-size:20px;">Your Defense Report</h2>
+      <p style="color:var(--txt-dim);font-size:13px;margin-top:4px;">Based on <span id="reportClaimCount">0</span> claims defended in this session</p>
+    </div>
+    <div class="reportgrid" id="reportStats"></div>
+    <div class="section-label">Claim-by-claim breakdown</div>
+    <div id="reportClaims"></div>
+    <div class="footer-actions">
+      <button class="btn" id="exportBtn">⬇ Export Report (.txt)</button>
+      <button class="btn" id="reviewChatBtn">💬 Review full transcript</button>
+      <button class="btn btn-primary" id="newSessionBtn2">＋ Start New Session</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------------- STATE ---------------- */
+const state = {
+  sourceText: '',
+  fileName: '',
+  audience: 'Mixed panel interview (recruiter + tech + manager)',
+  intensity: 'standard',
+  claims: [],           // {id, text, source, flag, status, confidence, transcript:[], resolved}
+  currentClaimIdx: 0,
+  chatHistory: [],       // full flat transcript for API calls per-claim context
+  sessionId: null,
+  startedAt: null
+};
+
+const LS_KEY = 'dye_sessions_v1';
+
+/* ---------------- UTIL ---------------- */
+function el(id){return document.getElementById(id);}
+function show(id){el(id).classList.remove('hidden');}
+function hide(id){el(id).classList.add('hidden');}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+function showError(msg, retryFn){
+  const zone = el('errZone');
+  zone.innerHTML = '';
+  const div = document.createElement('div');
+  div.className = 'errbanner';
+  div.innerHTML = `<span>⚠️ ${esc(msg)}</span>`;
+  if(retryFn){
+    const btn = document.createElement('button');
+    btn.textContent = 'Retry';
+    btn.onclick = ()=>{ zone.innerHTML=''; retryFn(); };
+    div.appendChild(btn);
+  } else {
+    const btn = document.createElement('button');
+    btn.textContent = 'Dismiss';
+    btn.onclick = ()=>{ zone.innerHTML=''; };
+    div.appendChild(btn);
+  }
+  zone.appendChild(div);
+}
+function clearError(){ el('errZone').innerHTML=''; }
+
+/* ---------------- CLAUDE API WRAPPER (with retry/backoff) ---------------- */
+async function callClaude(messages, systemPrompt, opts={}){
+  const maxRetries = 3;
+  let lastErr = null;
+  for(let attempt=0; attempt<maxRetries; attempt++){
+    try{
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          system: systemPrompt || undefined,
+          messages: messages
+        })
+      });
+      if(resp.status === 429 || resp.status >= 500){
+        lastErr = new Error('Temporary error (' + resp.status + ')');
+        await new Promise(r=>setTimeout(r, 900 * Math.pow(2,attempt)));
+        continue;
+      }
+      if(!resp.ok){
+        const t = await resp.text();
+        throw new Error('API error ' + resp.status + ': ' + t.slice(0,200));
+      }
+      const data = await resp.json();
+      const text = (data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n').trim();
+      return text;
+    }catch(e){
+      lastErr = e;
+      if(attempt === maxRetries-1) throw lastErr;
+      await new Promise(r=>setTimeout(r, 700 * Math.pow(2,attempt)));
+    }
+  }
+  throw lastErr || new Error('Unknown API failure');
+}
+
+function stripFence(s){
+  return s.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'').trim();
+}
+function safeParseJSON(text, fallback){
+  try{ return JSON.parse(stripFence(text)); }
+  catch(e){
+    // try to find first { or [ ... last } or ]
+    const m = text.match(/[\[{][\s\S]*[\]}]/);
+    if(m){ try{ return JSON.parse(m[0]); }catch(e2){} }
+    return fallback;
+  }
+}
+
+/* ---------------- FILE HANDLING ---------------- */
+const dropzone = el('dropzone');
+const fileInput = el('fileInput');
+dropzone.addEventListener('click', ()=>fileInput.click());
+dropzone.addEventListener('dragover', e=>{e.preventDefault(); dropzone.classList.add('drag');});
+dropzone.addEventListener('dragleave', ()=>dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e=>{
+  e.preventDefault(); dropzone.classList.remove('drag');
+  if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e=>{
+  if(e.target.files.length) handleFile(e.target.files[0]);
+});
+
+function handleFile(file){
+  const reader = new FileReader();
+  const isTextLike = /\.(txt|md|csv|json)$/i.test(file.name);
+  reader.onload = function(e){
+    if(isTextLike){
+      state.sourceText = e.target.result;
+      el('pasteArea').value = state.sourceText.slice(0,5000);
+    } else {
+      // pdf/docx binary - we can't parse client-side reliably without libs; ask user to paste instead
+      state.sourceText = '';
+      showError("This file type can't be read directly in-browser here. Please open it and paste the text into the box below instead.");
+    }
+  };
+  state.fileName = file.name;
+  renderFileChip();
+  if(isTextLike) reader.readAsText(file);
+}
+
+function renderFileChip(){
+  const zone = el('fileChipZone');
+  if(!state.fileName){ zone.innerHTML=''; return; }
+  zone.innerHTML = `<div class="filechip">📄 ${esc(state.fileName)} <span class="x" id="removeFileChip">✕</span></div>`;
+  el('removeFileChip').onclick = ()=>{ state.fileName=''; zone.innerHTML=''; };
+}
+
+/* ---------------- AUDIENCE / INTENSITY PICKERS ---------------- */
+function setupPickGrid(gridId, stateKey, defaultVal){
+  const grid = el(gridId);
+  [...grid.children].forEach(card=>{
+    if(card.dataset.val === defaultVal) card.classList.add('sel');
+    card.addEventListener('click', ()=>{
+      [...grid.children].forEach(c=>c.classList.remove('sel'));
+      card.classList.add('sel');
+      state[stateKey] = card.dataset.val;
+    });
+  });
+}
+setupPickGrid('audienceGrid','audience', state.audience);
+setupPickGrid('intensityGrid','intensity', state.intensity);
+
+/* ---------------- ANALYZE / EXTRACT CLAIMS ---------------- */
+el('analyzeBtn').addEventListener('click', async ()=>{
+  clearError();
+  const pasted = el('pasteArea').value.trim();
+  const text = pasted || state.sourceText.trim();
+  if(!text){
+    showError('Please paste some text or upload a readable file before analyzing.');
+    return;
+  }
+  state.sourceText = text;
+  state.sessionId = 'sess_' + Date.now();
+  state.startedAt = Date.now();
+
+  hide('screen-upload'); show('screen-extract');
+  el('extractTitle').textContent = 'Reading your material...';
+  el('extractSub').textContent = 'Pulling out every claim worth defending';
+
+  try{
+    const sys = `You are an expert technical recruiter and skeptical interviewer. You extract concrete, defensible CLAIMS from a candidate's resume/profile/project text. A claim is any statement of achievement, skill, responsibility, metric, or credential that an interviewer could challenge (e.g. "led a team of 5", "built a MERN stack app", "improved performance by 30%", "CGPA 8.82"). Ignore pure formatting/contact info.
+For each claim, classify strength as one of: "strong" (specific, quantified, verifiable), "vague" (generic, unquantified, buzzwordy), "risky" (implausible, inconsistent, or overly broad for someone's likely experience level).
+Return ONLY valid JSON, no markdown fences, no preamble. Format:
+{"claims":[{"text":"...","source":"short phrase like 'Resume - Experience section'","flag":"strong|vague|risky"}]}
+Extract between 5 and 14 claims depending on how much material exists. Prioritize the most interview-relevant and challengeable claims.`;
+    const userMsg = `Here is the candidate's material:\n\n${text.slice(0,8000)}\n\nExtract the claims now as JSON.`;
+    const raw = await callClaude([{role:'user', content:userMsg}], sys);
+    const parsed = safeParseJSON(raw, {claims:[]});
+    let claims = (parsed.claims || []).map((c,i)=>({
+      id: 'c'+i,
+      text: c.text || 'Unnamed claim',
+      source: c.source || 'Uploaded material',
+      flag: ['strong','vague','risky'].includes(c.flag) ? c.flag : 'vague',
+      status: 'pending',
+      confidence: null,
+      transcript: [],
+      questionsAsked: 0
+    }));
+    if(claims.length === 0){
+      showError('Could not extract claims from this text — try adding more detail (specific roles, projects, metrics).', ()=>{ hide('screen-extract'); show('screen-upload'); });
+      hide('screen-extract'); show('screen-upload');
+      return;
+    }
+    state.claims = claims;
+    renderClaimsReview();
+    hide('screen-extract'); show('screen-claims');
+  }catch(e){
+    showError('Something went wrong reading your material (' + e.message + ').', ()=>{ el('analyzeBtn').click(); });
+    hide('screen-extract'); show('screen-upload');
+  }
+});
+
+function renderClaimsReview(){
+  el('claimCount').textContent = state.claims.length;
+  const list = el('claimList');
+  list.innerHTML = '';
+  state.claims.forEach(c=>{
+    const tagClass = c.flag === 'strong' ? 'tag-strong' : c.flag === 'risky' ? 'tag-risky' : 'tag-vague';
+    const tagLabel = c.flag === 'strong' ? 'Looks Strong' : c.flag === 'risky' ? 'Needs Scrutiny' : 'Vague';
+    const row = document.createElement('div');
+    row.className = 'claimrow';
+    row.innerHTML = `<span class="tag ${tagClass}">${tagLabel}</span>
+      <div><div class="ctext">${esc(c.text)}</div><div class="csrc">${esc(c.source)}</div></div>`;
+    list.appendChild(row);
+  });
+}
+
+el('backToUploadBtn').addEventListener('click', ()=>{ hide('screen-claims'); show('screen-upload'); });
+
+/* ---------------- INTERVIEW FLOW ---------------- */
+el('startInterviewBtn').addEventListener('click', ()=>{
+  hide('screen-claims'); show('screen-interview');
+  state.currentClaimIdx = 0;
+  renderConfidenceSidebar();
+  askNextClaim(true);
+});
+
+function currentClaim(){ return state.claims[state.currentClaimIdx]; }
+
+function updateProgress(){
+  const total = state.claims.length;
+  const done = state.claims.filter(c=>c.status==='resolved').length;
+  const pct = Math.round((done/total)*100);
+  el('progressFill').style.width = pct + '%';
+  el('progressLabel').textContent = `Claim ${Math.min(state.currentClaimIdx+1,total)} of ${total}`;
+  el('progressPct').textContent = pct + '%';
+}
+
+function renderConfidenceSidebar(){
+  const box = el('confidenceList');
+  box.innerHTML = '';
+  state.claims.forEach(c=>{
+    const pct = c.confidence == null ? 0 : c.confidence;
+    const color = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--amber)' : pct === 0 ? 'rgba(255,255,255,0.15)' : 'var(--red)';
+    const row = document.createElement('div');
+    row.className = 'confrow';
+    row.innerHTML = `<span class="lbl" title="${esc(c.text)}">${esc(c.text.slice(0,26))}${c.text.length>26?'…':''}</span>
+      <div class="confbar"><i style="width:${pct}%;background:${color}"></i></div>
+      <span class="confval">${c.confidence==null?'–':pct}</span>`;
+    box.appendChild(row);
+  });
+}
+
+function appendMsg(role, text){
+  const log = el('chatLog');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const label = role === 'interviewer' ? 'Interviewer' : role === 'user' ? 'You' : '';
+  div.innerHTML = (label ? `<div class="role-label">${label}</div>` : '') + esc(text).replace(/\n/g,'<br>');
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+function appendTyping(){
+  const log = el('chatLog');
+  const div = document.createElement('div');
+  div.className = 'typing'; div.id = 'typingIndicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+function removeTyping(){
+  const t = el('typingIndicator');
+  if(t) t.remove();
+}
+
+function intensityInstruction(){
+  if(state.intensity === 'supportive') return 'Tone: warm and encouraging, but still genuinely probing. Give the candidate room to explain, and note when they self-correct well.';
+  if(state.intensity === 'hostile') return 'Tone: hostile, terse, and highly skeptical. Interrupt vague answers immediately. Point out contradictions bluntly. Push hard on numbers and specifics. Do not soften your challenges.';
+  return 'Tone: professional, realistic, and firm — like a competent interviewer who is fair but will not let vague or unsupported claims slide.';
+}
+
+function interviewerSystemPrompt(claim){
+  return `You are role-playing a skeptical, expert interviewer for the audience: "${state.audience}".
+${intensityInstruction()}
+You are currently drilling into ONE specific claim the candidate made about themselves:
+CLAIM: "${claim.text}"
+SOURCE: ${claim.source}
+
+Your job: ask ONE sharp, specific follow-up question at a time that tests whether this claim is well-supported. Reference specifics from their previous answers in this thread — never ask generic template questions. Look for: vague language, unquantified impact, missing technical depth, contradictions, claims that don't match likely experience level, or ownership that seems inflated (did THEY do it, or the team?).
+As the conversation progresses (this is turn-based), get progressively more specific and harder — dig into edge cases, trade-offs, what they'd do differently, or ask them to walk through actual mechanics/numbers.
+Rules:
+- Output ONLY the interviewer's next spoken question/challenge. No labels, no meta-commentary, no markdown.
+- Keep it to 1-3 sentences, natural spoken interview style.
+- Do not repeat a question you've essentially already asked.
+- If this is the very first question about this claim, open by asking them to briefly walk you through it, framed skeptically (e.g. "Walk me through this — what exactly was your role vs. the team's?").`;
+}
+
+async function askNextClaim(isFirstQuestionOfClaim){
+  const claim = currentClaim();
+  if(!claim){ finishInterview(); return; }
+  claim.status = 'active';
+  el('currentClaimBox').innerHTML = `<b>Claim</b>${esc(claim.text)}`;
+  updateProgress();
+
+  if(isFirstQuestionOfClaim && claim.transcript.length === 0){
+    appendMsg('system', `— Now defending: "${claim.text}" —`);
+  }
+
+  appendTyping();
+  try{
+    const msgs = claim.transcript.map(t=>({role: t.role === 'interviewer' ? 'assistant' : 'user', content: t.text}));
+    if(msgs.length === 0){
+      msgs.push({role:'user', content:'Begin the interview for this claim.'});
+    }
+    const q = await callClaude(msgs, interviewerSystemPrompt(claim));
+    removeTyping();
+    claim.transcript.push({role:'interviewer', text:q});
+    claim.questionsAsked++;
+    appendMsg('interviewer', q);
+    el('sendBtn').disabled = false;
+    clearError();
+  }catch(e){
+    removeTyping();
+    showError('The interviewer hit a temporary error (' + e.message + '). You can retry.', ()=>askNextClaim(isFirstQuestionOfClaim));
+  }
+}
+
+el('sendBtn').addEventListener('click', submitAnswer);
+el('answerInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); submitAnswer(); }
+});
+
+async function submitAnswer(){
+  const input = el('answerInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const claim = currentClaim();
+  if(!claim) return;
+
+  appendMsg('user', text);
+  claim.transcript.push({role:'user', text});
+  input.value = '';
+  el('sendBtn').disabled = true;
+
+  // Decide: continue probing this claim, or move on (after 2-4 exchanges), and update confidence
+  appendTyping();
+  try{
+    const evalSys = `You are scoring how well a candidate is defending this claim: "${claim.text}".
+Given the Q&A transcript so far, return ONLY valid JSON (no markdown fences):
+{"confidence": <0-100 integer, how well-defended this claim is so far>, "shouldContinue": <true/false, true if there's a clear valuable follow-up left to probe (max 4 total exchanges), false if enough has been probed or the answer was strong/exhausted>, "reason": "<one short phrase>"}
+Be a tough, realistic grader. Confidence should only be high (70+) if answers were specific, quantified, and consistent.`;
+    const transcriptText = claim.transcript.map(t=> (t.role==='interviewer'?'Interviewer: ':'Candidate: ') + t.text).join('\n');
+    const evalRaw = await callClaude([{role:'user', content: transcriptText}], evalSys);
+    const evalParsed = safeParseJSON(evalRaw, {confidence: claim.confidence || 40, shouldContinue: claim.questionsAsked < 2, reason:''});
+    claim.confidence = Math.max(0, Math.min(100, Math.round(evalParsed.confidence)));
+    renderConfidenceSidebar();
+
+    removeTyping();
+
+    const exchanges = claim.transcript.filter(t=>t.role==='user').length;
+    if(evalParsed.shouldContinue && exchanges < 4){
+      askNextClaim(false);
+    } else {
+      claim.status = 'resolved';
+      appendMsg('system', `— Claim defended. Confidence: ${claim.confidence}/100 —`);
+      updateProgress();
+      renderConfidenceSidebar();
+      state.currentClaimIdx++;
+      if(state.currentClaimIdx < state.claims.length){
+        setTimeout(()=>askNextClaim(true), 500);
+      } else {
+        setTimeout(finishInterview, 600);
+      }
+    }
+  }catch(e){
+    removeTyping();
+    el('sendBtn').disabled = false;
+    showError('Could not evaluate that answer (' + e.message + '). Your answer was saved — try sending again or click skip.', null);
+  }
+}
+
+el('skipBtn').addEventListener('click', ()=>{
+  const claim = currentClaim();
+  if(!claim) return;
+  claim.status = 'resolved';
+  claim.confidence = claim.confidence == null ? 20 : claim.confidence;
+  appendMsg('system', `— Skipped. Marked low-confidence until revisited. —`);
+  renderConfidenceSidebar();
+  state.currentClaimIdx++;
+  if(state.currentClaimIdx < state.claims.length){
+    askNextClaim(true);
+  } else {
+    finishInterview();
+  }
+});
+
+el('finishEarlyBtn').addEventListener('click', finishInterview);
+
+/* ---------------- REPORT ---------------- */
+async function finishInterview(){
+  hide('screen-interview');
+  show('screen-extract');
+  el('extractTitle').textContent = 'Compiling your Defense Report...';
+  el('extractSub').textContent = 'Analyzing every exchange for strength and gaps';
+
+  // ensure all claims have some status/confidence
+  state.claims.forEach(c=>{
+    if(c.status !== 'resolved'){ c.status='resolved'; }
+    if(c.confidence == null) c.confidence = c.transcript.length ? 30 : 0;
+  });
+
+  try{
+    const sys = `You are an expert interview coach producing a final "Defense Report". For each claim + its Q&A transcript + confidence score, write:
+1) a "verdict": "well-defended" | "partially-defended" | "weak"
+2) a short 1-2 sentence "analysis" of how they did (specific to their actual answers, not generic)
+3) a concrete, specific "tip" for how to strengthen this claim before a real interview
+Return ONLY valid JSON: {"results":[{"id":"...","verdict":"...","analysis":"...","tip":"..."}]}`;
+    const payload = state.claims.map(c=>({
+      id: c.id, claim: c.text, confidence: c.confidence,
+      transcript: c.transcript.map(t=>`${t.role}: ${t.text}`).join(' | ') || 'No answer given (skipped).'
+    }));
+    const raw = await callClaude([{role:'user', content: JSON.stringify(payload)}], sys);
+    const parsed = safeParseJSON(raw, {results:[]});
+    const resultsMap = {};
+    (parsed.results||[]).forEach(r=>resultsMap[r.id]=r);
+    state.claims.forEach(c=>{
+      const r = resultsMap[c.id];
+      c.verdict = r ? r.verdict : (c.confidence>=70?'well-defended':c.confidence>=40?'partially-defended':'weak');
+      c.analysis = r ? r.analysis : 'No detailed analysis available.';
+      c.tip = r ? r.tip : 'Prepare a specific example with numbers and your individual role.';
+    });
+  }catch(e){
+    state.claims.forEach(c=>{
+      c.verdict = c.confidence>=70?'well-defended':c.confidence>=40?'partially-defended':'weak';
+      c.analysis = 'Automated analysis unavailable — based on confidence score only.';
+      c.tip = 'Prepare a specific example with numbers, timeline, and your individual role.';
+    });
+    showError('Report analysis had an issue, showing a simplified version instead.');
+  }
+
+  renderReport();
+  saveSession();
+  hide('screen-extract'); show('screen-report');
+}
+
+function renderReport(){
+  const avg = Math.round(state.claims.reduce((s,c)=>s+(c.confidence||0),0)/state.claims.length);
+  el('scoreCircle').style.setProperty('--pct', avg);
+  el('scoreVal').textContent = avg;
+  el('reportClaimCount').textContent = state.claims.length;
+
+  const well = state.claims.filter(c=>c.verdict==='well-defended').length;
+  const partial = state.claims.filter(c=>c.verdict==='partially-defended').length;
+  const weak = state.claims.filter(c=>c.verdict==='weak').length;
+
+  el('reportStats').innerHTML = `
+    <div class="reportstat"><div class="num" style="color:var(--green)">${well}</div><div class="lbl">Well-Defended</div></div>
+    <div class="reportstat"><div class="num" style="color:var(--amber)">${partial}</div><div class="lbl">Partial</div></div>
+    <div class="reportstat"><div class="num" style="color:var(--red)">${weak}</div><div class="lbl">Weak</div></div>
+  `;
+
+  const box = el('reportClaims');
+  box.innerHTML = '';
+  state.claims.forEach(c=>{
+    const badgeClass = c.verdict==='well-defended'?'badge-well':c.verdict==='partially-defended'?'badge-partial':'badge-weak';
+    const badgeLabel = c.verdict==='well-defended'?'Well-Defended':c.verdict==='partially-defended'?'Partial':'Weak';
+    const div = document.createElement('div');
+    div.className = 'claimreport';
+    div.innerHTML = `
+      <div class="head"><h4>${esc(c.text)}</h4><span class="badge ${badgeClass}">${badgeLabel} · ${c.confidence}/100</span></div>
+      <p>${esc(c.analysis||'')}</p>
+      <div class="tip">💡 ${esc(c.tip||'')}</div>
+    `;
+    box.appendChild(div);
+  });
+}
+
+/* ---------------- EXPORT / HISTORY / LOCALSTORAGE ---------------- */
+function saveSession(){
+  let sessions = [];
+  try{ sessions = JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ sessions = []; }
+  const avg = Math.round(state.claims.reduce((s,c)=>s+(c.confidence||0),0)/state.claims.length) || 0;
+  sessions.unshift({
+    id: state.sessionId,
+    date: new Date(state.startedAt).toISOString(),
+    audience: state.audience,
+    score: avg,
+    claimCount: state.claims.length,
+    claims: state.claims
+  });
+  sessions = sessions.slice(0,20);
+  localStorage.setItem(LS_KEY, JSON.stringify(sessions));
+}
+
+function loadHistory(){
+  let sessions = [];
+  try{ sessions = JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ sessions = []; }
+  const listEl = el('historyList');
+  if(sessions.length === 0){
+    listEl.innerHTML = '<div class="emptystate"><div class="ic">🗂️</div>No past sessions yet. Complete an interview to see it here.</div>';
+    return;
+  }
+  listEl.innerHTML = '';
+  sessions.forEach(s=>{
+    const div = document.createElement('div');
+    div.className = 'histitem';
+    const d = new Date(s.date);
+    div.innerHTML = `<span class="l">${d.toLocaleDateString()} · ${esc(s.audience.split('(')[0].trim())} · ${s.claimCount} claims</span><span class="r">Score ${s.score}</span>`;
+    div.onclick = ()=>{
+      state.claims = s.claims;
+      state.sessionId = s.id;
+      state.startedAt = new Date(s.date).getTime();
+      renderReport();
+      hide('screen-upload'); show('screen-report');
+    };
+    listEl.appendChild(div);
+  });
+}
+
+el('historyBtn').addEventListener('click', ()=>{
+  const panel = el('historyPanel');
+  panel.classList.toggle('hidden');
+  if(!panel.classList.contains('hidden')) loadHistory();
+});
+
+function resetSession(){
+  state.sourceText=''; state.fileName=''; state.claims=[]; state.currentClaimIdx=0;
+  state.sessionId=null; state.startedAt=null;
+  el('pasteArea').value=''; el('fileChipZone').innerHTML=''; el('chatLog').innerHTML='';
+  clearError();
+  hide('screen-report'); hide('screen-interview'); hide('screen-claims'); hide('screen-extract');
+  show('screen-upload');
+}
+el('newSessionBtn').addEventListener('click', resetSession);
+el('newSessionBtn2').addEventListener('click', resetSession);
+
+el('exportBtn').addEventListener('click', ()=>{
+  const avg = Math.round(state.claims.reduce((s,c)=>s+(c.confidence||0),0)/state.claims.length) || 0;
+  let out = `DEFEND YOUR EXPERIENCE — DEFENSE REPORT\n`;
+  out += `Date: ${new Date(state.startedAt || Date.now()).toLocaleString()}\n`;
+  out += `Audience: ${state.audience}\n`;
+  out += `Overall Defense Score: ${avg}/100\n`;
+  out += `\n${'='.repeat(60)}\n\n`;
+  state.claims.forEach((c,i)=>{
+    out += `${i+1}. CLAIM: ${c.text}\n`;
+    out += `   Verdict: ${c.verdict || 'n/a'} (Confidence: ${c.confidence}/100)\n`;
+    out += `   Analysis: ${c.analysis || ''}\n`;
+    out += `   Tip to strengthen: ${c.tip || ''}\n`;
+    if(c.transcript && c.transcript.length){
+      out += `   --- Transcript ---\n`;
+      c.transcript.forEach(t=>{ out += `   ${t.role === 'interviewer' ? 'Interviewer' : 'You'}: ${t.text}\n`; });
+    }
+    out += `\n`;
+  });
+  const blob = new Blob([out], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'defense-report.txt';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+el('reviewChatBtn').addEventListener('click', ()=>{
+  hide('screen-report'); show('screen-interview');
+  el('chatLog').innerHTML='';
+  state.claims.forEach(c=>{
+    appendMsg('system', `— ${c.text} —`);
+    c.transcript.forEach(t=>appendMsg(t.role, t.text));
+  });
+  el('composer').style && null;
+});
+
+})();
+</script>
+</body>
+</html>
