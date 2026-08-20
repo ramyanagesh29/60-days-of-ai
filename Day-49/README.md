@@ -16,6 +16,18 @@ HTML, CSS, JavaScript (vanilla) — zero external dependencies, single file, wor
 Open `personal-ai-playbook.html` in any browser. No build step, no server.
 
 ## Screenshots
+
+**Dashboard** — overview of saved workflows, stats, and categories
+![Dashboard](Dashboard.png)
+
+**Prompt Builder** — assembling a prompt from building blocks with live preview
+![Prompt Builder](Prompt-builder.png)
+
+**Loop Builder** — turning a prompt into a self-correcting autonomous loop
+![Loop Builder](Loop-Builder.png)
+
+**My Workflows** — saved, searchable, and filterable workflow library
+![My Workflows](My-workflow.png)## Screenshots
 _(add below)_
 
 ## Why I built this
