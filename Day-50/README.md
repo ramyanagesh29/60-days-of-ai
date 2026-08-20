@@ -48,10 +48,10 @@ Résumé lines are cheap. Interviewers know it — and they probe. This project 
 
 ## Screenshots
 
-![Landing screen](./screenshots/Defend-Dashboard.png)
-![Audience & intensity picker](./screenshots/Audience.png)
-![Adaptive interview catching a contradiction](./screenshots/Experience.png)
-![Full interview conversation](./screenshots/Conversation.png)
+![Landing screen](Defend-Dashboard.png)
+![Audience & intensity picker](Audience.png)
+![Adaptive interview catching a contradiction](Experience.png)
+![Full interview conversation](Conversation.png)
 ---
 🔗 Connect: [LinkedIn](https://www.linkedin.com/in/ramya-n2918) | [GitHub](https://github.com/ramyanagesh29)
 
