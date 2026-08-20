@@ -46,6 +46,12 @@ Open `defend-your-experience.html` in any browser (works as a Claude artifact to
 
 Résumé lines are cheap. Interviewers know it — and they probe. This project came from a simple realization while prepping for placement season: it's not enough to *write* strong claims, you have to be able to *defend* them under pressure, with specifics, numbers, and ownership clearly separated from team effort. This tool is my own practice ground for that, built as Day 50 of my Claude Challenge.
 
+## Screenshots
+
+![Landing screen](./screenshots/Defend-Dashboard.png)
+![Audience & intensity picker](./screenshots/Audience.png)
+![Adaptive interview catching a contradiction](./screenshots/Experience.png)
+![Full interview conversation](./screenshots/Conversation.png)
 ---
 🔗 Connect: [LinkedIn](https://www.linkedin.com/in/ramya-n2918) | [GitHub](https://github.com/ramyanagesh29)
 
