@@ -48,9 +48,9 @@ Similarly, audio input was scoped to **browser Speech-to-Text (Web Speech API)**
 ![PRD Overview page](.Overivew.png)
 
 ### Pitch Deck Preview
-![Pitch Deck — Title slide](.Dashboard.png)
-![Pitch Deck — The Problem](.The-Problem.png)
-![Pitch Deck — The Solution](.The-Solution.png)
+![Pitch Deck — Title slide](./Dashboard.png)
+![Pitch Deck — The Problem](./The-Problem.png)
+![Pitch Deck — The Solution](./The-Solution.png)
 
 ## Key Learnings
 
