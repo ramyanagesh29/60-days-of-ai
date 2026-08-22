@@ -20,6 +20,8 @@ Claude interviewed me one question at a time instead of jumping to a solution:
 - Smart automation vs conversational agent vs **analysis/insights** → chose analysis, since it's lower-risk and plays to skills I already have
 - Explored several AI-analysis domains before landing on GD practice, based on my own failed-GD story
 
+![Interview — Question 1](./screenshots/QA_.png)
+
 ## Biggest Scoping Decision
 
 I initially wanted a **full planner with reminders and scheduling**. Claude flagged this as a scope-creep risk — full scheduling/notifications would eat 1-2 of my 9 remaining days. We scoped it down to a **lightweight "Practice Streak & Goals"** system (in-app banner, no push/email, no calendar) — same accountability value, a fraction of the build time.
@@ -32,19 +34,23 @@ Similarly, audio input was scoped to **browser Speech-to-Text (Web Speech API)**
 
 **Out of scope (Future Scope):** raw audio/tone analysis, push/email notifications, calendar scheduling, live multi-user GD rooms, mentor review.
 
+## Approved Summary
+
+![Approved project summary and generated deliverables](./screenshots/summary.png)
+
 ## Deliverables Generated
 
 1. ✅ Product Requirements Document (PRD) — [`GD_Prep_Coach_PRD.docx`](./GD_Prep_Coach_PRD.docx)
 2. ✅ Implementation Blueprint (Days 2–10) — [`GD_Prep_Coach_Implementation_Blueprint.md`](./GD_Prep_Coach_Implementation_Blueprint.md)
 3. ✅ Project Pitch Deck — [`GD_Prep_Coach_Pitch_Deck.pptx`](./GD_Prep_Coach_Pitch_Deck.pptx)
 
-## Screenshots
+### PRD Preview
+![PRD Overview page](.Overivew.png)
 
-![Interview process](./screenshots/interview.png)
-![Approved summary](./screenshots/approved-summary.png)
-![PRD](./screenshots/prd-preview.png)
-![Implementation Blueprint](./screenshots/blueprint-preview.png)
-![Pitch Deck](./screenshots/pitch-deck-preview.png)
+### Pitch Deck Preview
+![Pitch Deck — Title slide](.Dashboard.png)
+![Pitch Deck — The Problem](.The-Problem.png)
+![Pitch Deck — The Solution](.The-Solution.png)
 
 ## Key Learnings
 
