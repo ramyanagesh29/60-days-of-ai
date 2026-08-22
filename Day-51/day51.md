@@ -45,7 +45,7 @@ Similarly, audio input was scoped to **browser Speech-to-Text (Web Speech API)**
 3. ✅ Project Pitch Deck — [`GD_Prep_Coach_Pitch_Deck.pptx`](./GD_Prep_Coach_Pitch_Deck.pptx)
 
 ### PRD Preview
-![PRD Overview page](.Overivew.png)
+![PRD Overview page](./Overivew.png)
 
 ### Pitch Deck Preview
 ![Pitch Deck — Title slide](./Dashboard.png)
