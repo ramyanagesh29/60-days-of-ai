@@ -115,9 +115,6 @@ The application was tested locally after implementation.
 
 ![Application Test](./Test-case.png)
 
-### Backend and MongoDB
-
-![Backend and MongoDB](./backend-mongodb.png)
 
 ---
 
