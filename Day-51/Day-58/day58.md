@@ -1,91 +1,64 @@
-# Day 58 — Testing, Debugging & Production Optimization
+# GD Prep Coach — Day 8 Summary
 
-## Capstone Project: GD Prep Coach
+**Day 8 of 10 | ABTalks 60-Day Claude AI Challenge — 10-Day Capstone**
+**Focus:** Testing, Debugging & Production Optimization
 
-Day 8 focused on testing, debugging, security, and production-readiness of the GD Prep Coach application.
+---
 
-## What I Completed
+## What Was Completed Today
 
-- Performed a complete QA and production-readiness review.
-- Improved backend security and robustness.
-- Added CORS restrictions for the production frontend.
-- Added rate limiting for authentication endpoints.
-- Added Helmet security headers.
-- Added email validation.
-- Added ObjectId validation.
-- Added response length validation.
-- Added request body size limits.
-- Added global error handling.
-- Added clean 404 API responses.
-- Improved error handling across backend routes.
-- Added startup validation for required environment variables.
-- Improved frontend authentication and 404 handling.
-- Verified loading, empty, error, and responsive states.
-- Completed a full end-to-end application walkthrough.
-- Verified the application locally and in production.
-- Updated the required documentation.
-- Committed and pushed the completed changes to GitHub.
+Conducted a full release-readiness review as a Senior QA Engineer / Security Reviewer / Performance Engineer would, then fixed every issue found. No new features were added — this was entirely a hardening pass on the existing MVP.
 
-## End-to-End Testing Completed
+### Backend Security & Robustness (Milestone 1)
+- Added express-rate-limit on auth routes (20 attempts / 15 min per IP) to prevent brute-force attacks
+- Added helmet() for standard security headers
+- Locked down CORS to an explicit allowlist (localhost + the live Vercel URL via FRONTEND_URL env var)
+- Added real email format validation on signup/login
+- Added response text length cap (3000 characters) to prevent abuse/quota waste
+- Added startup validation for required environment variables
+- Added a global error handler and 404 handler for consistent, clean JSON error responses
+- Added ObjectId validation before every database lookup by ID, preventing crashes on malformed IDs
 
-The following scenarios were tested successfully:
+### Frontend Hardening (Milestone 2)
+- Added ProtectedRoute — unauthenticated users redirected to Login before any protected page loads
+- Added PublicOnlyRoute — already-logged-in users redirected away from Login/Signup to Dashboard
+- Centralized 401 handling in a single axios response interceptor
+- Added a styled 404 page for unmatched URLs
+- Added accessible label elements to all form inputs
+- Fixed the browser tab title and added a meta description
 
-1. Signup with a new account → Topics
-2. Logout → Login
-3. Login with the same account → Dashboard
-4. Wrong password → Clean error message
-5. Browse and filter Topics by category
-6. Submit a Practice response → AI score and feedback
-7. Dashboard → streak, goal, and recent attempts
-8. History → new attempt appears
-9. Broken URL → 404 page
-10. Mobile-width testing → hamburger menu and responsive layout
+### Verification (Milestone 3)
+- Completed a full 10-point end-to-end manual walkthrough on the live production deployment
+- Performed manual security spot-checks: cross-user data access blocked, unauthenticated requests rejected, secrets excluded from Git, CORS correctly restrictive
+- Documented the full pass in TESTING.md
 
-## Security Improvements
+---
 
-The backend was hardened with:
+## Release Readiness
 
-- CORS allowlist
-- Authentication rate limiting
-- Helmet security headers
-- Email validation
-- MongoDB ObjectId validation
-- Input length limits
-- Request body limits
-- Environment variable validation
-- Global error handling
-- API 404 handling
+Following this review, GD Prep Coach is considered stable, secure, and ready for public use. Every core PRD feature works correctly together, common attack vectors and edge cases are handled gracefully, and the application has been verified end-to-end in its live, deployed form.
 
-## Production Deployment
+---
 
-Backend:
+## What Remains Before Final Launch
 
-https://gd-prep-coach.onrender.com
+Per the Implementation Blueprint, Days 9-10 remain:
+- Day 9: Final deployment polish (CORS lockdown was originally scheduled here, completed early today as a security fix)
+- Day 10: Final documentation (README), demo recording, LinkedIn showcase post, official v1.0 launch
 
-Frontend:
+---
 
-https://gd-prep-coach.vercel.app
+## Tomorrow's Objective
 
-Health Check:
+Final deployment verification and polish, then moving into Day 10's launch activities: a complete README, a recorded demo, and the official v1.0 announcement.
 
-https://gd-prep-coach.onrender.com/api/health
+---
 
-## Key Learnings
+## Issues Encountered & Resolved
 
-### 1. Testing is more than checking whether the app opens
-A production-ready application needs testing for incorrect inputs, API failures, authentication problems, invalid URLs, mobile layouts, and edge cases.
+| Issue | Resolution |
+|---|---|
+| CORS needed a real production URL before lockdown could be tested | Obtained live Vercel URL, added as FRONTEND_URL env var on Render, verified redeploy succeeded |
+| Needed to confirm fixes didn't break existing functionality | Ran a full 10-point manual regression pass after all changes, on the live site |
 
-### 2. Security should be part of development
-CORS restrictions, rate limiting, security headers, validation, and environment-variable checks help protect the application from common production issues.
-
-### 3. Error handling improves user experience
-Clean error messages and proper 404 responses make the application easier to understand and prevent unexpected crashes.
-
-### 4. End-to-end testing matters
-Testing the complete flow from signup to practice, AI feedback, dashboard, and history helps confirm that all parts of the application work together.
-
-## Day 58 Outcome
-
-The GD Prep Coach application was reviewed, tested, hardened, and verified as a stable production-ready MVP.
-
-**Status: Day 58 Completed ✅**
+No blocking issues remain. The application has been reviewed, hardened, and verified — ready for the final launch days.
