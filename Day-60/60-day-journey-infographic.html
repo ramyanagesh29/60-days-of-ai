@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>60-Day Claude AI Challenge — Journey to GD Prep Coach</title>
+<style>
+  :root {
+    --navy: #14152b;
+    --surface: #1e2044;
+    --border: #34376b;
+    --violet: #7c6bff;
+    --violet-light: #a99bff;
+    --text: #f0f1fa;
+    --muted: #b8bbd9;
+    --success: #2fd480;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    padding: 40px 20px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 50px; }
+  header .badge {
+    display: inline-block;
+    background: var(--violet);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 999px;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+  }
+  header h1 {
+    font-family: Georgia, serif;
+    font-size: 2.6rem;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff, var(--violet-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { color: var(--muted); font-size: 1.05rem; max-width: 650px; margin: 0 auto; }
+
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+    margin: 50px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(var(--violet), var(--success));
+  }
+  .stage {
+    position: relative;
+    margin-bottom: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+  }
+  .stage::before {
+    content: '';
+    position: absolute;
+    left: -33px;
+    top: 24px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--violet);
+    border: 3px solid var(--navy);
+  }
+  .stage .range {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--violet-light);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stage h3 { font-family: Georgia, serif; font-size: 1.25rem; margin-bottom: 8px; }
+  .stage p { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+  .stage .skills {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stage .skills span {
+    font-size: 0.75rem;
+    background: rgba(124,107,255,0.15);
+    color: var(--violet-light);
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(124,107,255,0.3);
+  }
+
+  .capstone {
+    margin-top: 60px;
+    background: linear-gradient(135deg, var(--surface), #262a54);
+    border: 2px solid var(--violet);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 10px 50px rgba(124,107,255,0.2);
+  }
+  .capstone .badge2 {
+    display: inline-block;
+    background: var(--success);
+    color: #0a2618;
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .capstone h2 {
+    font-family: Georgia, serif;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  .capstone p.tag {
+    color: var(--muted);
+    margin-bottom: 24px;
+    font-size: 1.05rem;
+  }
+  .capstone-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .capstone-grid .item {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .capstone-grid .item .n { font-size: 1.6rem; font-weight: 800; color: var(--violet-light); }
+  .capstone-grid .item .l { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+  footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: 0.85rem; }
+  footer a { color: var(--violet-light); }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.8rem; }
+    .capstone { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="badge">ABTALKS 60-DAY CLAUDE AI CHALLENGE</span>
+    <h1>From First Prompt to Production App</h1>
+    <p>A 60-day journey through AI fundamentals, prompting, reasoning, and applied development — culminating in a fully shipped, live AI product.</p>
+  </header>
+
+  <div class="timeline">
+
+    <div class="stage">
+      <div class="range">Days 1 – 15 · Foundations</div>
+      <h3>AI Fundamentals & Effective Prompting</h3>
+      <p>Learned how large language models reason, how to structure clear and specific prompts, and how small changes in instruction shape dramatically different outputs.</p>
+      <div class="skills">
+        <span>Prompt Engineering</span><span>Role-Based Prompting</span><span>Few-Shot Examples</span><span>Model Selection Strategy</span>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="range">Days 16 – 30 · Applied Reasoning</div>
+      <h3>Research Workflows & Structured Thinking</h3>
+      <p>Moved from single prompts to multi-step reasoning workflows — research, synthesis, and structured decision-making using AI as a thinking partner, not just an answer machine.</p>
+      <div class="skills">
+        <span>Research Workflows</span><span>Structured Reasoning</span><span>AI Workflow Design</span><span>Iterative Refinement</span>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="range">Days 31 – 45 · Building With AI</div>
+      <h3>Automation, Product Thinking & Early Builds</h3>
+      <p>Started building real, functioning tools — nutrition trackers, environmental data dashboards, interactive learning apps — learning to turn an idea into a working artifact end to end.</p>
+      <div class="skills">
+        <span>Automation</span><span>Product Thinking</span><span>AI-Powered Tools</span><span>Data-Driven Apps</span>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="range">Days 46 – 60 · Sophisticated Systems</div>
+      <h3>Multimodal AI, Knowledge Systems & Agentic Architectures</h3>
+      <p>Progressed into increasingly sophisticated territory — multimodal AI applications, knowledge systems, autonomous agent design, and multi-agent collaboration — building the judgment needed for a full, independent product build.</p>
+      <div class="skills">
+        <span>Multimodal AI</span><span>Knowledge Systems</span><span>Autonomous Agents</span><span>Multi-Agent Collaboration</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="capstone">
+    <span class="badge2">✓ CAPSTONE ACHIEVEMENT</span>
+    <h2>GD Prep Coach — v1.0.0</h2>
+    <p class="tag">Every skill built across 60 days, converged into one live, tested, production-deployed AI application.</p>
+
+    <div class="capstone-grid">
+      <div class="item"><div class="n">10</div><div class="l">Days: Idea → Production</div></div>
+      <div class="item"><div class="n">Full SDLC</div><div class="l">Requirements → Deployment</div></div>
+      <div class="item"><div class="n">AI-Powered</div><div class="l">Real Gemini Integration</div></div>
+      <div class="item"><div class="n">Live</div><div class="l">Deployed & Verified</div></div>
+    </div>
+  </div>
+
+  <footer>
+    Built with <strong>Claude</strong> as part of the <a href="https://www.abtalks.in">ABTalks 60-Day Claude AI Challenge</a><br>
+    GD Prep Coach — <a href="https://gd-prep-coach.vercel.app">gd-prep-coach.vercel.app</a>
+  </footer>
+
+</div>
+</body>
+</html>
